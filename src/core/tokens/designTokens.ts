@@ -4,11 +4,13 @@ import type {
   ThemePreferences,
   RadiusScale,
   UIDensity,
+  FontFamilyPreset,
+  FontFamilyPresetDefinition,
 } from '../contracts/ThemeContract';
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — APPLE HIG × GOOGLE MATERIAL YOU DESIGN TOKENS
+ * UXU DESIGN SYSTEM — LIQUID GLASS × GOOGLE MATERIAL YOU DESIGN TOKENS
  * ============================================================================
  */
 
@@ -19,6 +21,10 @@ export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {
   customRadiusPx: 12,
   density: 'comfortable',
   fontScale: 100, // 100% = crisp 14px base UI font, adjustable 80% - 125%
+  fontFamilyPreset: 'inter-jakarta',
+  iconStyle: 'rounded',
+  iconFilled: false,
+  iconWeight: 400,
   glassIntensity: 82,
   reducedMotion: false,
   webglEnabled: false, // Strictly optional & disabled by default for zero idle GPU load
@@ -31,7 +37,7 @@ export const SEED_PALETTES: Record<SeedPaletteId, SeedPaletteDefinition> = {
   'cupertino-blue': {
     id: 'cupertino-blue',
     name: 'Cupertino Blue',
-    inspiration: 'Apple HIG',
+    inspiration: 'Liquid Glass',
     description: 'Safir mavi ve turkuaz.',
     auroraColors: {
       colorA: [0.04, 0.88, 0.72], // Arctic Aurora Emerald-Cyan
@@ -112,7 +118,7 @@ export const SEED_PALETTES: Record<SeedPaletteId, SeedPaletteDefinition> = {
   'sunset-coral': {
     id: 'sunset-coral',
     name: 'Solar Coral',
-    inspiration: 'Apple HIG',
+    inspiration: 'Liquid Glass',
     description: 'Mercan kızılı ve turuncu.',
     auroraColors: {
       colorA: [0.98, 0.24, 0.44], // Crimson Aurora
@@ -240,5 +246,66 @@ export const DENSITY_SCALE_TOKENS: Record<
     controlHeightMd: '46px',
     cardPadding: '28px',
     fontSizeScale: '1.03',
+  },
+};
+
+export const FONT_FAMILY_PRESETS: Record<
+  FontFamilyPreset,
+  FontFamilyPresetDefinition
+> = {
+  'inter-jakarta': {
+    id: 'inter-jakarta',
+    name: 'Inter × Plus Jakarta',
+    badge: 'Varsayılan • Hibrit UI',
+    description: 'Okunabilir Google Inter gövde metni ve geometrik Plus Jakarta Sans başlıklar.',
+    sansStack:
+      "'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif",
+    displayStack:
+      "'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    monoStack: "'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace",
+  },
+  'outfit-material': {
+    id: 'outfit-material',
+    name: 'Outfit (Google M3)',
+    badge: 'Google Material You',
+    description: 'Google Sans / Material Design 3 estetiğine en yakın modern geometrik Google Font ailesi.',
+    sansStack:
+      "'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, Roboto, sans-serif",
+    displayStack:
+      "'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif",
+    monoStack: "'JetBrains Mono', 'Fira Code', monospace",
+  },
+  'dm-sans': {
+    id: 'dm-sans',
+    name: 'DM Sans × Jakarta',
+    badge: 'Kurumsal Stüdyo',
+    description: 'Yüksek optik netliğe sahip DM Sans arayüz tipografisi ve Fira Code kod ailesi.',
+    sansStack:
+      "'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    displayStack:
+      "'Plus Jakarta Sans', 'DM Sans', -apple-system, sans-serif",
+    monoStack: "'Fira Code', 'JetBrains Mono', Consolas, monospace",
+  },
+  'space-grotesk': {
+    id: 'space-grotesk',
+    name: 'Space Grotesk × Mono',
+    badge: 'WebGL & Telemetri',
+    description: 'Teknik gösterge panelleri, finansal veri tabloları ve WebGL sahneleri için fütüristik Google Font.',
+    sansStack:
+      "'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    displayStack:
+      "'Space Grotesk', 'Plus Jakarta Sans', sans-serif",
+    monoStack: "'JetBrains Mono', 'Fira Code', monospace",
+  },
+  'system-sf': {
+    id: 'system-sf',
+    name: 'Sistem Yerel (OS)',
+    badge: 'Yerel Sistem',
+    description: 'Sıfır ağ gecikmeli işletim sistemi yerel yazı tipi (SF Pro Display / Segoe UI / Roboto).',
+    sansStack:
+      "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif",
+    displayStack:
+      "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif",
+    monoStack: "'SF Mono', 'JetBrains Mono', Consolas, monospace",
   },
 };

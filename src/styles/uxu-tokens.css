@@ -41,11 +41,17 @@
   --uxu-transition-fast: 160ms var(--uxu-spring);
   --uxu-transition-normal: 280ms var(--uxu-spring);
 
-  /* Typography */
+  /* Typography & Google Material Symbols Variable Font Icons */
   --uxu-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display',
     'Segoe UI', Roboto, sans-serif;
   --uxu-font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
-  --uxu-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  --uxu-font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+
+  --uxu-icon-font-family: 'Material Symbols Rounded';
+  --uxu-icon-fill: 0;
+  --uxu-icon-weight: 400;
+  --uxu-icon-grade: 0;
+  --uxu-icon-opsz: 20;
 }
 
 /* DARK THEME TOKENS (Apple Pro Dark × Material You Dark Surface Container) */
@@ -2355,10 +2361,50 @@ pre {
 }
 
 .uxu-progress-linear__fill {
+  position: relative;
+  overflow: hidden;
   height: 100%;
   border-radius: 9999px;
   background: var(--uxu-primary);
   transition: width 300ms var(--uxu-spring);
+}
+
+.uxu-progress-linear__shimmer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation-name: uxu-shimmer-sweep;
+  animation-duration: var(--uxu-anim-duration, 2.6s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.uxu-progress-linear__fill--indeterminate {
+  width: 45% !important;
+  animation-name: uxu-linear-indeterminate;
+  animation-duration: var(--uxu-anim-duration, 2.6s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes uxu-linear-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(125%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .uxu-progress-linear--success .uxu-progress-linear__fill {
@@ -2389,7 +2435,19 @@ pre {
 }
 
 .uxu-progress-circular__svg--spin {
-  animation: uxu-spin var(--uxu-anim-duration, 2.6s) linear infinite;
+  animation-name: uxu-circular-spin;
+  animation-duration: var(--uxu-anim-duration, 2.6s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes uxu-circular-spin {
+  0% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
 }
 
 .uxu-progress-circular__track {
@@ -2454,32 +2512,46 @@ pre {
 
 /* Skeleton */
 .uxu-skeleton {
-  background: var(--uxu-surface-tonal-high);
+  position: relative;
+  overflow: hidden;
+  background: color-mix(
+    in srgb,
+    var(--uxu-text-primary) 11%,
+    var(--uxu-surface-tonal-high)
+  );
+  border: 1px solid var(--uxu-border-subtle);
   border-radius: var(--uxu-radius-md);
 }
 .uxu-skeleton--text {
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .uxu-skeleton--circular {
   border-radius: 50%;
 }
-.uxu-skeleton--animated {
+.uxu-skeleton__shimmer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
   background: linear-gradient(
     90deg,
-    var(--uxu-surface-tonal) 25%,
-    var(--uxu-surface-tonal-high) 50%,
-    var(--uxu-surface-tonal) 75%
+    transparent 0%,
+    color-mix(in srgb, var(--uxu-primary) 38%, rgba(255, 255, 255, 0.32)) 50%,
+    transparent 100%
   );
-  background-size: 200% 100%;
-  animation: uxu-shimmer var(--uxu-shimmer-duration, 2.8s) ease-in-out infinite;
+  transform: translateX(-100%);
+  animation-name: uxu-shimmer-sweep;
+  animation-duration: var(--uxu-shimmer-duration, 2.8s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
-@keyframes uxu-shimmer {
+@keyframes uxu-shimmer-sweep {
   0% {
-    background-position: 200% 0;
+    transform: translateX(-100%);
   }
   100% {
-    background-position: -200% 0;
+    transform: translateX(100%);
   }
 }
 
@@ -4733,6 +4805,62 @@ pre {
   font-family: var(--uxu-font-mono);
   padding: 2px 7px;
   border-radius: 6px;
+}
+
+/* ============================================================================
+ * PRIMITIVE: GOOGLE MATERIAL SYMBOLS VARIABLE FONT ICON (.uxu-google-icon)
+ * ============================================================================ */
+.uxu-google-icon {
+  font-family: var(--uxu-icon-font-family, 'Material Symbols Rounded');
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga';
+  font-variation-settings:
+    'FILL' var(--uxu-icon-fill, 0),
+    'wght' var(--uxu-icon-weight, 400),
+    'GRAD' var(--uxu-icon-grade, 0),
+    'opsz' var(--uxu-icon-opsz, 20);
+  transition:
+    font-variation-settings 180ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.uxu-google-icon--primary {
+  color: var(--uxu-primary);
+}
+.uxu-google-icon--secondary {
+  color: var(--uxu-secondary);
+}
+.uxu-google-icon--success {
+  color: var(--uxu-success);
+}
+.uxu-google-icon--warning {
+  color: var(--uxu-warning);
+}
+.uxu-google-icon--danger {
+  color: var(--uxu-danger);
+}
+.uxu-google-icon--info {
+  color: var(--uxu-info);
+}
+.uxu-google-icon--neutral,
+.uxu-google-icon--muted {
+  color: var(--uxu-text-secondary);
 }
 
 

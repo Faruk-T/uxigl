@@ -7,6 +7,8 @@ import React, {
   useState,
 } from 'react';
 import type {
+  FontFamilyPreset,
+  GoogleIconStyle,
   IThemeEngine,
   IThemeStorageAdapter,
   RadiusScale,
@@ -20,6 +22,7 @@ import type {
 } from '../core/contracts/ThemeContract';
 import {
   DEFAULT_THEME_PREFERENCES,
+  FONT_FAMILY_PRESETS,
   SEED_PALETTES,
 } from '../core/tokens/designTokens';
 import { defaultThemeStorageAdapter } from '../core/services/StorageService';
@@ -175,6 +178,37 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     [updatePrefs]
   );
 
+  const setFontFamilyPreset = useCallback(
+    (fontFamilyPreset: FontFamilyPreset) => {
+      updatePrefs((prev) => ({ ...prev, fontFamilyPreset }));
+    },
+    [updatePrefs]
+  );
+
+  const setIconStyle = useCallback(
+    (iconStyle: GoogleIconStyle) => {
+      updatePrefs((prev) => ({ ...prev, iconStyle }));
+    },
+    [updatePrefs]
+  );
+
+  const setIconFilled = useCallback(
+    (iconFilled: boolean) => {
+      updatePrefs((prev) => ({ ...prev, iconFilled }));
+    },
+    [updatePrefs]
+  );
+
+  const setIconWeight = useCallback(
+    (iconWeight: number) => {
+      updatePrefs((prev) => ({
+        ...prev,
+        iconWeight: Math.max(100, Math.min(700, Math.round(iconWeight / 100) * 100)),
+      }));
+    },
+    [updatePrefs]
+  );
+
   const setGlassIntensity = useCallback(
     (glassIntensity: number) => {
       updatePrefs((prev) => ({
@@ -238,6 +272,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   }, [storageAdapter, systemMode, themeEngine]);
 
   const availablePalettes = useMemo(() => Object.values(SEED_PALETTES), []);
+  const availableFontPresets = useMemo(
+    () => Object.values(FONT_FAMILY_PRESETS),
+    []
+  );
   const activePalette =
     SEED_PALETTES[preferences.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
 
@@ -247,6 +285,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       resolvedMode,
       activePalette,
       availablePalettes,
+      availableFontPresets,
       setMode,
       toggleMode,
       setSeedPalette,
@@ -254,6 +293,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       setCustomRadiusPx,
       setDensity,
       setFontScale,
+      setFontFamilyPreset,
+      setIconStyle,
+      setIconFilled,
+      setIconWeight,
       setGlassIntensity,
       setReducedMotion,
       setWebglEnabled,
@@ -267,6 +310,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       resolvedMode,
       activePalette,
       availablePalettes,
+      availableFontPresets,
       setMode,
       toggleMode,
       setSeedPalette,
@@ -274,6 +318,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       setCustomRadiusPx,
       setDensity,
       setFontScale,
+      setFontFamilyPreset,
+      setIconStyle,
+      setIconFilled,
+      setIconWeight,
       setGlassIntensity,
       setReducedMotion,
       setWebglEnabled,

@@ -5,6 +5,7 @@ import type {
 } from '../contracts/ThemeContract';
 import {
   DENSITY_SCALE_TOKENS,
+  FONT_FAMILY_PRESETS,
   RADIUS_SCALE_TOKENS,
   SEED_PALETTES,
 } from '../tokens/designTokens';
@@ -68,6 +69,34 @@ export class CssVariableThemeEngine implements IThemeEngine {
     root.style.setProperty('--uxu-control-height-md', densityTokens.controlHeightMd);
     root.style.setProperty('--uxu-card-padding', densityTokens.cardPadding);
     root.style.setProperty('--uxu-font-scale', String(combinedFontScale));
+
+    // Google Fonts Typography Preset Tokens
+    const fontPreset =
+      FONT_FAMILY_PRESETS[prefs.fontFamilyPreset ?? 'inter-jakarta'] ??
+      FONT_FAMILY_PRESETS['inter-jakarta'];
+    root.setAttribute('data-font-preset', fontPreset.id);
+    root.style.setProperty('--uxu-font-sans', fontPreset.sansStack);
+    root.style.setProperty('--uxu-font-display', fontPreset.displayStack);
+    root.style.setProperty('--uxu-font-mono', fontPreset.monoStack);
+
+    // Google Material Symbols Variable Font Icon Tokens (opsz, wght, FILL, GRAD)
+    const iconStyle = prefs.iconStyle ?? 'rounded';
+    const iconFontFamily =
+      iconStyle === 'outlined'
+        ? "'Material Symbols Outlined'"
+        : iconStyle === 'sharp'
+        ? "'Material Symbols Sharp'"
+        : "'Material Symbols Rounded'";
+    const iconFill = prefs.iconFilled ? '1' : '0';
+    const iconWeight = String(Math.max(100, Math.min(700, prefs.iconWeight ?? 400)));
+    // Material 3 optical grade: -25 in dark mode prevents bright icon haloing, 0 in light mode
+    const iconGrade = resolvedMode === 'dark' ? '-25' : '0';
+
+    root.setAttribute('data-icon-style', iconStyle);
+    root.style.setProperty('--uxu-icon-font-family', iconFontFamily);
+    root.style.setProperty('--uxu-icon-fill', iconFill);
+    root.style.setProperty('--uxu-icon-weight', iconWeight);
+    root.style.setProperty('--uxu-icon-grade', iconGrade);
 
     // Apple Glassmorphism Blur & Specular Intensity
     const blurPx = Math.round((prefs.glassIntensity / 100) * 32);
