@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="tr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UXI Design System — pronounced /juː-eks-aɪ/ ("Yu-Eks-Ay" / "Yuksi")</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      (function () {
+        try {
+          var raw =
+            localStorage.getItem('uxu.theme.preferences') ||
+            localStorage.getItem('uxu.design_system.theme_preferences.v3') ||
+            localStorage.getItem('uxu.design_system.theme_preferences.v2');
+          if (raw) {
+            var p = JSON.parse(raw);
+            var mode =
+              p.mode === 'system'
+                ? window.matchMedia('(prefers-color-scheme: dark)').matches
+                  ? 'dark'
+                  : 'light'
+                : p.mode || 'dark';
+            document.documentElement.setAttribute('data-theme', mode);
+            document.documentElement.style.colorScheme = mode;
+            if (p.seedPalette) {
+              document.documentElement.setAttribute('data-seed', p.seedPalette);
+            }
+            if (p.webglEnabled !== undefined) {
+              document.documentElement.setAttribute(
+                'data-webgl',
+                String(Boolean(p.webglEnabled))
+              );
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
