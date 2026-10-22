@@ -1,52 +1,89 @@
-# UXI Design System & Enterprise Workspace (v2.5.0)
+# uxiGL — Modular Liquid Glass × Google Material You Design System
 
-> **UXI** *(pronounced `/juː-eks-aɪ/` "Yu-Eks-Ay" or simply **"yook-see"** / **"Yuksi"**)*
-> Next-Generation **Apple HIG Liquid Glass × Google Material You (M3)** Modular React Design System, integrated with **SheetGL** (60 FPS WebGL DataGrid) and **FileManGL** (WebGL2 Virtual File System).
+> **Uniting User Experience (UX), User Interface (UI), and Hardware-Accelerated WebGL (`SheetGL` + `FileManGL`) into a Single Enterprise Architecture.**
 
----
-
-## 🎙️ Marka Kimliği ve Telaffuz Rehberi (How to Pronounce UXI)
-
-**UXI**, **UX** (*User Experience*) ve **UI** (*User Interface*) kavramlarının tek bir çatı altında birleşimini temsil eder:
-
-1. **Harf Harf Okunuşu: `"Yu-Eks-Ay"` (`/juː - eks - aɪ/`) — *En Profesyonel & Global (Resmi Öneri)***
-   - Tıpkı **UI** (*Yu-Ay*) ve **UX** (*Yu-Eks*) kavramlarının okunuşu gibi harflerin İngilizce tek tek telaffuz edilmesidir.
-   - **Avantajı:** İsmin doğrudan UX ve UI birleşimi olduğunu dinleyenin zihninde anında kodlar. Global pazarda (GitHub, Product Hunt, ThemeForest vb.) geliştiricilerin %90'ı bu şekilde okur. Resmi tanıtımlarda, dokümantasyonda ve videolarda **"Yu-Eks-Ay"** (veya *"Yu-Eks-Ay Admin"*) kullanılmalıdır.
-2. **Tek Kelime Gibi (İngilizce Fonetik): `"Yuksi"` veya `"Uksi"` (`/juːksi/` • `/ʊksi/`) — *En Akılda Kalıcı & Sempatik***
-   - Kısaltmaları tek bir kelime gibi okuma eğiliminden (MUI paketine *"Mui"*, GUI'ye *"Gui"* veya Nuxt'a *"Nakst"* denmesi gibi) yola çıkan okunuştur.
-   - **Avantajı:** Ekip içi günlük konuşmalarda (*"Abi Uksi'nin tablo bileşenini güncelledim"*) söylemesi çok pratiktir, ağızda yuvarlanmaz ve markaya samimi, akılda kalıcı bir karakter katar.
-3. **Hibrit Okunuş: `"Yu-Eksi"` (`/juː - eksi/`) — *Ritmik & Modern***
-   - İlk iki harfi İngilizce kısaltma gibi okuyup sonunu birleştirerek okumaktır.
-   - **Avantajı:** Hem UX vurgusunu korur hem de *"Pixi (PixiJS)"* gibi popüler grafik kütüphanelerinin telaffuz ritmine benzer bir tını yakalar.
+[![Version](https://img.shields.io/badge/version-2.5.0-0284c7.svg)](https://github.com/umitunc)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg)](https://www.typescriptlang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## 🔗 URL Route Haritası
+## 🎨 Brand Identity & Single-Glyph Monogram (`U` + `X` + `I`)
 
-| Route URL | Açıklama |
-| :--- | :--- |
-| `/` | **UXI Tanıtım Sayfası (Landing Page)** — SheetGL & FileManGL stilinde canlı önizlemeli vitrin |
-| `/dashboard/overview` | **Komuta Merkezi — Genel Bakış** |
-| `/dashboard/analytics` | **Canlı Analitik & Gelir Grafikleri** |
-| `/dashboard/crm-orders` | **SheetGL 60 FPS WebGL Tablo (4 Kurumsal Senaryo)** |
-| `/dashboard/file-manager` | **FileManGL WebGL2 Sanal Dosya Yöneticisi (VFS)** |
-| `/dashboard/smart-cluster` | **Sunucu & Cihaz Kümesi Yönetimi** |
-| `/components/inputs/*` | `button`, `input`, `switch`, `checkbox`, `slider` |
-| `/components/surfaces/*` | `card`, `segmented-control`, `tabs-accordion`, `modal-command` |
-| `/components/feedback/*` | `chips-badges`, `progress-avatar`, `datatable-statcard`, `filemangl-explorer` |
-| `/docs/*` | `getting-started`, `theming-tokens`, `layout-shell`, `cli-shortcuts` |
+**`uxiGL`** is part of the `GL` ecosystem alongside **`SheetGL`** and **`FileManGL`**.
+
+The [`UXILogo`](src/components/brand/UXILogo.tsx) emblem reduces the three letters **U**, **X**, and **I** into a **single unified 3D Liquid-Glass glyph**:
+1. **`U` — Outer Liquid-Glass Cradle:** The outer continuous ribbon forms a 3D `U` bowl that holds the entire symbol.
+2. **`X` — Intersecting Diagonal Blades:** Two crossed diagonal light ribbons (`\ /`) bridge the arms of the `U`.
+3. **`I` — Central Crystalline Pillar:** A vertical luminescent spine passes directly through the center of the `X` and `U`, crowned with a floating diamond node (`•`).
 
 ---
 
-## 🚀 Hızlı Kurulum
+## ✨ Key Architectural Highlights
+
+1. **Liquid Glass & Standard Materials:**
+   - **Liquid Glass (`Regular` & `Clear`):** Reserved strictly for the floating navigation and transient control layer (`Sidebar`, `TopHeader`, `CommandPalette`, `SegmentedControl`, `Slider` & `Switch` thumbs).
+   - **Standard Materials (`UltraThin`, `Thin`, `Regular`, `Thick`):** Applied to the content layer (`Card`, `DataTable`, KPI panels) with 4-tier **Vibrancy** (`label-primary`, `label-secondary`, `label-tertiary`, `fill-vibrant`).
+2. **Google Material You (M3) & Live `0px–32px` Border Radius Engine:**
+   - **6 Seed Color Palettes:** *Cupertino Blue, Material Iris, Emerald Mint, Sunset Coral, Amber Gold, Graphite Mono* with automatic dark/light tonal adaptation.
+   - **Live Corner Geometry (`0px–32px`):** Switch between `Sharp (4px)`, `Squircle (12px)`, `Pill (22px)`, or fine-tune any pixel radius (`0px–32px`) from the TopHeader (`R- | R:12px | R+`), Component Playground, or Theme Studio Drawer.
+   - **Global Font Scale (`80%–125%`):** Real-time root `rem` scaling persisted in `localStorage`.
+3. **Dual Data Table Architecture (`SheetGL` + Native `<DataTable />`):**
+   - **`SheetGLGridAdapter` (WebGL/Canvas DataGrid):** Includes **4 enterprise scenarios** (*SaaS & Enterprise Finance*, *AI & Cloud Node Telemetry*, *Workforce & Payroll Matrix*, *Global Logistics & SKU Inventory*) with live formula evaluation, sorting, filtering, and CSV export.
+   - **Native `<DataTable />`:** Zero-GPU semantic HTML table with **4 visual variants** (`default`, `striped`, `bordered`, `compact`), column sorting, search filtering, and row selection.
+4. **FileManGL WebGL2 Virtual File System (`FileManGLExplorerAdapter`):**
+   - Windows 11 tabbed explorer UX, 3D Spatial View (`webgl_spatial`), Disk Treemap (`webgl_diskmap`), and a 5-layer **NTFS ACL + POSIX (`0755`)** permission engine.
+5. **Clean HTML5 History API Routing (`RouteService`):**
+   - Every navigation item, tab, breadcrumb, and component renders as a semantic `<a href="...">` with clean URLs (`/`, `/dashboard/*`, `/components/*`, `/docs/*`) and full browser Back/Forward (`popstate`) support.
+6. **Zero Idle CPU/GPU Resource Footprint & SOLID Principles:**
+   - Single-Active-Engine policy ensures only one heavy canvas (`SheetGL` or `FileManGL`) is mounted per view.
+   - Strict Dependency Inversion (`ThemeEngineService`, `StorageService`, `RouteService`) and Open/Closed component contracts.
+
+---
+
+## 🔗 Application Route Map
+
+| URL Route | View / Module | Description |
+| :--- | :--- | :--- |
+| `/` | `UXILandingPage` | Full-screen `uxiGL` product landing page with live interactive preview & phonetic guide |
+| `/dashboard/overview` | `AppleGoogleAppShowcase` | Command Center Overview (KPIs, neural telemetry, native table & SheetGL summary) |
+| `/dashboard/analytics` | `AppleGoogleAppShowcase` | Live Analytics & Regional Performance Matrix |
+| `/dashboard/crm-orders` | `SheetGLGridAdapter` | Full-page SheetGL (4 enterprise presets) + Native `<DataTable />` comparison |
+| `/dashboard/file-manager` | `FileManGLExplorerAdapter` | Full-page FileManGL WebGL2 Virtual File System Explorer |
+| `/dashboard/smart-cluster` | `AppleGoogleAppShowcase` | AI Neural Engine Compilation & Hardware Cluster Controls |
+| `/components/inputs/:id` | `InteractivePlayground` | Form Controls (`button`, `input`, `switch`, `checkbox`, `slider`) |
+| `/components/surfaces/:id` | `InteractivePlayground` | Surfaces & Navigation (`card`, `segmented-control`, `tabs-accordion`, `modal-command`) |
+| `/components/feedback/:id` | `InteractivePlayground` | Data & Feedback (`chips-badges`, `progress-avatar`, `datatable-statcard`, `filemangl-explorer`) |
+| `/docs/:topic` | `ArchitectureDocsView` | Interactive Documentation (`getting-started`, `theming-tokens`, `layout-shell`, `cli-shortcuts`) |
+
+---
+
+## 🚀 Quick Start
 
 ```bash
+# 1. Install dependencies
 npm install
+
+# 2. Start the development server
 npm run dev
-```
 
-Üretim derlemesi için:
-
-```bash
+# 3. Type-check and build for production
 npm run build
 ```
+
+### Ecosystem Packages (`SheetGL` & `FileManGL`)
+
+```bash
+# Install SheetGL & FileManGL alongside uxiGL
+npm install sheetgl filemangl lucide-react
+
+# Or scaffold standalone workspaces via NPX
+npx filemangl init
+npx sheetgl init
+```
+
+---
+
+## 📄 License
+
+MIT License • Crafted with ❤️ by [Trunçgil Teknoloji](https://www.truncgil.com)

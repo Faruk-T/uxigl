@@ -1,8 +1,8 @@
 {
-  "name": "uxi-design-system",
+  "name": "uxigl",
   "private": true,
   "version": "2.5.0",
-  "description": "UXI (pronounced /juː-eks-aɪ/ or 'yook-see') — Apple HIG Liquid Glass & Google Material You Modular React Design System",
+  "description": "uxiGL — Liquid Glass & Google Material You Modular Design System",
   "type": "module",
   "scripts": {
     "dev": "vite",
