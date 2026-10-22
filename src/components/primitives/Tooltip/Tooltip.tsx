@@ -3,7 +3,7 @@ import type { IdentifiableProps } from '../../../core/contracts/ComponentContrac
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — TOOLTIP
+ * uxiGL PRIMITIVE — TOOLTIP
  * ============================================================================
  * Apple macOS Sonoma translucent glass tooltip with optional keyboard shortcut badge.
  */

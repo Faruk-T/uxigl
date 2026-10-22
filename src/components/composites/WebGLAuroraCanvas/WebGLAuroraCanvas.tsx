@@ -3,7 +3,7 @@ import { useTheme } from '../../../providers/ThemeProvider';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — ULTRA-LOW-POWER WEBGL ATMOSPHERIC CANVAS
+ * uxiGL COMPOSITE — ULTRA-LOW-POWER WEBGL ATMOSPHERIC CANVAS
  * ============================================================================
  * Resource-optimized GPU ambient background:
  * - Renders at 0.15x resolution scale (max 256x144px) — 98% fewer pixels than 1080p,

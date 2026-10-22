@@ -1190,7 +1190,7 @@ export default function App() {
                   variant="glass"
                   eyebrow="LIQUID GLASS × MATERIAL 3"
                   title="Canlı Tema, Renk Paleti & Border Radius"
-                  subtitle="Değişiklikler tüm UXI bileşenlerine ve localStorage’a anında uygulanır"
+                  subtitle="Değişiklikler tüm uxiGL bileşenlerine ve localStorage’a anında uygulanır"
                 >
                   <div className="uxu-stack-md">
                     <div className="uxu-stage-row">
@@ -1266,7 +1266,7 @@ export default function App() {
 
                 <Card
                   variant="tonal"
-                  eyebrow="GOOGLE MATERIAL SYMBOLS & UXI PRIMITIVES"
+                  eyebrow="GOOGLE MATERIAL SYMBOLS & UXIGL PRIMITIVES"
                   title="Değişken Google Font İkonları & Bileşenler"
                   subtitle="Google Material Symbols (Rounded / Outlined / Sharp • FILL / wght), ilerleme halkaları ve tablo"
                 >

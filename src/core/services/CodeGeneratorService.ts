@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — JSX/TSX CODE GENERATOR SERVICE (SRP)
+ * uxiGL DESIGN SYSTEM — JSX/TSX CODE GENERATOR SERVICE (SRP)
  * ============================================================================
  * [SRP] Generates clean, formatted React TypeScript usage snippets dynamically
  * from playground state without coupling UI components to string serialization.

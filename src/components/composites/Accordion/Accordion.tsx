@@ -4,7 +4,7 @@ import type { IdentifiableProps } from '../../../core/contracts/ComponentContrac
 
 /**
  * ============================================================================
- * UXU COMPOSITE — ACCORDION
+ * uxiGL COMPOSITE — ACCORDION
  * ============================================================================
  * Smooth expandable disclosure panels with single or multiple expansion mode.
  */

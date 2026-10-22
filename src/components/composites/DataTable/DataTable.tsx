@@ -4,7 +4,7 @@ import type { IdentifiableProps } from '../../../core/contracts/ComponentContrac
 
 /**
  * ============================================================================
- * UXU COMPOSITE — NATIVE DATA TABLE (LIGHTWEIGHT HTML TABLE)
+ * uxiGL COMPOSITE — NATIVE DATA TABLE (LIGHTWEIGHT HTML TABLE)
  * ============================================================================
  * Clean, lightweight, zero-WebGL native HTML `<table>` component for simple
  * datasets, settings lists, audit logs, and summary reports.

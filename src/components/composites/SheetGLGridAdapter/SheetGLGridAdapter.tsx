@@ -9,7 +9,6 @@ import {
   type IGridThemeTokens,
 } from 'sheetgl';
 import {
-  Zap,
   Database,
   RefreshCw,
   Sparkles,
@@ -21,11 +20,10 @@ import {
   Package,
 } from 'lucide-react';
 import { useTheme } from '../../../providers/ThemeProvider';
-import { Badge } from '../../primitives';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — SHEETGL MULTI-SCENARIO ENTERPRISE DATAGRID ADAPTER
+ * uxiGL COMPOSITE — SHEETGL MULTI-SCENARIO ENTERPRISE DATAGRID ADAPTER
  * ============================================================================
  * Supports 4 distinct SheetGL enterprise table scenarios:
  * 1. `finance-erp`      — Kurumsal Finans & Sipariş Defteri
@@ -160,7 +158,7 @@ const COMPLIANCE_TAGS = [
 ];
 
 const COMPANIES = [
-  'Apple Cupertino Cloud',
+  'Cupertino Cloud Systems',
   'Google DeepMind Labs',
   'Truncgil Teknoloji A.Ş.',
   'Stripe Global Treasury',
@@ -369,7 +367,7 @@ const HARDWARE_ITEMS = [
   'Mac Studio M4 Ultra 192GB',
   'Samsung PM1743 15.36TB NVMe',
   'Mellanox Quantum-2 QM9700',
-  'Apple Pro Display XDR Nano',
+  'Pro Display XDR Nano',
   'Cisco Nexus 9364D-GX2A',
   'Micron 9400 Pro 30.72TB U.3',
   'APC Symmetra PX 100kW UPS',
@@ -469,7 +467,7 @@ export function generateSheetGLDataset(
 
       result[idx] = {
         id: i,
-        code: `UXU-${String(10000 + i).padStart(6, '0')}`,
+        code: `UXIGL-${String(10000 + i).padStart(6, '0')}`,
         company: COMPANIES[i % COMPANIES.length],
         city,
         status: STATUS_OPTIONS[i % STATUS_OPTIONS.length].value,
@@ -512,7 +510,7 @@ export const SheetGLGridAdapter: React.FC<SheetGLGridAdapterProps> = ({
   showPresetSwitcher = true,
   initialRowCount = 150,
   height = 520,
-  showControlBar = true,
+  showControlBar = false,
   showFormulaBar: initialFormulaBar = true,
   batchEditMode: initialBatchEdit = true,
   presetStyle: initialPresetStyle = 'apple',
@@ -1161,10 +1159,6 @@ export const SheetGLGridAdapter: React.FC<SheetGLGridAdapterProps> = ({
       {showControlBar && (
         <div className="uxu-sheetgl-toolbar">
           <div className="uxu-sheetgl-toolbar__left">
-            <Badge tone="primary" pulse>
-              <Zap size={11} /> SheetGL v2.0
-            </Badge>
-
             {showPresetSwitcher && (
               <div className="uxu-sheetgl-pill-group">
                 <button
@@ -1240,7 +1234,7 @@ export const SheetGLGridAdapter: React.FC<SheetGLGridAdapterProps> = ({
                 }`}
                 onClick={() => setPresetStyle('apple')}
               >
-                <Sparkles size={11} /> Apple HIG
+                <Sparkles size={11} /> Liquid Glass
               </button>
               <button
                 type="button"

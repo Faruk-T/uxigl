@@ -2,7 +2,7 @@ import type { ReactNode, CSSProperties } from 'react';
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — INTERFACE SEGREGATION & LISKOV SUBSTITUTION CONTRACTS
+ * uxiGL DESIGN SYSTEM — INTERFACE SEGREGATION & LISKOV SUBSTITUTION CONTRACTS
  * ============================================================================
  * Adheres to:
  * - [I] Interface Segregation Principle (ISP): Small, role-focused interfaces
@@ -57,7 +57,7 @@ export interface LoadableProps {
   loadingText?: string;
 }
 
-/** [ISP] Contract for components supporting standardized UXU sizing */
+/** [ISP] Contract for components supporting standardized uxiGL sizing */
 export interface SizableProps {
   size?: ComponentSize;
 }
@@ -81,7 +81,7 @@ export interface DismissibleProps {
 
 /**
  * [LSP] Unified Form Control Contract
- * Any UXU form control (Input, Switch, Slider, Checkbox, SegmentedControl)
+ * Any uxiGL form control (Input, Switch, Slider, Checkbox, SegmentedControl)
  * implements this generic contract so form containers can treat them polymorphically.
  */
 export interface FormControlContract<TValue>

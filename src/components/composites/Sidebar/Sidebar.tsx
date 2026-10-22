@@ -17,7 +17,7 @@ import { Avatar, Badge, Progress } from '../../primitives';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — HIERARCHICAL ENTERPRISE SIDEBAR WITH SUB-MENUS
+ * uxiGL COMPOSITE — HIERARCHICAL ENTERPRISE SIDEBAR WITH SUB-MENUS
  * ============================================================================
  * Classic UX multi-level navigation tree with expandable sub-menus, tree
  * connector lines, badge counters, and collapsible rail mode — crafted with
@@ -43,9 +43,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenCommandPalette,
   onOpenThemeStudio,
 }) => {
-  // Keep track of expanded parent menu IDs (default: expand all sections so sub-menus are immediately accessible)
+  // Keep track of expanded parent menu IDs (default: expand key sections so sub-menus are accessible)
   const [expandedIds, setExpandedIds] = useState<string[]>([
     activeItemId,
+    'elements',
     'docs-guide',
     'dashboard',
     'components-inputs',
@@ -197,8 +198,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <ul className="uxu-sidebar__list">
                 {group.items.map((item) => {
                   const hasSub = Boolean(item.subItems && item.subItems.length > 0);
-                  const isParentActive = activeItemId === item.id;
-                  const isExpanded = expandedIds.includes(item.id);
+                  const hasMatchingSub =
+                    hasSub &&
+                    Boolean(
+                      item.subItems?.some((s) => s.id === activeSubItemId)
+                    );
+                  const isParentActive =
+                    activeItemId === item.id ||
+                    hasMatchingSub ||
+                    (!hasSub &&
+                      activeItemId === 'dashboard' &&
+                      activeSubItemId === item.id);
+                  const isExpanded =
+                    expandedIds.includes(item.id) || hasMatchingSub;
                   const parentHref =
                     item.href ??
                     RouteService.buildPath(item.id, item.subItems?.[0]?.id);

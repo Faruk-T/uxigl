@@ -2,7 +2,7 @@ import type { PropDocItem } from '../../core/contracts/ComponentContracts';
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — COMPREHENSIVE HANDS-ON COMPONENT DOCUMENTATION CATALOG
+ * uxiGL DESIGN SYSTEM — COMPREHENSIVE HANDS-ON COMPONENT DOCUMENTATION CATALOG
  * ============================================================================
  * Every component includes:
  * - Practical summary & import statement
@@ -782,8 +782,8 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
   <Chip selected={isSelected} onClick={() => setIsSelected(!isSelected)}>
     Sadece Aktif Düğümler
   </Chip>
-  <Chip dismissible onDismiss={() => removeTag('react')}>
-    React 19
+  <Chip dismissible onDismiss={() => removeTag('typescript')}>
+    TypeScript 5
   </Chip>
   <Badge tone="success" pulse>Sistem Çevrimiçi</Badge>
   <Badge tone="warning" variant="outlined">Bakım Modu</Badge>
@@ -880,7 +880,7 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
         name: 'shape (Avatar)',
         type: "'squircle' | 'circle'",
         defaultValue: "'squircle'",
-        description: 'Apple Squircle veya tam daire kesim.',
+        description: 'Squircle veya tam daire kesim.',
       },
     ],
   },
@@ -897,7 +897,7 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
     dos: [
       'Büyük veri setlerinde (1.000 - 50.000+ satır), Excel formüllerinde ve toplu CRUD işlemlerinde SheetGLGridAdapter (finance-erp, cloud-telemetry, hr-payroll, inventory-supply) kullanın.',
       '5 - 100 satırlık basit özet listeleri, ayar tabloları ve sıfır GPU yükü gereken durumlarda hafif Native <DataTable variant="default | striped | bordered | minimal" /> bileşenini tercih edin.',
-      'UXU tema rengini IGridThemeTokens üzerinden SheetGL ile eşitleyin.',
+      'uxiGL tema rengini IGridThemeTokens üzerinden SheetGL ile eşitleyin.',
     ],
     donts: [
       'On binlerce satırı klasik DOM tablo düğümleriyle render etmeyin.',
@@ -955,7 +955,7 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
         name: 'theme (SheetGL)',
         type: "'apple-dark' | 'apple-light' | 'google-dark' | 'google-light' | IGridThemeTokens",
         defaultValue: "'apple-dark'",
-        description: 'Apple HIG veya Google Material You WebGL/Canvas tema şablonu.',
+        description: 'Liquid Glass veya Google Material You WebGL/Canvas tema şablonu.',
       },
       {
         name: 'batchEditMode / showFormulaBar',
@@ -982,7 +982,7 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
     importStatement:
       "import { FileManGL, I18nProvider, DEFAULT_FILE_MANAGER_CONFIG } from 'filemangl';\nimport 'filemangl/style.css';",
     dos: [
-      'UXU resolvedMode değerini config.theme ("dark" | "light") ve .theme-light sınıfı ile senkronize edin.',
+      'uxiGL resolvedMode değerini config.theme ("dark" | "light") ve .theme-light sınıfı ile senkronize edin.',
       'Büyük klasör analizlerinde disk_map_webgl veya spatial_webgl görünümlerini açın.',
       'İki dizin arası hızlı transfer için enableDualPane={true} aktif edin.',
     ],

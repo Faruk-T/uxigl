@@ -1,12 +1,48 @@
 {
   "name": "uxigl",
-  "private": true,
-  "version": "2.5.0",
-  "description": "uxiGL — Liquid Glass & Google Material You Modular Design System",
+  "version": "2.5.1",
+  "description": "uxiGL — Liquid Glass & Google Material You Modular Design System with SheetGL DataGrid, FileManGL VFS & Interactive Analytics Charts",
+  "license": "MIT",
+  "author": "Trunçgil Teknoloji (https://www.truncgil.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/umitunc/uxigl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/umitunc/uxigl/issues"
+  },
+  "homepage": "https://github.com/umitunc/uxigl#readme",
+  "keywords": [
+    "uxigl",
+    "design-system",
+    "liquid-glass",
+    "material-3",
+    "material-you",
+    "sheetgl",
+    "filemangl",
+    "webgl",
+    "datagrid",
+    "analytics-dashboard",
+    "ui-components"
+  ],
   "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles": "./src/styles/uxu-tokens.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "docs"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "prepublishOnly": "npm run build",
     "preview": "vite preview"
   },
   "dependencies": {

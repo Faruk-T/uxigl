@@ -7,7 +7,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — SWITCH (TOGGLE)
+ * uxiGL PRIMITIVE — SWITCH (TOGGLE)
  * ============================================================================
  * Combines iOS tactile fluid spring track with Google Material 3 thumb icons.
  *

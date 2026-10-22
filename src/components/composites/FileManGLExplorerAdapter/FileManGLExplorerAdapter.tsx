@@ -49,8 +49,8 @@ export const FileManGLExplorerAdapter: React.FC<
 
   const [config, setConfig] = useState<IFileManagerConfig>(() => ({
     ...DEFAULT_FILE_MANAGER_CONFIG,
-    volumeName: 'UXU Enterprise Cloud VFS',
-    mountPath: '/Volumes/UXU-Cloud',
+    volumeName: 'uxiGL Enterprise Cloud VFS',
+    mountPath: '/Volumes/uxiGL-Cloud',
     theme: resolvedMode,
     fontScale: preferences.fontScale,
     borderRadius: preferences.radiusScale,
@@ -71,7 +71,7 @@ export const FileManGLExplorerAdapter: React.FC<
         defaultViewMode === 'webgl_diskmap'),
   }));
 
-  // Keep FileManGL synchronized with UXU global Dark/Light theme, Radius, Accent Palette, Font Scale & WebGL state
+  // Keep FileManGL synchronized with uxiGL global Dark/Light theme, Radius, Accent Palette, Font Scale & WebGL state
   useEffect(() => {
     setConfig((prev) => ({
       ...prev,
@@ -137,8 +137,12 @@ export const FileManGLExplorerAdapter: React.FC<
       {showQuickToolbar && (
         <div className="uxu-sheetgl-toolbar">
           <div className="uxu-sheetgl-toolbar__left">
-            <Badge tone="primary" pulse>
-              <HardDrive size={11} /> FileManGL v1.0.4 WebGL2 VFS
+            <Badge
+              tone="primary"
+              pulse
+              leadingIcon={<HardDrive size={11} />}
+            >
+              FileManGL v1.0.4
             </Badge>
             <div className="uxu-sheetgl-pill-group">
               {(

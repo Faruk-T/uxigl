@@ -4,7 +4,7 @@ import { RouteService } from '../../../core/services/RouteService';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — SEGMENTED CONTROL
+ * uxiGL COMPOSITE — SEGMENTED CONTROL
  * ============================================================================
  * Signature Apple HIG Segmented Control with tactile sliding active pill.
  *

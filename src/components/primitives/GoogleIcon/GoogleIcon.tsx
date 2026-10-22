@@ -8,7 +8,7 @@ import type { GoogleIconStyle } from '../../../core/contracts/ThemeContract';
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — GOOGLE MATERIAL SYMBOLS VARIABLE FONT ICON (<GoogleIcon />)
+ * uxiGL PRIMITIVE — GOOGLE MATERIAL SYMBOLS VARIABLE FONT ICON (<GoogleIcon />)
  * ============================================================================
  * Renders Google's official Material Symbols variable font icons ('Rounded',
  * 'Outlined', 'Sharp') with live support for all 4 variable font axes:

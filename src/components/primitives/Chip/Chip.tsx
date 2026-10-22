@@ -11,7 +11,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — CHIP
+ * uxiGL PRIMITIVE — CHIP
  * ============================================================================
  * Google Material Design 3 Filter, Assist & Input Chips with Apple glass finish.
  *

@@ -21,7 +21,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — DYNAMIC ISLAND / MATERIAL SNACKBAR TOAST PROVIDER
+ * uxiGL DESIGN SYSTEM — DYNAMIC ISLAND / MATERIAL SNACKBAR TOAST PROVIDER
  * ============================================================================
  * [DIP] Implements `INotificationService` contract.
  * [SRP] Decouples notification state queuing from visual toast rendering.

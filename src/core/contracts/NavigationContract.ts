@@ -3,7 +3,7 @@ import type { IdentifiableProps, SemanticTone } from './ComponentContracts';
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — SIDEBAR & HIERARCHICAL NAVIGATION CONTRACTS (ISP & OCP)
+ * uxiGL DESIGN SYSTEM — SIDEBAR & HIERARCHICAL NAVIGATION CONTRACTS (ISP & OCP)
  * ============================================================================
  * Adheres to:
  * - [I] Interface Segregation Principle (ISP): Focused contracts for hierarchical

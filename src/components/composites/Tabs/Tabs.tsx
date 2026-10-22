@@ -7,7 +7,7 @@ import { RouteService } from '../../../core/services/RouteService';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — TABS
+ * uxiGL COMPOSITE — TABS
  * ============================================================================
  * Material Design 3 Primary & Secondary Tabs with active indicator bar.
  */

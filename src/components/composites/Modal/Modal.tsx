@@ -5,7 +5,7 @@ import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — MODAL / DIALOG SHEET
+ * uxiGL COMPOSITE — MODAL / DIALOG SHEET
  * ============================================================================
  * Combines macOS Sonoma sheet vibrancy with Material Design 3 Dialog structure.
  *

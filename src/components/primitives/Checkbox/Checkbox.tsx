@@ -7,7 +7,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — CHECKBOX
+ * uxiGL PRIMITIVE — CHECKBOX
  * ============================================================================
  * Implements `FormControlContract<boolean>` [LSP], making it 100% interchangeable
  * with `Switch` anywhere a boolean control is required.

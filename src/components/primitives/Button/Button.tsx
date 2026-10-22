@@ -9,7 +9,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — BUTTON
+ * uxiGL PRIMITIVE — BUTTON
  * ============================================================================
  * Apple HIG spring-press feedback + Google Material You tonal & filled surfaces.
  *

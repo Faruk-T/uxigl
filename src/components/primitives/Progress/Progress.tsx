@@ -7,7 +7,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — PROGRESS (LINEAR & CIRCULAR RING)
+ * uxiGL PRIMITIVE — PROGRESS (LINEAR & CIRCULAR RING)
  * ============================================================================
  * Combines Apple Watch Activity Ring SVG aesthetics with Material 3 Linear
  * progress bar & indeterminate shimmer.

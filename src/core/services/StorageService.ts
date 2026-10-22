@@ -3,7 +3,7 @@ import { DEFAULT_THEME_PREFERENCES } from '../tokens/designTokens';
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — PERSISTENT STORAGE ADAPTER SERVICE (DIP & SRP)
+ * uxiGL DESIGN SYSTEM — PERSISTENT STORAGE ADAPTER SERVICE (DIP & SRP)
  * ============================================================================
  * [SRP] Responsible for reliably persisting and restoring user theme & layout
  * preferences across browser refreshes (F5).

@@ -12,7 +12,7 @@ import {
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — CSS VARIABLE THEME ENGINE (SRP & DIP)
+ * uxiGL DESIGN SYSTEM — CSS VARIABLE THEME ENGINE (SRP & DIP)
  * ============================================================================
  * [SRP] Responsible solely for translating abstract `ThemePreferences` into
  * DOM CSS Custom Properties (`--uxu-*`) and data attributes on `documentElement`.

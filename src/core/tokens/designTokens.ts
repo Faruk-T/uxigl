@@ -10,7 +10,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — LIQUID GLASS × GOOGLE MATERIAL YOU DESIGN TOKENS
+ * uxiGL DESIGN SYSTEM — LIQUID GLASS × GOOGLE MATERIAL YOU DESIGN TOKENS
  * ============================================================================
  */
 

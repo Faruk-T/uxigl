@@ -55,7 +55,7 @@ export interface ArchitectureDocsViewProps {
   onOpenCommandPalette?: () => void;
 }
 
-const INSTALL_SNIPPET = `# 1. UXI Tasarım Sistemi, SheetGL (DataGrid) ve FileManGL (VFS) Paketlerini Kurun
+const INSTALL_SNIPPET = `# 1. uxiGL Tasarım Sistemi, SheetGL (DataGrid) ve FileManGL (VFS) Paketlerini Kurun
 npm install sheetgl filemangl lucide-react
 # veya: pnpm add sheetgl filemangl lucide-react | yarn add ... | bun add ...
 
@@ -91,14 +91,14 @@ import { Mail, Lock, Sparkles } from 'lucide-react';
 
 export function QuickWorkspaceCard() {
   const { notify } = useToast();
-  const [email, setEmail] = useState('mimar@uxi.dev');
+  const [email, setEmail] = useState('mimar@uxigl.dev');
   const [rememberMe, setRememberMe] = useState(true);
 
   return (
     <Card
       variant="glass"
-      title="UXI Çalışma Alanına Bağlan"
-      subtitle="Apple HIG Cam Yüzeyi × Google Material You Tonal Kontroller"
+      title="uxiGL Çalışma Alanına Bağlan"
+      subtitle="Liquid Glass Cam Yüzeyi × Google Material You Tonal Kontroller"
       headerAction={<Badge tone="success" pulse>Hazır</Badge>}
     >
       <div className="uxu-stack-md">
@@ -155,7 +155,7 @@ export function ThemeSwitcherButton() {
         Material Iris Paletine Geç
       </Button>
       <Button variant="glass" onClick={() => setRadiusScale('squircle')}>
-        Apple Squircle Köşe
+        Squircle Köşe
       </Button>
     </div>
   );
@@ -261,7 +261,7 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
   };
 
   // Interactive states for the "Get Started" live mini-app card
-  const [demoEmail, setDemoEmail] = useState('mimar@uxu.dev');
+  const [demoEmail, setDemoEmail] = useState('mimar@uxigl.dev');
   const [demoPass, setDemoPass] = useState('••••••••••••');
   const [demoRemember, setDemoRemember] = useState(true);
 
@@ -370,7 +370,7 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
             >
               <div className="uxu-stack-md">
                 <p className="uxu-muted-p">
-                  UXU Design System; tüm renk, köşe yuvarlaklığı, yoğunluk ve
+                  uxiGL Design System; tüm renk, köşe yuvarlaklığı, yoğunluk ve
                   cam bulanıklığı değişkenlerini <code>ThemeProvider</code>{' '}
                   üzerinden, bildirimleri ise <code>ToastProvider</code>{' '}
                   üzerinden yönetir.
@@ -394,7 +394,7 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
                 <Card
                   variant="glass"
                   glowOnHover
-                  title="UXU Çalışma Alanına Bağlan"
+                  title="uxiGL Çalışma Alanına Bağlan"
                   subtitle="Canlı Önizleme: Input, Switch, Badge ve Button bir arada"
                   headerAction={
                     <Badge tone="success" pulse size="sm">
@@ -851,7 +851,7 @@ export function IconDemo() {
           >
             <div className="uxu-stack-md">
               <p className="uxu-muted-p">
-                UXU uygulama iskeleti <code>.uxu-app-frame</code> kapsayıcısı
+                uxiGL uygulama iskeleti <code>.uxu-app-frame</code> kapsayıcısı
                 içinde sol tarafta hiyerarşik alt menülere sahip{' '}
                 <code>&lt;Sidebar /&gt;</code> ve sağ tarafta{' '}
                 <code>&lt;TopHeader /&gt;</code> +{' '}

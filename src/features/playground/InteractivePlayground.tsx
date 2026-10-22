@@ -114,7 +114,7 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
   >('spatial');
   const [activeTabId, setActiveTabId] = useState('overview');
   const [selectedChips, setSelectedChips] = useState<string[]>([
-    'Apple HIG',
+    'Liquid Glass',
     'Material Design 3',
   ]);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
@@ -147,7 +147,7 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
             loading: isLoading || undefined,
             disabled: isDisabled || undefined,
           },
-          childrenCode: 'UXI Eylemi Başlat',
+          childrenCode: 'uxiGL Eylemi Başlat',
         });
       case 'input':
         return CodeGeneratorService.generateSnippet({
@@ -228,7 +228,7 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
             selected: true,
             disabled: isDisabled || undefined,
           },
-          childrenCode: 'Apple HIG & Material 3',
+          childrenCode: 'Liquid Glass & Material 3',
         });
       case 'progress-avatar':
         return CodeGeneratorService.generateSnippet({
@@ -266,7 +266,7 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
                 ? 'lg'
                 : 'md',
             title: 'Frankfurt M4 Ultra Node',
-            subtitle: 'Apple HIG Glass × Google Material 3 Surface',
+            subtitle: 'Liquid Glass × Google Material 3 Surface',
             interactive: true,
             glowOnHover: true,
           },
@@ -361,7 +361,7 @@ export function CloudFileManagerExample() {
                   })
                 }
               >
-                UXI Eylemi Başlat
+                uxiGL Eylemi Başlat
               </Button>
             </div>
 
@@ -595,9 +595,9 @@ export function CloudFileManagerExample() {
               options={[
                 {
                   value: 'spatial',
-                  label: 'Apple Spatial Glass',
+                  label: 'Spatial Liquid Glass',
                   icon: <Sparkles size={15} />,
-                  badge: 'HIG',
+                  badge: 'Glass',
                 },
                 {
                   value: 'tonal',
@@ -607,7 +607,7 @@ export function CloudFileManagerExample() {
                 },
                 {
                   value: 'adaptive',
-                  label: 'UXU Hibrit Sentez',
+                  label: 'uxiGL Hibrit Sentez',
                   icon: <Zap size={15} />,
                   badge: 'Pro',
                 },
@@ -715,7 +715,7 @@ export function CloudFileManagerExample() {
             </div>
             <div className="uxu-stage-row">
               {[
-                'Apple HIG',
+                'Liquid Glass',
                 'Material Design 3',
                 'Dark / Light Mode',
                 'Responsive Grid',
@@ -1037,7 +1037,7 @@ export function CloudFileManagerExample() {
               onClose={() => setDemoModalOpen(false)}
               showMacTrafficLights
               title="Sunucu Kümesi Yapılandırma Onayı"
-              subtitle="Apple macOS Sequoia Sheet + Google Material 3 Dialog"
+              subtitle="Liquid Glass Sheet + Google Material 3 Dialog"
               icon={<ShieldCheck size={20} />}
               footer={
                 <div className="uxu-modal-footer-actions">
@@ -1168,7 +1168,7 @@ export function CloudFileManagerExample() {
             <Card
               variant="tonal"
               padding="md"
-              eyebrow="UXU NATIVE HTML TABLE (BASİT VE HAFİF TABLO)"
+              eyebrow="UXIGL NATIVE HTML TABLE (BASİT VE HAFİF TABLO)"
               title="Basit Native Tablo Tasarımı (<DataTable />)"
               subtitle="Sıfır WebGL yüküyle çalışan, 4 görsel varyantlı ve satır seçimi destekli semantik HTML tablo"
               headerAction={
@@ -1199,14 +1199,14 @@ export function CloudFileManagerExample() {
                 data={[
                   {
                     id: '1',
-                    module: '@uxu/core-tokens',
+                    module: '@uxigl/core-tokens',
                     version: 'v2.5.0',
                     bundleSize: '4.2 kB',
                     status: 'Stable',
                   },
                   {
                     id: '2',
-                    module: '@uxu/native-table',
+                    module: '@uxigl/native-table',
                     version: 'v2.5.0',
                     bundleSize: '3.1 kB',
                     status: 'Stable',

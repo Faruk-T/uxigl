@@ -7,7 +7,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU COMPOSITE — STAT CARD WITH SPARKLINE
+ * uxiGL COMPOSITE — STAT CARD WITH SPARKLINE
  * ============================================================================
  * Apple Health / Fitness metric card blended with Google Analytics sparkline.
  */

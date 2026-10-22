@@ -4,7 +4,7 @@ import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — SPOTLIGHT COMMAND PALETTE (⌘K / Ctrl+K)
+ * uxiGL COMPOSITE — SPOTLIGHT COMMAND PALETTE (⌘K / Ctrl+K)
  * ============================================================================
  * Inspired by Apple macOS Spotlight & Raycast + Google Search Assist chips.
  */

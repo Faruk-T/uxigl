@@ -1,6 +1,6 @@
-# UXU Mimari ve SOLID Tasarım Dokümantasyonu
+# uxiGL Mimari ve SOLID Tasarım Dokümantasyonu
 
-Bu belge, **UXU Design System** projesinin klasör yapısını, **SOLID** yazılım mühendisliği prensiplerinin React + TypeScript ortamında nasıl uygulandığını ve **Apple HIG × Google Material You** token mimarisini açıklar.
+Bu belge, **uxiGL Design System** projesinin klasör yapısını, **SOLID** yazılım mühendisliği prensiplerinin TypeScript ortamında nasıl uygulandığını ve **Liquid Glass × Google Material You** token mimarisini açıklar.
 
 ---
 

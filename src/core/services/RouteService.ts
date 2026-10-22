@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — URL ROUTER & HISTORY SYNCHRONIZATION SERVICE (SRP)
+ * uxiGL DESIGN SYSTEM — URL ROUTER & HISTORY SYNCHRONIZATION SERVICE (SRP)
  * ============================================================================
  * Provides deterministic, clean HTML5 History API URL routing for every
  * section, sub-menu, documentation topic, dashboard view, and playground
@@ -50,12 +50,21 @@ const DOCS_TOPIC_IDS = new Set([
   'cli-shortcuts',
 ]);
 
-const DASHBOARD_VIEW_IDS = new Set([
+export const DASHBOARD_VIEW_IDS = new Set([
   'overview',
   'analytics',
+  'users',
+  'products',
   'crm-orders',
+  'forms',
+  'elements-overview',
+  'reports',
+  'messages',
+  'calendar',
   'file-manager',
   'smart-cluster',
+  'settings',
+  'security',
 ]);
 
 export class RouteService {

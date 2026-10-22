@@ -7,13 +7,13 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — INPUT
+ * uxiGL PRIMITIVE — INPUT
  * ============================================================================
  * Hybrid of Apple Spotlight translucent input & Material M3 Outlined/Filled field.
  *
  * SOLID Principles Applied:
  * - [LSP] Implements `FormControlContract<string>`, enabling seamless swap with
- *   any other UXU text control.
+ *   any other uxiGL text control.
  * - [OCP] Extensible via `leadingIcon`, `trailingIcon`, `prefixText`, and `clearable`.
  */
 

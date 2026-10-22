@@ -11,12 +11,27 @@ import {
   Rocket,
   Sparkles,
   Home,
+  TrendingUp,
+  Users,
+  Package,
+  ShoppingBag,
+  FileText,
+  BarChart2,
+  MessageSquare,
+  Calendar,
+  FolderOpen,
+  Settings,
+  Shield,
+  HelpCircle,
 } from 'lucide-react';
 import { useTheme } from './providers/ThemeProvider';
 import { useToast } from './providers/ToastProvider';
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcut';
 import { defaultThemeStorageAdapter } from './core/services/StorageService';
-import { RouteService } from './core/services/RouteService';
+import {
+  RouteService,
+  DASHBOARD_VIEW_IDS,
+} from './core/services/RouteService';
 import {
   CommandPalette,
   type CommandActionItem,
@@ -135,26 +150,186 @@ export const App: React.FC = () => {
     { metaOrCtrl: true }
   );
 
-  // Hierarchical Sidebar Menu Configuration with Concise, Scannable Labels & Explicit Route URLs
+  // Hierarchical Sidebar Menu Configuration (Metis Admin Template Structure + uxiGL Ecosystem)
   const sidebarGroups = useMemo<SidebarNavGroup[]>(
     () => [
       {
-        id: 'grp-get-started',
-        title: 'BAŞLANGIÇ',
+        id: 'grp-main',
+        title: 'DASHBOARD & MODÜLLER',
         items: [
           {
-            id: 'landing',
-            label: 'Tanıtım Sayfası (/)',
-            href: '/',
-            icon: <Home size={16} />,
-            badge: 'uxiGL',
+            id: 'overview',
+            label: 'Dashboard',
+            href: '/dashboard/overview',
+            icon: <LayoutDashboard size={16} />,
+          },
+          {
+            id: 'analytics',
+            label: 'Analytics',
+            href: '/dashboard/analytics',
+            icon: <TrendingUp size={16} />,
+            badge: 'Hot',
             badgeTone: 'info',
           },
           {
+            id: 'users',
+            label: 'Users',
+            href: '/dashboard/users',
+            icon: <Users size={16} />,
+          },
+          {
+            id: 'products',
+            label: 'Products',
+            href: '/dashboard/products',
+            icon: <Package size={16} />,
+          },
+          {
+            id: 'crm-orders',
+            label: 'Orders',
+            href: '/dashboard/crm-orders',
+            icon: <ShoppingBag size={16} />,
+            badge: 'SheetGL',
+            badgeTone: 'primary',
+          },
+          {
+            id: 'forms',
+            label: 'Forms',
+            href: '/dashboard/forms',
+            icon: <FileText size={16} />,
+            badge: 'New',
+            badgeTone: 'success',
+          },
+          {
+            id: 'elements',
+            label: 'Elements',
+            href: '/dashboard/elements-overview',
+            icon: <Box size={16} />,
+            badge: 'New',
+            badgeTone: 'primary',
+            subItems: [
+              {
+                id: 'elements-overview',
+                label: 'Overview',
+                href: '/dashboard/elements-overview',
+              },
+              {
+                id: 'button',
+                label: 'Buttons',
+                href: '/components/inputs/button',
+              },
+              {
+                id: 'chips-badges',
+                label: 'Badges & Chips',
+                href: '/components/feedback/chips-badges',
+              },
+              {
+                id: 'card',
+                label: 'Cards',
+                href: '/components/surfaces/card',
+              },
+              {
+                id: 'modal-command',
+                label: 'Modals & Alerts',
+                href: '/components/surfaces/modal-command',
+              },
+              {
+                id: 'input',
+                label: 'Forms (Input)',
+                href: '/components/inputs/input',
+              },
+              {
+                id: 'switch',
+                label: 'Switch & Toggle',
+                href: '/components/inputs/switch',
+              },
+              {
+                id: 'checkbox',
+                label: 'Checkbox',
+                href: '/components/inputs/checkbox',
+              },
+              {
+                id: 'slider',
+                label: 'Slider',
+                href: '/components/inputs/slider',
+              },
+              {
+                id: 'segmented-control',
+                label: 'Segmented',
+                href: '/components/surfaces/segmented-control',
+              },
+              {
+                id: 'tabs-accordion',
+                label: 'Tabs & Accordion',
+                href: '/components/surfaces/tabs-accordion',
+              },
+              {
+                id: 'progress-avatar',
+                label: 'Progress & Avatar',
+                href: '/components/feedback/progress-avatar',
+              },
+              {
+                id: 'datatable-statcard',
+                label: 'Tables (SheetGL)',
+                href: '/components/feedback/datatable-statcard',
+              },
+              {
+                id: 'filemangl-explorer',
+                label: 'FileManGL VFS',
+                href: '/components/feedback/filemangl-explorer',
+              },
+            ],
+          },
+          {
+            id: 'reports',
+            label: 'Reports',
+            href: '/dashboard/reports',
+            icon: <BarChart2 size={16} />,
+          },
+          {
+            id: 'messages',
+            label: 'Messages',
+            href: '/dashboard/messages',
+            icon: <MessageSquare size={16} />,
+            badge: '3',
+            badgeTone: 'danger',
+          },
+          {
+            id: 'calendar',
+            label: 'Calendar',
+            href: '/dashboard/calendar',
+            icon: <Calendar size={16} />,
+          },
+          {
+            id: 'file-manager',
+            label: 'Files',
+            href: '/dashboard/file-manager',
+            icon: <FolderOpen size={16} />,
+            badge: 'VFS',
+            badgeTone: 'info',
+          },
+        ],
+      },
+      {
+        id: 'grp-admin',
+        title: 'ADMIN',
+        items: [
+          {
+            id: 'settings',
+            label: 'Settings',
+            href: '/dashboard/settings',
+            icon: <Settings size={16} />,
+          },
+          {
+            id: 'security',
+            label: 'Security',
+            href: '/dashboard/security',
+            icon: <Shield size={16} />,
+          },
+          {
             id: 'docs-guide',
-            label: 'Başlangıç Rehberi',
+            label: 'Help & Support',
             href: '/docs/getting-started',
-            icon: <Rocket size={16} />,
+            icon: <HelpCircle size={16} />,
             subItems: [
               {
                 id: 'getting-started',
@@ -178,117 +353,13 @@ export const App: React.FC = () => {
               },
             ],
           },
-        ],
-      },
-      {
-        id: 'grp-workspace',
-        title: 'DASHBOARD',
-        items: [
           {
-            id: 'dashboard',
-            label: 'Komuta Merkezi',
-            href: '/dashboard/overview',
-            icon: <LayoutDashboard size={16} />,
-            badge: 'Canlı',
-            badgeTone: 'success',
-            subItems: [
-              {
-                id: 'overview',
-                label: 'Genel Bakış',
-                href: '/dashboard/overview',
-              },
-              {
-                id: 'analytics',
-                label: 'Canlı Analitik',
-                href: '/dashboard/analytics',
-              },
-              {
-                id: 'crm-orders',
-                label: 'SheetGL Tablo',
-                href: '/dashboard/crm-orders',
-              },
-              {
-                id: 'file-manager',
-                label: 'FileManGL Dosya',
-                href: '/dashboard/file-manager',
-              },
-              {
-                id: 'smart-cluster',
-                label: 'Sunucu Kümesi',
-                href: '/dashboard/smart-cluster',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 'grp-design-system',
-        title: 'BİLEŞENLER',
-        items: [
-          {
-            id: 'components-inputs',
-            label: 'Form Kontrolleri',
-            href: '/components/inputs/button',
-            icon: <Sliders size={16} />,
-            subItems: [
-              { id: 'button', label: 'Button', href: '/components/inputs/button' },
-              { id: 'input', label: 'Input', href: '/components/inputs/input' },
-              { id: 'switch', label: 'Switch', href: '/components/inputs/switch' },
-              { id: 'checkbox', label: 'Checkbox', href: '/components/inputs/checkbox' },
-              { id: 'slider', label: 'Slider', href: '/components/inputs/slider' },
-            ],
-          },
-          {
-            id: 'components-surfaces',
-            label: 'Yüzey & Gezinme',
-            href: '/components/surfaces/card',
-            icon: <Box size={16} />,
-            subItems: [
-              { id: 'card', label: 'Card', href: '/components/surfaces/card' },
-              {
-                id: 'segmented-control',
-                label: 'Segmented',
-                href: '/components/surfaces/segmented-control',
-              },
-              {
-                id: 'tabs-accordion',
-                label: 'Tabs & Accordion',
-                href: '/components/surfaces/tabs-accordion',
-              },
-              {
-                id: 'modal-command',
-                label: 'Modal & ⌘K',
-                href: '/components/surfaces/modal-command',
-              },
-            ],
-          },
-          {
-            id: 'components-feedback',
-            label: 'Veri & Durum',
-            href: '/components/feedback/chips-badges',
-            icon: <Sparkles size={16} />,
-            subItems: [
-              {
-                id: 'chips-badges',
-                label: 'Chip & Badge',
-                href: '/components/feedback/chips-badges',
-              },
-              {
-                id: 'progress-avatar',
-                label: 'Progress & Avatar',
-                href: '/components/feedback/progress-avatar',
-              },
-              {
-                id: 'datatable-statcard',
-                label: 'SheetGL & KPI',
-                href: '/components/feedback/datatable-statcard',
-              },
-              {
-                id: 'filemangl-explorer',
-                label: 'FileManGL VFS',
-                href: '/components/feedback/filemangl-explorer',
-              },
-            ],
+            id: 'landing',
+            label: 'Tanıtım Sayfası (/)',
+            href: '/',
+            icon: <Home size={16} />,
+            badge: 'uxiGL',
+            badgeTone: 'info',
           },
         ],
       },
@@ -296,8 +367,49 @@ export const App: React.FC = () => {
     []
   );
 
+  // Handler when selecting a component inside the InteractivePlayground or Quick Directory
+  const handlePlaygroundComponentSelect = (compId: string) => {
+    const sectionId = RouteService.getSectionForComponent(compId);
+    setActiveSectionId(sectionId);
+    setActiveSubItemId(compId);
+  };
+
   // Unified handler when any Sidebar parent or sub-menu item is clicked
   const handleSidebarSelect = (itemId: string, subItemId?: string) => {
+    if (itemId === 'landing') {
+      setActiveSectionId('landing');
+      setActiveSubItemId('home');
+      return;
+    }
+
+    if (itemId === 'docs-guide') {
+      setActiveSectionId('docs-guide');
+      setActiveSubItemId(subItemId || 'getting-started');
+      return;
+    }
+
+    if (itemId === 'elements') {
+      if (!subItemId || subItemId === 'elements-overview') {
+        setActiveSectionId('dashboard');
+        setActiveSubItemId('elements-overview');
+      } else {
+        handlePlaygroundComponentSelect(subItemId);
+      }
+      return;
+    }
+
+    if (DASHBOARD_VIEW_IDS.has(itemId)) {
+      setActiveSectionId('dashboard');
+      setActiveSubItemId(itemId);
+      return;
+    }
+
+    if (itemId === 'dashboard') {
+      setActiveSectionId('dashboard');
+      setActiveSubItemId(subItemId || 'overview');
+      return;
+    }
+
     const section = itemId as MainSectionId;
     setActiveSectionId(section);
 
@@ -306,20 +418,9 @@ export const App: React.FC = () => {
       return;
     }
 
-    // Default sub-item fallback if parent clicked directly
-    if (section === 'landing') setActiveSubItemId('home');
-    if (section === 'docs-guide') setActiveSubItemId('getting-started');
-    if (section === 'dashboard') setActiveSubItemId('overview');
     if (section === 'components-inputs') setActiveSubItemId('button');
     if (section === 'components-surfaces') setActiveSubItemId('card');
     if (section === 'components-feedback') setActiveSubItemId('chips-badges');
-  };
-
-  // Handler when selecting a component inside the InteractivePlayground or Quick Directory
-  const handlePlaygroundComponentSelect = (compId: string) => {
-    const sectionId = RouteService.getSectionForComponent(compId);
-    setActiveSectionId(sectionId);
-    setActiveSubItemId(compId);
   };
 
   // Dynamic Breadcrumbs based on active Sidebar menu & sub-menu with explicit route hrefs
@@ -335,7 +436,17 @@ export const App: React.FC = () => {
 
     for (const grp of sidebarGroups) {
       for (const navItem of grp.items) {
-        if (navItem.id === activeSectionId) {
+        const hasSub = Boolean(navItem.subItems && navItem.subItems.length > 0);
+        const matchingSub = navItem.subItems?.find(
+          (s) => s.id === activeSubItemId
+        );
+        const isDirectDashboardMatch =
+          !hasSub &&
+          activeSectionId === 'dashboard' &&
+          navItem.id === activeSubItemId;
+        const isDirectSectionMatch = navItem.id === activeSectionId;
+
+        if (isDirectDashboardMatch || isDirectSectionMatch || matchingSub) {
           const parentHref =
             navItem.href ??
             RouteService.buildPath(navItem.id, navItem.subItems?.[0]?.id);
@@ -346,14 +457,16 @@ export const App: React.FC = () => {
             onClick: () =>
               handleSidebarSelect(navItem.id, navItem.subItems?.[0]?.id),
           });
-          const sub = navItem.subItems?.find((s) => s.id === activeSubItemId);
-          if (sub) {
+          if (matchingSub) {
             items.push({
-              id: sub.id,
-              label: sub.label,
-              href: sub.href ?? RouteService.buildPath(navItem.id, sub.id),
+              id: matchingSub.id,
+              label: matchingSub.label,
+              href:
+                matchingSub.href ??
+                RouteService.buildPath(activeSectionId, matchingSub.id),
             });
           }
+          return items;
         }
       }
     }
@@ -509,6 +622,7 @@ export const App: React.FC = () => {
                   onSubViewChange={(sub) =>
                     handleSidebarSelect('dashboard', sub)
                   }
+                  onSelectComponent={handlePlaygroundComponentSelect}
                 />
               )}
 

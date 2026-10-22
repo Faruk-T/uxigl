@@ -7,7 +7,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — AVATAR & AVATAR GROUP
+ * uxiGL PRIMITIVE — AVATAR & AVATAR GROUP
  * ============================================================================
  * Supports squircle (Apple iOS) or circle (Material You) geometry, initials
  * fallback, and live presence status ring.

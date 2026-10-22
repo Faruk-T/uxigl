@@ -3,7 +3,7 @@ import type { IdentifiableProps } from '../../../core/contracts/ComponentContrac
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — SKELETON
+ * uxiGL PRIMITIVE — SKELETON
  * ============================================================================
  * Shimmering loading placeholders with squircle, circular, and text line modes.
  */

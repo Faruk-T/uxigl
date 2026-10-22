@@ -7,7 +7,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — SLIDER
+ * uxiGL PRIMITIVE — SLIDER
  * ============================================================================
  * Inspired by macOS Control Center Brightness/Volume bar & Material 3 Slider.
  *

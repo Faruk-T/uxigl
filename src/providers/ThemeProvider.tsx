@@ -30,7 +30,7 @@ import { defaultThemeEngine } from '../core/services/ThemeEngineService';
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — THEME & WEBGL SHADER PROVIDER
+ * uxiGL DESIGN SYSTEM — THEME & WEBGL SHADER PROVIDER
  * ============================================================================
  */
 

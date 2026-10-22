@@ -2,7 +2,7 @@ import type { SemanticTone } from './ComponentContracts';
 
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — NOTIFICATION / TOAST CONTRACT (DIP & ISP)
+ * uxiGL DESIGN SYSTEM — NOTIFICATION / TOAST CONTRACT (DIP & ISP)
  * ============================================================================
  */
 

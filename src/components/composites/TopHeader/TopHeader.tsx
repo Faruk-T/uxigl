@@ -19,7 +19,7 @@ import { Button, Tooltip } from '../../primitives';
 
 /**
  * ============================================================================
- * UXU COMPOSITE — FULL-WIDTH DASHBOARD TOP HEADER BAR
+ * uxiGL COMPOSITE — FULL-WIDTH DASHBOARD TOP HEADER BAR
  * ============================================================================
  */
 

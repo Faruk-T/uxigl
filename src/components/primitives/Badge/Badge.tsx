@@ -8,7 +8,7 @@ import type {
 
 /**
  * ============================================================================
- * UXU PRIMITIVE — BADGE
+ * uxiGL PRIMITIVE — BADGE
  * ============================================================================
  * Status & count indicators with optional live pulsing indicator.
  */

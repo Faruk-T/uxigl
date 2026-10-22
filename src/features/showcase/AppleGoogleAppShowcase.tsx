@@ -57,13 +57,30 @@ import type {
   TonalProps,
 } from '../../core/contracts/ComponentContracts';
 import { useToast } from '../../providers/ToastProvider';
+import {
+  AnalyticsChartsSuite,
+  type AnalyticsPeriod,
+} from './AnalyticsChartsSuite';
+import {
+  AdminSubViews,
+  type ExtendedAdminViewId,
+} from './AdminSubViews';
 
 export type DashboardSubView =
   | 'overview'
   | 'analytics'
+  | 'users'
+  | 'products'
   | 'crm-orders'
+  | 'forms'
+  | 'elements-overview'
+  | 'reports'
+  | 'messages'
+  | 'calendar'
   | 'file-manager'
-  | 'smart-cluster';
+  | 'smart-cluster'
+  | 'settings'
+  | 'security';
 
 interface DeploymentRow extends Record<string, unknown> {
   id: string;
@@ -77,7 +94,7 @@ interface DeploymentRow extends Record<string, unknown> {
 const INITIAL_DEPLOYMENTS: DeploymentRow[] = [
   {
     id: 'dep-1',
-    service: 'uxu-glass-compositor',
+    service: 'uxigl-glass-compositor',
     owner: 'Deniz Kaya',
     environment: 'visionOS Spatial Edge',
     health: 99,
@@ -131,7 +148,7 @@ const INITIAL_API_KEYS: ApiKeyRow[] = [
   {
     id: 'key-1',
     keyName: 'Production Edge Gateway',
-    prefix: 'uxu_live_98f2...a41c',
+    prefix: 'uxigl_live_98f2...a41c',
     scope: 'read:all, write:ledger',
     lastUsed: '2 dk önce • Frankfurt',
     rateLimit: '12,000 req/dk',
@@ -140,7 +157,7 @@ const INITIAL_API_KEYS: ApiKeyRow[] = [
   {
     id: 'key-2',
     keyName: 'SheetGL Telemetry Sync',
-    prefix: 'uxu_live_34b1...e09d',
+    prefix: 'uxigl_live_34b1...e09d',
     scope: 'stream:metrics, read:nodes',
     lastUsed: '8 dk önce • İstanbul',
     rateLimit: '5,000 req/dk',
@@ -149,7 +166,7 @@ const INITIAL_API_KEYS: ApiKeyRow[] = [
   {
     id: 'key-3',
     keyName: 'FileManGL Cloud VFS Connector',
-    prefix: 'uxu_rot_77c4...b12a',
+    prefix: 'uxigl_rot_77c4...b12a',
     scope: 'vfs:mount, acl:admin',
     lastUsed: '41 dk önce • Londra',
     rateLimit: '2,500 req/dk',
@@ -158,7 +175,7 @@ const INITIAL_API_KEYS: ApiKeyRow[] = [
   {
     id: 'key-4',
     keyName: 'Legacy Analytics Sandbox',
-    prefix: 'uxu_test_11a0...f88b',
+    prefix: 'uxigl_test_11a0...f88b',
     scope: 'read:reports',
     lastUsed: '14 gün önce • Zürih',
     rateLimit: '500 req/dk',
@@ -180,7 +197,7 @@ const INITIAL_INVOICES: InvoiceSummaryRow[] = [
   {
     id: 'inv-1',
     invoiceNo: 'INV-2026-0841',
-    customer: 'Apple Cupertino Cloud',
+    customer: 'Cupertino Cloud Systems',
     plan: 'Enterprise Unlimited',
     amount: '$48,500.00',
     billingDate: '22 Eki 2026',
@@ -252,18 +269,18 @@ const CHART_SERIES_BY_PERIOD: Record<
 export interface AppleGoogleAppShowcaseProps {
   activeSubView?: DashboardSubView;
   onSubViewChange?: (subView: DashboardSubView) => void;
+  onSelectComponent?: (compId: string) => void;
 }
 
 export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
   activeSubView = 'overview',
   onSubViewChange,
+  onSelectComponent,
 }) => {
   const { notify } = useToast();
 
   // Chart period state
-  const [chartPeriod, setChartPeriod] = useState<'24h' | '7d' | '30d' | '1y'>(
-    '7d'
-  );
+  const [chartPeriod, setChartPeriod] = useState<AnalyticsPeriod>('30d');
 
   // Spatial Audio / Media widget state (Apple HIG style)
   const [isPlaying, setIsPlaying] = useState(true);
@@ -310,7 +327,7 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
   // Quick Task / Tag Filter state
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [activeTags, setActiveTags] = useState<string[]>([
-    'Apple HIG',
+    'Liquid Glass',
     'Material You',
     'Responsive',
   ]);
@@ -328,35 +345,66 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
 
   const currentChart = CHART_SERIES_BY_PERIOD[chartPeriod];
 
+  const isExtendedAdminView = (
+    [
+      'users',
+      'products',
+      'forms',
+      'elements-overview',
+      'reports',
+      'messages',
+      'calendar',
+      'settings',
+      'security',
+    ] as DashboardSubView[]
+  ).includes(activeSubView);
+
   return (
     <div className="uxu-showcase-dashboard">
       {/* Top Dashboard Sub-Navigation Bar & Action Strip */}
       <div className="uxu-dash-toolbar">
         <div className="uxu-dash-toolbar__left">
           <h1 className="uxu-dash-toolbar__title">
-            {activeSubView === 'overview' && 'Genel Bakış'}
-            {activeSubView === 'analytics' && 'Canlı Analitik'}
-            {activeSubView === 'crm-orders' && 'SheetGL WebGL DataGrid'}
-            {activeSubView === 'file-manager' && 'FileManGL Dosya Yöneticisi'}
+            {activeSubView === 'overview' && 'Dashboard — Genel Bakış'}
+            {activeSubView === 'analytics' && 'Analytics Dashboard'}
+            {activeSubView === 'users' && 'Users — Kullanıcı Yönetimi'}
+            {activeSubView === 'products' && 'Products — Ürün Kataloğu & Stok'}
+            {activeSubView === 'crm-orders' && 'Orders — SheetGL Sipariş & Finans'}
+            {activeSubView === 'forms' && 'Forms — Kurumsal Form Stüdyosu'}
+            {activeSubView === 'elements-overview' && 'Elements — UI Bileşenleri Özeti'}
+            {activeSubView === 'reports' && 'Reports — Raporlar & SLA Analizi'}
+            {activeSubView === 'messages' && 'Messages — Mesaj Merkezi (3)'}
+            {activeSubView === 'calendar' && 'Calendar — Sürüm & Operasyon Takvimi'}
+            {activeSubView === 'file-manager' && 'Files — FileManGL Dosya Yöneticisi'}
             {activeSubView === 'smart-cluster' && 'Cihaz & Sunucu Kümesi'}
+            {activeSubView === 'settings' && 'Settings — Çalışma Alanı Ayarları'}
+            {activeSubView === 'security' && 'Security — Zero-Trust & API Güvenliği'}
           </h1>
           <span className="uxu-dash-toolbar__subtitle">
-            Gerçek zamanlı sistem metrikleri, SheetGL tablo ve FileManGL VFS paneli
+            {activeSubView === 'analytics'
+              ? 'Comprehensive insights and performance metrics — Gelir, Trafik Kaynakları, Dönüşüm Hunisi, Coğrafi ve Cihaz Analitiği'
+              : 'Gerçek zamanlı sistem metrikleri, etkileşimli grafikler, SheetGL tablo ve FileManGL VFS paneli'}
           </span>
         </div>
 
         <div className="uxu-dash-toolbar__right">
           {onSubViewChange && (
             <SegmentedControl<DashboardSubView>
-              value={activeSubView}
+              value={
+                ['overview', 'analytics', 'crm-orders', 'file-manager', 'smart-cluster'].includes(
+                  activeSubView
+                )
+                  ? activeSubView
+                  : 'overview'
+              }
               onChange={onSubViewChange}
               size="sm"
               options={[
-                { value: 'overview', label: 'Özet', href: '/dashboard/overview' },
-                { value: 'analytics', label: 'Analitik', href: '/dashboard/analytics' },
-                { value: 'crm-orders', label: 'SheetGL', href: '/dashboard/crm-orders' },
-                { value: 'file-manager', label: 'FileManGL', href: '/dashboard/file-manager' },
-                { value: 'smart-cluster', label: 'Küme', href: '/dashboard/smart-cluster' },
+                { value: 'overview', label: 'Dashboard', href: '/dashboard/overview' },
+                { value: 'analytics', label: 'Analytics', href: '/dashboard/analytics' },
+                { value: 'crm-orders', label: 'Orders', href: '/dashboard/crm-orders' },
+                { value: 'file-manager', label: 'Files', href: '/dashboard/file-manager' },
+                { value: 'smart-cluster', label: 'Cluster', href: '/dashboard/smart-cluster' },
               ]}
             />
           )}
@@ -368,7 +416,7 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
             onClick={() =>
               notify({
                 title: 'Rapor İndirildi',
-                description: 'UXU_Report_2026.pdf hazırlandı.',
+                description: 'uxiGL_Report_2026.pdf hazırlandı.',
                 tone: 'success',
               })
             }
@@ -378,170 +426,75 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
         </div>
       </div>
 
-      {/* 1. Top 4-Card KPI Strip */}
-      <div className="uxu-kpi-grid">
-        <StatCard
-          label="Toplam Gelir"
-          value={currentChart.totalRevenue}
-          delta={currentChart.growth}
-          trend="up"
-          tone="primary"
-          subtitle="Aktif abonelikler"
-          icon={<DollarSign size={17} />}
-          sparklineData={currentChart.primary}
+      {/* Render Dedicated Metis Admin Sub-Views (Users, Products, Forms, Elements Overview, Reports, Messages, Calendar, Settings, Security) */}
+      {isExtendedAdminView && (
+        <AdminSubViews
+          viewId={activeSubView as ExtendedAdminViewId}
+          onSelectElementComponent={onSelectComponent}
         />
-        <StatCard
-          label="Aktif Kullanıcı"
-          value="128.4K"
-          delta="+12.6% bu ay"
-          trend="up"
-          tone="success"
-          subtitle="99.98% kararlılık"
-          icon={<Users size={17} />}
-          sparklineData={[54, 62, 71, 79, 86, 93, 100]}
+      )}
+
+      {/* Render Full 8-Section Metis Analytics Dashboard when activeSubView === 'analytics' */}
+      {activeSubView === 'analytics' && (
+        <AnalyticsChartsSuite
+          period={chartPeriod}
+          onPeriodChange={setChartPeriod}
+          fullAnalyticsMode={true}
         />
-        <StatCard
-          label="Tepki Süresi"
-          value="8.3 ms"
-          delta="Anlık yanıt"
-          trend="up"
-          tone="info"
-          subtitle="Akıcı etkileşim"
-          icon={<Activity size={17} />}
-          sparklineData={[118, 120, 119, 120, 120, 120, 120]}
+      )}
+
+      {/* Render Top KPI + Interactive Revenue Spline/Bar Chart + Traffic Sources Donut on Overview */}
+      {activeSubView === 'overview' && (
+        <AnalyticsChartsSuite
+          period={chartPeriod}
+          onPeriodChange={setChartPeriod}
+          fullAnalyticsMode={false}
         />
-        <StatCard
-          label="Küme Verimi"
-          value="98.4%"
-          delta="-18% güç"
-          trend="up"
-          tone="warning"
-          subtitle="4 aktif bölge"
-          icon={<Cpu size={17} />}
-          sparklineData={[72, 76, 81, 85, 90, 95, 98.4]}
-        />
-      </div>
+      )}
 
-      {/* 2. Analytics & Revenue Chart + Live Activity Stream */}
-      {(activeSubView === 'overview' || activeSubView === 'analytics') && (
-        <div className="uxu-dash-chart-and-feed">
-          <Card
-            variant="glass"
-            glowOnHover
-            eyebrow="GELİR ANALİTİĞİ"
-            title="Gelir & İşlem Hacmi"
-            subtitle="Dönemsel büyüme karşılaştırması"
-            headerIcon={<TrendingUp size={18} />}
-            headerAction={
-              <SegmentedControl<'24h' | '7d' | '30d' | '1y'>
-                value={chartPeriod}
-                onChange={setChartPeriod}
-                size="sm"
-                options={[
-                  { value: '24h', label: '24S' },
-                  { value: '7d', label: '7G' },
-                  { value: '30d', label: '30G' },
-                  { value: '1y', label: '1Y' },
-                ]}
-              />
-            }
-          >
-            <div className="uxu-interactive-chart">
-              <div className="uxu-interactive-chart__bars">
-                {currentChart.labels.map((lbl, idx) => {
-                  const pVal = currentChart.primary[idx];
-                  const sVal = currentChart.secondary[idx];
-                  return (
-                    <div key={lbl} className="uxu-chart-col">
-                      <div className="uxu-chart-col__bars-wrap">
-                        <div
-                          className="uxu-chart-bar uxu-chart-bar--primary"
-                          style={{ height: `${pVal}%` }}
-                          title={`Kurumsal: %${pVal}`}
-                        />
-                        <div
-                          className="uxu-chart-bar uxu-chart-bar--secondary"
-                          style={{ height: `${sVal}%` }}
-                          title={`Bulut: %${sVal}`}
-                        />
-                      </div>
-                      <span className="uxu-chart-col__label">{lbl}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="uxu-chart-legend">
-                <span className="uxu-chart-legend__item">
-                  <i className="uxu-legend-dot uxu-legend-dot--primary" />
-                  Kurumsal Lisanslar
-                </span>
-                <span className="uxu-chart-legend__item">
-                  <i className="uxu-legend-dot uxu-legend-dot--secondary" />
-                  Bulut Abonelikleri
-                </span>
-              </div>
-            </div>
-          </Card>
-
-          <Card
-            variant="tonal"
-            eyebrow="CANLI AKIŞ"
-            title="Son İşlemler"
-            subtitle="Sistem ve ekip güncellemeleri"
-            headerIcon={<Clock size={18} />}
-            headerAction={
-              <Badge tone="success" pulse size="xs">
-                Canlı
-              </Badge>
-            }
-          >
-            <div className="uxu-activity-feed">
-              <div className="uxu-activity-item">
-                <Avatar name="Deniz Kaya" size="sm" status="online" tone="primary" />
-                <div className="uxu-activity-item__body">
-                  <strong>Deniz Kaya</strong> tema motorunu güncelledi.
-                  <span>2 dk önce • Production</span>
-                </div>
-                <Badge tone="primary" size="xs">
-                  v2.5
-                </Badge>
-              </div>
-
-              <div className="uxu-activity-item">
-                <Avatar name="Selin Yılmaz" size="sm" status="online" tone="success" />
-                <div className="uxu-activity-item__body">
-                  <strong>Selin Yılmaz</strong> yeni renk paletini onayladı.
-                  <span>14 dk önce • Tasarım</span>
-                </div>
-                <Badge tone="success" size="xs">
-                  Onaylı
-                </Badge>
-              </div>
-
-              <div className="uxu-activity-item">
-                <Avatar name="Mert Can" size="sm" status="busy" tone="warning" />
-                <div className="uxu-activity-item__body">
-                  <strong>Mert Can</strong> otomatik ölçeklemeyi açtı.
-                  <span>38 dk önce • Altyapı</span>
-                </div>
-                <Badge tone="warning" size="xs">
-                  Ölçek
-                </Badge>
-              </div>
-
-              <div className="uxu-activity-item">
-                <Avatar name="Zeynep Ak" size="sm" status="online" tone="info" />
-                <div className="uxu-activity-item__body">
-                  <strong>Zeynep Ak</strong> birim testlerini tamamladı.
-                  <span>1 saat önce • QA</span>
-                </div>
-                <Badge tone="info" size="xs">
-                  %100
-                </Badge>
-              </div>
-            </div>
-          </Card>
+      {/* Top 4-Card KPI Strip for Cluster view */}
+      {activeSubView === 'smart-cluster' && (
+        <div className="uxu-kpi-grid">
+          <StatCard
+            label="Toplam Gelir"
+            value={currentChart.totalRevenue}
+            delta={currentChart.growth}
+            trend="up"
+            tone="primary"
+            subtitle="Aktif abonelikler"
+            icon={<DollarSign size={17} />}
+            sparklineData={currentChart.primary}
+          />
+          <StatCard
+            label="Aktif Kullanıcı"
+            value="128.4K"
+            delta="+12.6% bu ay"
+            trend="up"
+            tone="success"
+            subtitle="99.98% kararlılık"
+            icon={<Users size={17} />}
+            sparklineData={[54, 62, 71, 79, 86, 93, 100]}
+          />
+          <StatCard
+            label="Tepki Süresi"
+            value="8.3 ms"
+            delta="Anlık yanıt"
+            trend="up"
+            tone="info"
+            subtitle="Akıcı etkileşim"
+            icon={<Activity size={17} />}
+            sparklineData={[118, 120, 119, 120, 120, 120, 120]}
+          />
+          <StatCard
+            label="Küme Verimi"
+            value="98.4%"
+            delta="-18% güç"
+            trend="up"
+            tone="warning"
+            subtitle="4 aktif bölge"
+            icon={<Cpu size={17} />}
+            sparklineData={[72, 76, 81, 85, 90, 95, 98.4]}
+          />
         </div>
       )}
 
@@ -598,61 +551,6 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
 
       {activeSubView === 'crm-orders' && (
         <div className="uxu-stack-md">
-          {/* Scenario selector cards for the 4 SheetGL tables */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 12,
-            }}
-          >
-            {(
-              Object.keys(SHEETGL_PRESET_META) as SheetGLDatasetPreset[]
-            ).map((presetKey) => {
-              const meta = SHEETGL_PRESET_META[presetKey];
-              const isSelected = activeSheetPreset === presetKey;
-              return (
-                <button
-                  key={presetKey}
-                  type="button"
-                  onClick={() => setActiveSheetPreset(presetKey)}
-                  className={`uxu-palette-card ${
-                    isSelected ? 'uxu-palette-card--active' : ''
-                  }`}
-                  style={{ padding: '12px 14px' }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                    }}
-                  >
-                    <strong style={{ fontSize: '0.86rem' }}>
-                      {meta.shortLabel}
-                    </strong>
-                    <Badge
-                      size="xs"
-                      tone={isSelected ? 'primary' : 'neutral'}
-                    >
-                      SheetGL
-                    </Badge>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--uxu-text-secondary)',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {meta.description}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
           <Card
             variant="glass"
             padding="md"
@@ -662,11 +560,24 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
             title={SHEETGL_PRESET_META[activeSheetPreset].label}
             subtitle={SHEETGL_PRESET_META[activeSheetPreset].description}
             headerIcon={<ShoppingBag size={18} />}
+            headerAction={
+              <SegmentedControl<SheetGLDatasetPreset>
+                size="sm"
+                value={activeSheetPreset}
+                onChange={setActiveSheetPreset}
+                options={[
+                  { value: 'finance-erp', label: 'Finans & ERP' },
+                  { value: 'cloud-telemetry', label: 'Telemetri' },
+                  { value: 'hr-payroll', label: 'İK & Bordro' },
+                  { value: 'inventory-supply', label: 'Stok & Lojistik' },
+                ]}
+              />
+            }
           >
             <SheetGLGridAdapter
               datasetPreset={activeSheetPreset}
               initialRowCount={300}
-              height={560}
+              height={580}
             />
           </Card>
         </div>
@@ -688,12 +599,12 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
       {/* 4. 3-Column Bento Grid: Apple Spatial Audio + Material Climate + LSP Control Center */}
       {(activeSubView === 'overview' || activeSubView === 'smart-cluster') && (
         <div className="uxu-bento-grid">
-          {/* Card 1: Apple HIG Spatial Audio & Control Center */}
+          {/* Card 1: Spatial Audio & Control Center */}
           <Card
             variant="glass"
             material="regular"
             glowOnHover
-            eyebrow="APPLE HIG • STANDART MALZEME (REGULAR)"
+            eyebrow="LIQUID GLASS • STANDART MALZEME (REGULAR)"
             title="Spatial Audio & Control Center"
             subtitle="İçerik Katmanı (Regular) + Medya Üstü Clear Liquid Glass"
             headerIcon={<Headphones size={20} />}
@@ -885,7 +796,7 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
                 </div>
                 <div className="uxu-stage-row">
                   {[
-                    'Apple HIG',
+                    'Liquid Glass',
                     'Material You',
                     'Responsive',
                     'Odak Modu',
@@ -957,7 +868,7 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
           >
             <div className="uxu-stack-md">
               <BooleanControlComponent
-                label="Apple Dinamik Cam Geçirgenliği"
+                label="Dinamik Cam Geçirgenliği"
                 description="Pencere odak durumuna göre blur katmanını optimize et"
                 value={settingsState.adaptiveVibrancy}
                 onChange={(val) =>
@@ -1004,7 +915,7 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
         <Card
           variant="glass"
           padding="md"
-          eyebrow="UXU NATIVE HTML TABLE (SIFIR WEBGL • HAFİF TABLO TASARIMI)"
+          eyebrow="UXIGL NATIVE HTML TABLE (SIFIR WEBGL • HAFİF TABLO TASARIMI)"
           title={
             nativeTableDataset === 'deployments'
               ? 'Dağıtık Mikroservis Durum Tablosu'
@@ -1307,12 +1218,12 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
         </Card>
       )}
 
-      {/* 6. Apple HIG Materials & Vibrancy Interactive Architecture Matrix */}
+      {/* 6. Materials & Vibrancy Interactive Architecture Matrix */}
       {(activeSubView === 'overview' || activeSubView === 'smart-cluster') && (
         <Card
           variant="glass"
           material="regular"
-          eyebrow="APPLE HUMAN INTERFACE GUIDELINES • MATERIALS & VIBRANCY"
+          eyebrow="LIQUID GLASS & STANDART MALZEMELER • VIBRANCY"
           title="Malzeme Katmanları: Liquid Glass vs. Standart Malzemeler"
           subtitle="Kontrol/Gezinme Katmanı (Liquid Glass: regular & clear) ile İçerik Katmanı (ultraThin, thin, regular, thick) ve UIVibrancyEffectStyle Hiyerarşisi"
           headerIcon={<Sparkles size={20} />}

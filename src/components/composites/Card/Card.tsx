@@ -3,7 +3,7 @@ import type { SurfaceContract } from '../../../core/contracts/ComponentContracts
 
 /**
  * ============================================================================
- * UXU COMPOSITE — CARD (SURFACE CONTAINER)
+ * uxiGL COMPOSITE — CARD (SURFACE CONTAINER)
  * ============================================================================
  * Fuses Apple visionOS / macOS Sonoma glass vibrancy (`variant="glass"`) with
  * Google Material You tonal surface containers (`variant="tonal"`).

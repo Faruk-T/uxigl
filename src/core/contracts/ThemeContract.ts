@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * UXU DESIGN SYSTEM — THEME & OPTIONAL WEBGL CONTRACTS (DIP & OCP)
+ * uxiGL DESIGN SYSTEM — THEME & OPTIONAL WEBGL CONTRACTS (DIP & OCP)
  * ============================================================================
  */
 
