@@ -1,26 +1,73 @@
 import React, { useId } from 'react';
+import defaultLogoPng from '../../assets/logo/uxi_no_bg.png';
 
 export interface UXILogoProps {
   size?: number;
   glow?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  variant?: 'image' | 'svg';
+  src?: string;
+  alt?: string;
 }
 
 /**
- * uxiGL 3D Interwoven Ribbon Monogram Logo (v2.5.0)
- * Exact vector reconstruction of the official uxiGL emblem:
- * - Outer 'U' 3D beveled pillars & curling lower cradle
- * - Intersecting 'X' sculpted S-ribbons (Mint-Teal & Violet/Cyan wave)
- * - Central translucent 'I' capsule with clipped diagonal refraction bands + top diamond dot
+ * uxiGL Official 3D Ribbon Monogram Logo
+ * - Displays the official high-resolution 3D translucent monogram (PNG with transparency) by default.
+ * - Supports vector SVG fallback via variant="svg".
+ * - Dual-tone cyan & orange glow filters with squircle bounds.
  */
 export const UXILogo: React.FC<UXILogoProps> = ({
   size = 32,
   glow = false,
   className = '',
   style,
+  variant = 'image',
+  src,
+  alt = 'uxiGL Logo',
 }) => {
   const uid = useId().replace(/:/g, '');
+
+  if (variant === 'image') {
+    const imgSrc = src || defaultLogoPng;
+    return (
+      <div
+        className={`uxu-logo ${className}`.trim()}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          width: size,
+          height: size,
+          flexShrink: 0,
+          userSelect: 'none',
+          filter: glow
+            ? 'drop-shadow(0 8px 24px rgba(0, 180, 255, 0.35)) drop-shadow(0 3px 12px rgba(255, 107, 26, 0.30))'
+            : undefined,
+          transition: 'transform 0.25s ease, filter 0.25s ease',
+          ...style,
+        }}
+      >
+        <img
+          src={imgSrc}
+          alt={alt}
+          width={size}
+          height={size}
+          loading="eager"
+          decoding="async"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            display: 'block',
+            userSelect: 'none',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -35,7 +82,7 @@ export const UXILogo: React.FC<UXILogoProps> = ({
         flexShrink: 0,
         userSelect: 'none',
         filter: glow
-          ? 'drop-shadow(0 4px 16px rgba(0, 195, 255, 0.34)) drop-shadow(0 2px 22px rgba(139, 92, 246, 0.26))'
+          ? 'drop-shadow(0 6px 18px rgba(0, 180, 255, 0.28)) drop-shadow(0 2px 10px rgba(255, 107, 26, 0.22))'
           : undefined,
         transition: 'transform 0.25s ease, filter 0.25s ease',
         ...style,
@@ -44,277 +91,442 @@ export const UXILogo: React.FC<UXILogoProps> = ({
       <svg
         width={size}
         height={size}
-        viewBox="0 0 120 120"
+        viewBox="0 0 128 128"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
         <defs>
-          {/* 1. Top Diamond Gradient (#FFFFFF -> #C8F7FB) */}
+          {/* MASTER POWERCLIP SQUIRCLE — Nothing spills outside this rounded square */}
+          <clipPath id={`uxigl_powerclip_${uid}`}>
+            <rect x="4" y="4" width="120" height="120" rx="28" />
+          </clipPath>
+
+          {/* Clip Path for Lowercase 'i' Stem */}
+          <clipPath id={`uxigl_istem_clip_${uid}`}>
+            <path d="M90.5 67C90.5 55.5 98.2 50.5 110 50.5V93.5C110 101.2 103.8 105.5 90.5 105.5V67Z" />
+          </clipPath>
+
+          {/* Soft 3D Elevation Drop Shadow for Foreground U & i */}
+          <filter
+            id={`uxigl_drop_${uid}`}
+            x="-12%"
+            y="-10%"
+            width="128%"
+            height="128%"
+          >
+            <feDropShadow
+              dx="0"
+              dy="4"
+              stdDeviation="4.5"
+              floodColor="#030D14"
+              floodOpacity="0.58"
+            />
+          </filter>
+
+          {/* 1. Base Dark Emerald-Slate Canvas Gradient (Top & Bottom X Notches) */}
           <linearGradient
-            id={`uxi_dia_${uid}`}
-            x1="52"
-            y1="9"
-            x2="69"
-            y2="26"
+            id={`uxigl_bg_dark_${uid}`}
+            x1="64"
+            y1="4"
+            x2="64"
+            y2="124"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="55%" stopColor="#E3FCFD" />
-            <stop offset="100%" stopColor="#C4F4FA" />
+            <stop offset="0%" stopColor="#071921" />
+            <stop offset="50%" stopColor="#0F2D37" />
+            <stop offset="100%" stopColor="#061720" />
           </linearGradient>
 
-          {/* 2A. Mint-Teal S-Ribbon Main Upper Face */}
+          {/* 2A. Left Warm Amber-Orange Lobe Gradient */}
           <linearGradient
-            id={`uxi_mint_top_${uid}`}
-            x1="26"
-            y1="18"
-            x2="83"
-            y2="110"
+            id={`uxigl_left_orange_${uid}`}
+            x1="8"
+            y1="6"
+            x2="66"
+            y2="122"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#35EDA4" />
-            <stop offset="32%" stopColor="#1AD8C9" />
-            <stop offset="68%" stopColor="#11C6DC" />
-            <stop offset="100%" stopColor="#22DFAC" />
+            <stop offset="0%" stopColor="#DF7A1C" />
+            <stop offset="32%" stopColor="#F47920" />
+            <stop offset="72%" stopColor="#F58220" />
+            <stop offset="100%" stopColor="#E5892B" />
           </linearGradient>
 
-          {/* 2B. Mint-Teal S-Ribbon Inner/Lower Bevel */}
+          {/* 2B. PowerClipped Left 'X' Wing — Vivid Red-Orange Center Triangle */}
           <linearGradient
-            id={`uxi_mint_bev_${uid}`}
-            x1="28"
-            y1="30"
-            x2="76"
-            y2="110"
+            id={`uxigl_x_left_wing_${uid}`}
+            x1="4"
+            y1="26"
+            x2="52"
+            y2="88"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#10C8D4" />
-            <stop offset="50%" stopColor="#0B8EC4" />
-            <stop offset="100%" stopColor="#16B5C8" />
+            <stop offset="0%" stopColor="#FF9E3B" />
+            <stop offset="28%" stopColor="#F85E24" />
+            <stop offset="75%" stopColor="#E63B1F" />
+            <stop offset="100%" stopColor="#D6321D" />
           </linearGradient>
 
-          {/* 3A. Right 'U' Pillar Outer-Right Bevel (#C5ADFB -> #855EED -> #5756E4) */}
+          {/* 2C. Inner U-Hollow Warm Shadowed X-Triangle */}
           <linearGradient
-            id={`uxi_ur_out_${uid}`}
-            x1="104"
-            y1="18"
-            x2="76"
-            y2="112"
+            id={`uxigl_x_inner_${uid}`}
+            x1="34"
+            y1="38"
+            x2="66"
+            y2="84"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#C5ADFB" />
-            <stop offset="42%" stopColor="#AF9AF5" />
-            <stop offset="76%" stopColor="#8A63EE" />
-            <stop offset="100%" stopColor="#5756E4" />
+            <stop offset="0%" stopColor="#6D4C29" />
+            <stop offset="55%" stopColor="#3B3A28" />
+            <stop offset="100%" stopColor="#1E352F" />
           </linearGradient>
 
-          {/* 3B. Right 'U' Pillar Inner-Left Bevel (#A490F3 -> #764DEB -> #454BDA) */}
+          {/* 3A. Top-Right Deep Emerald-Teal Dome (Behind Orange Dot) */}
           <linearGradient
-            id={`uxi_ur_in_${uid}`}
-            x1="96"
-            y1="22"
+            id={`uxigl_right_dome_${uid}`}
+            x1="82"
+            y1="8"
+            x2="122"
+            y2="62"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#1BC47D" />
+            <stop offset="50%" stopColor="#0E9471" />
+            <stop offset="100%" stopColor="#0B6968" />
+          </linearGradient>
+
+          {/* 3B. Lower-Right Sweeping Emerald -> Cyan -> Ocean Blue Lobe */}
+          <linearGradient
+            id={`uxigl_right_wave_${uid}`}
+            x1="124"
+            y1="36"
             x2="68"
-            y2="110"
+            y2="124"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#A48DF2" />
-            <stop offset="48%" stopColor="#7C4FEA" />
-            <stop offset="85%" stopColor="#5E50E3" />
-            <stop offset="100%" stopColor="#4349D9" />
+            <stop offset="0%" stopColor="#2EE87A" />
+            <stop offset="35%" stopColor="#14B8A6" />
+            <stop offset="72%" stopColor="#0891B2" />
+            <stop offset="100%" stopColor="#0369A1" />
           </linearGradient>
 
-          {/* 4A. Top-Right to Bottom-Left 'X' Ribbon — Upper Lavender-Indigo Facet */}
+          {/* 3C. Central S-Curve Teal-to-Azure Ribbon (Between U and i) */}
           <linearGradient
-            id={`uxi_x_up_${uid}`}
-            x1="90"
-            y1="18"
-            x2="38"
+            id={`uxigl_mid_s_ribbon_${uid}`}
+            x1="88"
+            y1="4"
+            x2="58"
+            y2="124"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#1AD696" />
+            <stop offset="38%" stopColor="#129AB8" />
+            <stop offset="75%" stopColor="#1565C0" />
+            <stop offset="100%" stopColor="#0EA5E9" />
+          </linearGradient>
+
+          {/* 4A. Left 'U' Stem — Outer-Left Royal Blue Facet */}
+          <linearGradient
+            id={`uxigl_u_blue_outer_${uid}`}
+            x1="19"
+            y1="24"
+            x2="48"
             y2="92"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#B091EE" />
-            <stop offset="35%" stopColor="#8E69EB" />
-            <stop offset="70%" stopColor="#5A6CE8" />
-            <stop offset="100%" stopColor="#3B7BEB" />
+            <stop offset="0%" stopColor="#38BDF8" />
+            <stop offset="35%" stopColor="#0A84FF" />
+            <stop offset="78%" stopColor="#0055D4" />
+            <stop offset="100%" stopColor="#003DA6" />
           </linearGradient>
 
-          {/* 4B. Top-Right to Bottom-Left 'X' Ribbon — Lower Cyan Wave Facet */}
+          {/* 4B. Left 'U' Stem — Inner-Right Electric Cyan-Blue Facet */}
           <linearGradient
-            id={`uxi_x_low_${uid}`}
-            x1="98"
-            y1="19"
-            x2="44"
-            y2="94"
+            id={`uxigl_u_blue_inner_${uid}`}
+            x1="28"
+            y1="24"
+            x2="39"
+            y2="86"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#00BAF7" />
-            <stop offset="42%" stopColor="#0CB4F3" />
-            <stop offset="76%" stopColor="#2E91EC" />
-            <stop offset="100%" stopColor="#387EE6" />
+            <stop offset="0%" stopColor="#26C6DA" />
+            <stop offset="22%" stopColor="#29B6F6" />
+            <stop offset="68%" stopColor="#0288D1" />
+            <stop offset="100%" stopColor="#005CE6" />
           </linearGradient>
 
-          {/* 5A. Left 'U' Pillar Outer Face & Bottom Cradle (#645CE5 -> #16C5FD -> #337CE5) */}
+          {/* 4C. 'U' Bowl Inner Apricot/Peach Crescent Facet */}
           <linearGradient
-            id={`uxi_ul_out_${uid}`}
-            x1="15"
-            y1="18"
-            x2="64"
-            y2="112"
+            id={`uxigl_u_peach_${uid}`}
+            x1="22"
+            y1="72"
+            x2="68"
+            y2="68"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#645CE5" />
-            <stop offset="32%" stopColor="#497EEE" />
-            <stop offset="66%" stopColor="#14C4FF" />
-            <stop offset="86%" stopColor="#1EA0F2" />
-            <stop offset="100%" stopColor="#3C5FDD" />
+            <stop offset="0%" stopColor="#FB7185" />
+            <stop offset="25%" stopColor="#FDBA74" />
+            <stop offset="65%" stopColor="#FBBF24" />
+            <stop offset="100%" stopColor="#A3E635" />
           </linearGradient>
 
-          {/* 5B. Left 'U' Pillar Inner Bevel & Bottom Hook (#665CEA -> #268BED -> #455BD5) */}
+          {/* 4D. 'U' Outer Bowl to Top-Right Arch (Red-Orange -> Gold -> Neon Green) */}
           <linearGradient
-            id={`uxi_ul_in_${uid}`}
+            id={`uxigl_u_main_sweep_${uid}`}
             x1="24"
-            y1="19"
-            x2="69"
-            y2="100"
+            y1="102"
+            x2="82"
+            y2="8"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#665CEA" />
-            <stop offset="36%" stopColor="#4F70EA" />
-            <stop offset="68%" stopColor="#1E94EE" />
-            <stop offset="88%" stopColor="#3264DB" />
-            <stop offset="100%" stopColor="#454BDA" />
+            <stop offset="0%" stopColor="#EE3A24" />
+            <stop offset="22%" stopColor="#FF6B1A" />
+            <stop offset="44%" stopColor="#F59E0B" />
+            <stop offset="64%" stopColor="#84CC16" />
+            <stop offset="82%" stopColor="#2CE87E" />
+            <stop offset="100%" stopColor="#34F585" />
           </linearGradient>
 
-          {/* 6A. Central 'I' Capsule Base Vertical Gradient */}
+          {/* 5A. Lowercase 'i' Stem — Left Electric Blue Half */}
           <linearGradient
-            id={`uxi_i_base_${uid}`}
-            x1="61.5"
-            y1="36"
-            x2="61.5"
-            y2="103.5"
+            id={`uxigl_i_blue_${uid}`}
+            x1="91"
+            y1="51"
+            x2="102"
+            y2="105"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#B4F6FE" />
-            <stop offset="30%" stopColor="#94E4FC" />
-            <stop offset="62%" stopColor="#42B5FC" />
-            <stop offset="85%" stopColor="#5FA3FA" />
-            <stop offset="100%" stopColor="#7C8FFB" />
+            <stop offset="0%" stopColor="#29D8FF" />
+            <stop offset="45%" stopColor="#0088FF" />
+            <stop offset="100%" stopColor="#0048E5" />
           </linearGradient>
 
-          {/* 6B. Central 'I' Capsule Clipped Diagonal Violet Refraction Band */}
+          {/* 5B. Lowercase 'i' Stem — Right Peach/Orange/Red Half */}
           <linearGradient
-            id={`uxi_i_band_${uid}`}
-            x1="70"
-            y1="49"
-            x2="53"
-            y2="78"
+            id={`uxigl_i_orange_${uid}`}
+            x1="104"
+            y1="51"
+            x2="104"
+            y2="105"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0%" stopColor="#8D69F2" />
-            <stop offset="50%" stopColor="#7584F4" />
-            <stop offset="100%" stopColor="#5AA1F6" />
+            <stop offset="0%" stopColor="#FCD385" />
+            <stop offset="38%" stopColor="#FF8524" />
+            <stop offset="76%" stopColor="#F43F1A" />
+            <stop offset="100%" stopColor="#E11D2E" />
           </linearGradient>
 
-          {/* Clip Path for Central 'I' Capsule */}
-          <clipPath id={`uxi_i_clip_${uid}`}>
-            <rect x="53.5" y="36" width="16" height="67.5" rx="8" />
-          </clipPath>
+          {/* 6A. Lowercase 'i' Dot — 3D Glossy Orange Sphere */}
+          <radialGradient
+            id={`uxigl_i_dot_${uid}`}
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="translate(99.5 31.5) rotate(55) scale(16.5)"
+          >
+            <stop offset="0%" stopColor="#FFCA64" />
+            <stop offset="38%" stopColor="#FF7E12" />
+            <stop offset="78%" stopColor="#F03218" />
+            <stop offset="100%" stopColor="#C81E1E" />
+          </radialGradient>
+
+          {/* 6B. Glossy Specular Highlight on Orange Sphere */}
+          <radialGradient
+            id={`uxigl_dot_spec_${uid}`}
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="translate(103.5 27.5) rotate(25) scale(6 4.2)"
+          >
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0.95" />
+            <stop offset="55%" stopColor="#FFE4B5" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          </radialGradient>
         </defs>
 
-        {/* =================================================================
-            1. TOP-LEFT TO BOTTOM-RIGHT MINT/TEAL S-RIBBON (Back X Wing)
-        ================================================================= */}
-        {/* Inner/Lower Bevel of Mint Ribbon */}
-        <path
-          d="M24 22L56 58C71 74 77 88 73 102C70 109 62 113 53 113.5C65 111 72 102 70 89C68 78 60 69 47 56L24 33V22Z"
-          fill={`url(#uxi_mint_bev_${uid})`}
-        />
-        {/* Upper/Main Face of Mint-Teal S-Ribbon */}
-        <path
-          d="M22 19.5C28 16.5 36 18.5 41 25.5L56 47L77 71C86 82 86 99 74 109.5C68 113.5 60 114.2 54 114C68 111.5 76 100.5 74 87.5C72 77 63 67.5 49 54L25 29.5C22 25.5 20.5 21 22 19.5Z"
-          fill={`url(#uxi_mint_top_${uid})`}
-        />
-
-        {/* =================================================================
-            2. RIGHT 'U' 3D BEVELED PILLAR & LOWER-RIGHT BOWL
-        ================================================================= */}
-        {/* Right Pillar Inner-Left Bevel */}
-        <path
-          d="M93 26C93 20.5 96.8 18 101 18L101.5 72C101.5 95 85 112 60 114C56 114.2 53 114 50 113.5C74 111 93 93.5 93 70V26Z"
-          fill={`url(#uxi_ur_in_${uid})`}
-        />
-        {/* Right Pillar Outer-Right Bevel */}
-        <path
-          d="M101 18C105.2 18 107.5 20.8 107.5 25.5V70C107.5 95.5 89 114 61 114H55C80 112.5 99.5 94 99.5 70V24C99.5 20.2 100 18 101 18Z"
-          fill={`url(#uxi_ur_out_${uid})`}
-        />
-
-        {/* =================================================================
-            3. TOP-RIGHT TO BOTTOM-LEFT 'X' DUAL-FACETED RIBBON
-        ================================================================= */}
-        {/* Upper-Left Violet-Indigo Facet */}
-        <path
-          d="M36 89L76 26C80.5 19.2 87.5 17.2 93.5 18.8C96 19.5 98 21 98 21C92.5 22 87.5 26.5 82.5 34.5L45 92C41 92 38 90.8 36 89Z"
-          fill={`url(#uxi_x_up_${uid})`}
-        />
-        {/* Lower-Right Electric Cyan Sculpted Leaf-Wave Facet */}
-        <path
-          d="M44 93.5L81.5 35C86.5 27 92.5 20.5 99.5 18.3C101.5 17.7 102.8 19 102.2 21.8C101.2 26.8 101.5 31.8 98.8 36.8C96.5 41 91.5 46 86 53.5L54 96C50 96 46.5 95 44 93.5Z"
-          fill={`url(#uxi_x_low_${uid})`}
-        />
-
-        {/* =================================================================
-            4. LEFT 'U' 3D BEVELED PILLAR & BOTTOM-LEFT CURLING CRADLE
-        ================================================================= */}
-        {/* Left 'U' Inner Bevel & Hook Wrapping Around Bottom of 'I' Capsule */}
-        <path
-          d="M16 18C23 19.2 28 24.8 28 32.5V69C28 84 39 94.5 53 94.5C61 94.5 66.5 89.5 66.5 82.5C66.5 77.5 63.5 73 59 69.5L65 62C71.5 67.5 74.5 75.5 74.5 84.5C74.5 96.5 64.5 105.5 50 105.5C32 105.5 20.5 90.5 20.5 69V24C20.5 20.2 18.8 18.4 16 18Z"
-          fill={`url(#uxi_ul_in_${uid})`}
-        />
-        {/* Left 'U' Outer Pillar & Lower-Left Bowl */}
-        <path
-          d="M12.5 23.5C12.5 19.5 14.2 17.8 16.5 18C19.5 19.5 21 23 21 27.5V69C21 89.5 33 104 51 104C62.5 104 71 97.5 73.5 87.5C74.5 100.5 64 114 47.5 114C26.5 114 12.5 96.5 12.5 71V23.5Z"
-          fill={`url(#uxi_ul_out_${uid})`}
-        />
-
-        {/* =================================================================
-            5. CENTRAL VERTICAL 'I' CAPSULE WITH INTERWOVEN X REFRACTION
-        ================================================================= */}
-        <g clipPath={`url(#uxi_i_clip_${uid})`}>
-          {/* Base Vertical 'I' Pill (Ice Cyan -> Sky Blue -> Periwinkle) */}
+        {/* ===================================================================
+            MASTER POWERCLIP GROUP — Everything is strictly masked inside rx=28
+        =================================================================== */}
+        <g clipPath={`url(#uxigl_powerclip_${uid})`}>
+          {/* 1. Deep Dark Slate-Teal Base Canvas (Visible in Top & Bottom X Notches) */}
           <rect
-            x="53.5"
-            y="36"
-            width="16"
-            height="67.5"
-            rx="8"
-            fill={`url(#uxi_i_base_${uid})`}
+            x="4"
+            y="4"
+            width="120"
+            height="120"
+            fill={`url(#uxigl_bg_dark_${uid})`}
           />
-          {/* Diagonal Violet-Periwinkle Band Where Upper 'X' Facet Crosses 'I' */}
+
+          {/* 2. Inner U-Hollow PowerClipped 'X' Shadow Facets */}
           <path
-            d="M51 67L72 47V61L51 81V67Z"
-            fill={`url(#uxi_i_band_${uid})`}
+            d="M36 28L66 56V88L36 88V28Z"
+            fill={`url(#uxigl_x_inner_${uid})`}
           />
-          {/* Diagonal Sky-Cyan Band Where Lower 'X' Facet Crosses 'I' */}
+          {/* Right-pointing X-chevron inside U hollow */}
           <path
-            d="M51 81L72 61V71L51 91V81Z"
-            fill="#48BCFA"
-            fillOpacity="0.65"
+            d="M36 42L48.5 59.5L36 77V42Z"
+            fill="#8D6E3F"
+            fillOpacity="0.55"
+          />
+
+          {/* 3. Left Warm Amber-Orange Lobe (Clipped inside Left Side of Squircle) */}
+          <path
+            d="M4 4H60C50 18 42 34 38 48L48.5 59.5L38 74C44 92 52 108 62 124H4V4Z"
+            fill={`url(#uxigl_left_orange_${uid})`}
+          />
+
+          {/* 4. PowerClipped Left 'X' Diagonal Wing (Vivid Red-Orange Triangle + Glossy Upper Arc) */}
+          <path
+            d="M4 23C16 22 28 31 48.5 59.5L19 98C12 91 7 84 4 79V23Z"
+            fill={`url(#uxigl_x_left_wing_${uid})`}
+          />
+          {/* Subtle Top-Left Glossy Highlight Arc on Left X Wing */}
+          <path
+            d="M4 23C12 21.5 18.5 23.5 24 29.5L19.5 34C14 29 9 26.5 4 26.5V23Z"
+            fill="#FFD28A"
+            fillOpacity="0.42"
+          />
+
+          {/* 5. Top-Right Emerald-Teal Dome (Housing the 'i' Sphere) */}
+          <path
+            d="M84 4H124V46C116 56 102 60 84 58V4Z"
+            fill={`url(#uxigl_right_dome_${uid})`}
+          />
+
+          {/* 6. Lower-Right Sweeping Emerald -> Turquoise -> Deep Blue Wave Lobe */}
+          <path
+            d="M124 34C123 48 114 55 101 58C88 61 82 78 79 94C76 109 67 119 56 124H124V34Z"
+            fill={`url(#uxigl_right_wave_${uid})`}
+          />
+
+          {/* 7. Central S-Curve Teal-to-Azure Ribbon (Between U and i) */}
+          <path
+            d="M80 4H99C90 12 84 26 83 48C82 76 76 103 56 124H44C62 106 68 82 69 48C70 24 73 11 80 4Z"
+            fill={`url(#uxigl_mid_s_ribbon_${uid})`}
+          />
+          {/* Crisp Cyan Specular Edge Along Lower S-Curve */}
+          <path
+            d="M99 4C90 12 84 26 83 48C82 76 76 103 56 124"
+            stroke="#5EEAD4"
+            strokeWidth="1.4"
+            strokeOpacity="0.7"
+          />
+
+          {/* =================================================================
+              8. FOREGROUND 3D SCULPTED 'U' & 'i' (With Soft Elevation Shadow)
+          ================================================================= */}
+          <g filter={`url(#uxigl_drop_${uid})`}>
+            {/* 8A. Left 'U' Stem — Inner-Right Electric Cyan-Blue Facet */}
+            <path
+              d="M27 24H30.5C35.2 24 38.5 27.5 38.5 32.5V67C38.5 78.5 45.5 85.5 55.5 85.5C58 85.5 60.5 84.8 62.5 83.8C58 89.5 51.5 92.5 43.5 91.5C33.5 90.2 27 81 27 67.5V24Z"
+              fill={`url(#uxigl_u_blue_inner_${uid})`}
+            />
+
+            {/* 8B. Left 'U' Stem — Outer-Left Royal Blue Facet & Lower Curve */}
+            <path
+              d="M19.5 24H25.5C27.5 26 28.5 29.5 28.5 34V67.5C28.5 81 36.5 90 49.5 90C53.5 90 57.2 89 60.5 87C55.5 93 48.5 95.5 40.5 94.5C27.5 92.8 19.5 81.5 19.5 65.5V24Z"
+              fill={`url(#uxigl_u_blue_outer_${uid})`}
+            />
+
+            {/* 8C. 'U' Bowl Inner Apricot/Peach Crescent Facet */}
+            <path
+              d="M22.5 75.5C26.5 87.5 36.5 93 48.5 91.5C59.5 90 65.5 81 66.5 66.5L71.5 61C71 81.5 62.5 95.5 46.5 97.5C33.5 99 24.5 90.5 22.5 75.5Z"
+              fill={`url(#uxigl_u_peach_${uid})`}
+            />
+
+            {/* 8D. Main Outer 'U' Bowl to Top-Right Arch (Red-Orange -> Gold -> Neon Green) */}
+            <path
+              d="M19.5 61.5C20.5 82.5 31.5 95.5 47.5 95.5C61.5 95.5 67 83.5 67 64V36C67 19 72.5 9 80.5 4H93.5C84.5 10.5 80 21.5 80 38V65C80 90.5 67.5 104.5 46.5 104.5C28.5 104.5 19.5 89.5 19.5 66.5V61.5Z"
+              fill={`url(#uxigl_u_main_sweep_${uid})`}
+            />
+
+            {/* Crisp Specular Rim Lines on 'U' */}
+            <path
+              d="M30.5 24C35.2 24 38.5 27.5 38.5 32.5V67C38.5 78.5 45.5 85.5 55.5 85.5"
+              stroke="#7DD3FC"
+              strokeWidth="1.2"
+              strokeOpacity="0.85"
+            />
+            <path
+              d="M67 64V36C67 19 72.5 9 80.5 4"
+              stroke="#BBF7D0"
+              strokeWidth="1.3"
+              strokeOpacity="0.85"
+            />
+
+            {/* 8E. Lowercase 'i' Stem (Dual-Tone Electric Blue & Peach/Orange/Red) */}
+            <g clipPath={`url(#uxigl_istem_clip_${uid})`}>
+              {/* Base Blue Left Side */}
+              <rect
+                x="90"
+                y="50"
+                width="21"
+                height="56"
+                fill={`url(#uxigl_i_blue_${uid})`}
+              />
+              {/* Right Peach/Orange/Red Side Split by Smooth S-Curve */}
+              <path
+                d="M110 50.5C101.5 56.5 98.5 65.5 98.5 78C98.5 90.5 95.5 99 90.5 105.5H111V50.5H110Z"
+                fill={`url(#uxigl_i_orange_${uid})`}
+              />
+              {/* Glowing Seam Highlight Along the 'i' Stem Split */}
+              <path
+                d="M110 50.5C101.5 56.5 98.5 65.5 98.5 78C98.5 90.5 95.5 99 90.5 105.5"
+                stroke="#FDE68A"
+                strokeWidth="1.2"
+                strokeOpacity="0.75"
+              />
+              {/* Left Cyan Edge Highlight on 'i' Stem */}
+              <path
+                d="M90.5 105.5V67C90.5 55.5 98.2 50.5 110 50.5"
+                stroke="#7DD3FC"
+                strokeWidth="1.2"
+                strokeOpacity="0.8"
+              />
+            </g>
+
+            {/* 8F. Lowercase 'i' Dot — 3D Glossy Orange Orb */}
+            <circle
+              cx="100.5"
+              cy="34.5"
+              r="12"
+              fill={`url(#uxigl_i_dot_${uid})`}
+            />
+            {/* Top-Right Specular Glint on Orange Orb */}
+            <ellipse
+              cx="103.5"
+              cy="28"
+              rx="5.5"
+              ry="3.8"
+              transform="rotate(-18 103.5 28)"
+              fill={`url(#uxigl_dot_spec_${uid})`}
+            />
+            {/* Crisp Rim Highlight on Orange Orb */}
+            <circle
+              cx="100.5"
+              cy="34.5"
+              r="11.4"
+              stroke="#FDBA74"
+              strokeWidth="0.8"
+              strokeOpacity="0.55"
+            />
+          </g>
+
+          {/* 9. Subtle Inner Squircle Glass Rim Border */}
+          <rect
+            x="4.75"
+            y="4.75"
+            width="118.5"
+            height="118.5"
+            rx="27.25"
+            stroke="#FFFFFF"
+            strokeWidth="1.2"
+            strokeOpacity="0.18"
           />
         </g>
-
-        {/* =================================================================
-            6. TOP FLOATING ROUNDED DIAMOND ('I' DOT)
-        ================================================================= */}
-        <rect
-          x="51.5"
-          y="8"
-          width="18"
-          height="18"
-          rx="4.8"
-          transform="rotate(45 60.5 17)"
-          fill={`url(#uxi_dia_${uid})`}
-        />
       </svg>
     </div>
   );

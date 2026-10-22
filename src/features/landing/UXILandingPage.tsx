@@ -337,7 +337,7 @@ export default function App() {
               flexShrink: 0,
             }}
           >
-            <UXILogo size={isMobile ? 28 : 32} glow={true} />
+            <UXILogo size={isMobile ? 28 : 34} glow={true} />
             <div style={{ display: 'flex', alignItems: 'baseline', gap: isMobile ? 5 : 8 }}>
               <span
                 style={{
@@ -695,10 +695,36 @@ export default function App() {
           style={{
             display: 'flex',
             justifyContent: 'center',
-            marginBottom: isMobile ? 16 : 22,
+            marginBottom: isMobile ? 18 : 26,
+            position: 'relative',
           }}
         >
-          <UXILogo size={isMobile ? 96 : 138} glow={true} />
+          {/* Subtle ambient backlight aura for 3D emblem */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: isMobile ? 160 : 230,
+              height: isMobile ? 160 : 230,
+              borderRadius: '50%',
+              background:
+                'radial-gradient(circle, rgba(0, 200, 255, 0.22) 0%, rgba(255, 107, 26, 0.16) 42%, transparent 72%)',
+              filter: 'blur(36px)',
+              pointerEvents: 'none',
+              zIndex: 0,
+            }}
+          />
+          <UXILogo
+            size={isMobile ? 108 : 156}
+            glow={true}
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.35s ease',
+            }}
+          />
         </div>
 
         {/* HERO TITLE */}
