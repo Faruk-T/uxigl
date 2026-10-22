@@ -1049,31 +1049,31 @@ export default function App() {
             {
               icon: <Sparkles size={16} color="#2FF58E" />,
               title: 'Liquid Glass Yüzeyler',
-              tag: 'Regular & Clear',
+              tag: 'HIG',
               href: '/components/surfaces/card',
               sec: 'components-surfaces',
               sub: 'card',
             },
             {
               icon: <Sliders size={16} color="#00C8FF" />,
-              title: 'Material 3 & R:0-32px',
-              tag: '6 Palet • Kalıcı',
+              title: 'Material 3 & Radius',
+              tag: '0–32px',
               href: '/docs/theming-tokens',
               sec: 'docs-guide',
               sub: 'theming-tokens',
             },
             {
               icon: <Table2 size={16} color="#818CF8" />,
-              title: 'SheetGL + Native Tablo',
-              tag: 'WebGL + HTML',
+              title: 'SheetGL & Tablo',
+              tag: 'DataGrid',
               href: '/dashboard/crm-orders',
               sec: 'dashboard',
               sub: 'crm-orders',
             },
             {
               icon: <HardDrive size={16} color="#C084FC" />,
-              title: 'FileManGL WebGL2 VFS',
-              tag: 'NTFS ACL + 0755',
+              title: 'FileManGL VFS',
+              tag: 'ACL + 0755',
               href: '/dashboard/file-manager',
               sec: 'dashboard',
               sub: 'file-manager',
@@ -1098,11 +1098,14 @@ export default function App() {
                 gap: 10,
                 textDecoration: 'none',
                 color: colors.text,
+                whiteSpace: 'nowrap',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                 {pillar.icon}
-                <strong style={{ fontSize: 13 }}>{pillar.title}</strong>
+                <strong style={{ fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {pillar.title}
+                </strong>
               </div>
               <span
                 style={{
@@ -1114,6 +1117,8 @@ export default function App() {
                     ? 'rgba(255,255,255,0.06)'
                     : 'rgba(15,23,42,0.06)',
                   color: colors.muted,
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
                 }}
               >
                 {pillar.tag}

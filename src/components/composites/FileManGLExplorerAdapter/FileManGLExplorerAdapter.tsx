@@ -42,7 +42,7 @@ export const FileManGLExplorerAdapter: React.FC<
   locale = 'tr',
   driverType = 'vfs_localstorage',
   height = 600,
-  showQuickToolbar = true,
+  showQuickToolbar = false,
 }) => {
   const { resolvedMode, preferences, activePalette } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
