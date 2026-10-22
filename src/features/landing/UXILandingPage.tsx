@@ -1,31 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
-  Layers,
   Sliders,
-  Cpu,
-  Shield,
   BookOpen,
   Play,
-  Volume2,
   Copy,
   Check,
   Sun,
   Moon,
-  LayoutDashboard,
   Table2,
   HardDrive,
 } from 'lucide-react';
 import { UXILogo } from '../../components/brand/UXILogo';
 import {
-  Button,
-  Badge,
   Switch,
   Slider,
   Progress,
   Avatar,
   AvatarGroup,
   Chip,
+  GoogleIcon,
 } from '../../components/primitives';
 import {
   Card,
@@ -35,9 +29,13 @@ import {
   FileManGLExplorerAdapter,
 } from '../../components/composites';
 import { useTheme } from '../../providers/ThemeProvider';
-import { useToast } from '../../providers/ToastProvider';
 import { RouteService } from '../../core/services/RouteService';
-import type { RadiusScale, SeedPaletteId } from '../../core/contracts/ThemeContract';
+import type {
+  FontFamilyPreset,
+  GoogleIconStyle,
+  RadiusScale,
+  SeedPaletteId,
+} from '../../core/contracts/ThemeContract';
 
 export interface UXILandingPageProps {
   onNavigate: (sectionId: string, subItemId?: string) => void;
@@ -54,12 +52,15 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
     resolvedMode,
     preferences,
     availablePalettes,
+    availableFontPresets,
     toggleMode,
     setSeedPalette,
     setRadiusScale,
     setCustomRadiusPx,
+    setFontFamilyPreset,
+    setIconStyle,
+    setIconFilled,
   } = useTheme();
-  const { notify } = useToast();
 
   const isDark = resolvedMode === 'dark';
   const [lang, setLang] = useState<'tr' | 'en'>('tr');
@@ -70,7 +71,72 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
   );
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [previewTab, setPreviewTab] = useState<LandingPreviewTab>('components');
-  const [copiedReadme, setCopiedReadme] = useState(false);
+  const [installTab, setInstallTab] = useState<
+    'npm' | 'npx_filemangl' | 'npx_sheetgl' | 'pnpm' | 'yarn' | 'bun'
+  >('npm');
+  const [copiedCmdKey, setCopiedCmdKey] = useState<string | null>(null);
+  const [showQuickUsage, setShowQuickUsage] = useState<boolean>(false);
+
+  const copyCommand = (key: string, text: string) => {
+    navigator.clipboard?.writeText(text);
+    setCopiedCmdKey(key);
+    setTimeout(() => {
+      setCopiedCmdKey((prev) => (prev === key ? null : prev));
+    }, 2000);
+  };
+
+  const installCommands = {
+    npm: {
+      label: 'npm',
+      cmd: 'npm install sheetgl filemangl lucide-react',
+      hint: isTR
+        ? 'uxiGL ekosistemi + SheetGL + FileManGL kurulumu'
+        : 'Install uxiGL ecosystem + SheetGL + FileManGL',
+    },
+    npx_filemangl: {
+      label: 'npx filemangl',
+      cmd: 'npx filemangl init',
+      hint: isTR
+        ? 'Hazır <FileManGLWorkspace /> bileşenini oluşturur'
+        : 'Scaffolds ready-to-use <FileManGLWorkspace />',
+    },
+    npx_sheetgl: {
+      label: 'npx sheetgl',
+      cmd: 'npx sheetgl init',
+      hint: isTR
+        ? 'Hazır <SheetGL /> veri tablosu bileşenini oluşturur'
+        : 'Scaffolds ready-to-use <SheetGL /> data grid',
+    },
+    pnpm: {
+      label: 'pnpm',
+      cmd: 'pnpm add sheetgl filemangl lucide-react',
+      hint: 'PNPM Workspace',
+    },
+    yarn: {
+      label: 'yarn',
+      cmd: 'yarn add sheetgl filemangl lucide-react',
+      hint: 'Yarn Package Manager',
+    },
+    bun: {
+      label: 'bun',
+      cmd: 'bun add sheetgl filemangl lucide-react',
+      hint: 'Bun Runtime',
+    },
+  } as const;
+
+  const uxiUsageSnippet = `import { ThemeProvider } from './providers/ThemeProvider';
+import { SheetGL } from 'sheetgl';
+import { FileManGL, DEFAULT_FILE_MANAGER_CONFIG } from 'filemangl';
+import 'filemangl/style.css';
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <FileManGL config={{ ...DEFAULT_FILE_MANAGER_CONFIG, borderRadius: 'squircle' }} />
+      <SheetGL dataSource={rows} columns={columns} theme="apple-dark" />
+    </ThemeProvider>
+  );
+}`;
 
   // Interactive demo states inside the Landing Page preview box
   const [demoSwitch, setDemoSwitch] = useState(true);
@@ -114,27 +180,12 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
     }
   };
 
-  const speakPronunciation = (text: string) => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.rate = 0.92;
-      window.speechSynthesis.speak(utterance);
-    }
-    notify({
-      title: `Telaffuz: ${text}`,
-      description: 'UXI — UX × UI Birleşik Tasarım Sistemi',
-      tone: 'info',
-    });
-  };
-
   const features = isTR
     ? [
         {
           icon: '✨',
-          title: 'Apple HIG Liquid Glass & Standart Malzemeler',
-          desc: 'Gezinme ve kontrol katmanında yüzen Liquid Glass (Regular & Clear), içerik katmanında ise 4 kademeli Apple Standart Malzemeleri (UltraThin, Thin, Regular, Thick) ve Vibrancy hiyerarşisi.',
+          title: 'Liquid Glass & Katmanlı Yüzey Malzemeleri',
+          desc: 'Gezinme ve kontrol katmanında yüzen Liquid Glass (Regular & Clear), içerik katmanında ise 4 kademeli Standart Yüzey Malzemeleri (UltraThin, Thin, Regular, Thick) ve Vibrancy hiyerarşisi.',
         },
         {
           icon: '🎨',
@@ -143,7 +194,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
         },
         {
           icon: '📊',
-          title: 'SheetGL 60 FPS WebGL Tablo + Native DataTable',
+          title: 'SheetGL WebGL Tablo + Native DataTable',
           desc: '100.000+ satır için 4 kurumsal senaryolu (Finans, Telemetri, İK, Stok) SheetGL kanvas tablosu ve sıfır GPU yüküyle çalışan 4 varyantlı semantik HTML <DataTable />.',
         },
         {
@@ -165,8 +216,8 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
     : [
         {
           icon: '✨',
-          title: 'Apple HIG Liquid Glass & Standard Materials',
-          desc: 'Floating Liquid Glass (Regular & Clear) for navigation and transient controls, paired with 4-tier Apple Standard Materials and Vibrancy for the content layer.',
+          title: 'Liquid Glass & Standard Materials',
+          desc: 'Floating Liquid Glass (Regular & Clear) for navigation and transient controls, paired with 4-tier Standard Materials and Vibrancy for the content layer.',
         },
         {
           icon: '🎨',
@@ -175,7 +226,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
         },
         {
           icon: '📊',
-          title: 'SheetGL 60 FPS WebGL Grid + Native DataTable',
+          title: 'SheetGL WebGL Grid + Native DataTable',
           desc: 'Includes 4 enterprise SheetGL presets (Finance, Telemetry, HR, Inventory) plus a lightweight 4-variant semantic HTML <DataTable />.',
         },
         {
@@ -191,61 +242,19 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
         {
           icon: '⚡',
           title: 'Zero Idle Resource Architecture & SOLID',
-          desc: 'Single-active-engine lifecycle and strict Apple HIG backdrop-filter discipline keep idle CPU & GPU usage near 0%.',
+          desc: 'Single-active-engine lifecycle and strict backdrop-filter discipline keep idle CPU & GPU usage near 0%.',
         },
       ];
-
-  const pronunciationModes = [
-    {
-      badge: isTR ? '1. EN PROFESYONEL & GLOBAL (ÖNERİLEN)' : '1. MOST PROFESSIONAL & GLOBAL (RECOMMENDED)',
-      tone: 'primary' as const,
-      title: isTR ? 'Harf Harf Okunuşu: "Yu-Eks-Ay"' : 'Letter-by-Letter: "Yu-Eks-Ay"',
-      ipa: '/juː - eks - aɪ/',
-      speechText: 'U X I',
-      howItSounds: isTR
-        ? 'Tıpkı UI (Yu-Ay) ve UX (Yu-Eks) kavramlarının okunuşu gibi harflerin İngilizce tek tek telaffuz edilmesidir.'
-        : 'Pronounced letter by letter in English, just like UX (Yu-Eks) and UI (Yu-Ay).',
-      advantage: isTR
-        ? 'İsmin doğrudan UX ve UI birleşimi olduğunu dinleyenin zihninde anında kodlar. Global pazarda (ThemeForest, GitHub, Product Hunt vb.) bir geliştirici bu ismi gördüğünde %90 ihtimalle içinden böyle okuyacaktır. Resmi tanıtımlarda, dokümantasyonda ve videolarda kesinlikle "Yu-Eks-Ay" (veya "Yu-Eks-Ay Admin") kullanılmalıdır.'
-        : 'Instantly encodes the fusion of UX and UI in the listener’s mind. Across GitHub, Product Hunt, and enterprise teams, 90% of developers naturally read it this way.',
-    },
-    {
-      badge: isTR ? '2. EN AKILDA KALICI & SEMPATİK' : '2. MOST MEMORABLE & FRIENDLY',
-      tone: 'success' as const,
-      title: isTR ? 'Tek Kelime Gibi: "Yuksi" veya "Uksi"' : 'As a Single Word: "Yook-see" / "Uksi"',
-      ipa: '/juːksi/ • /ʊksi/',
-      speechText: 'yooksee',
-      howItSounds: isTR
-        ? 'Kısaltmaları tek bir kelime gibi okuma eğiliminden (örneğin MUI paketine "Mui", GUI\'ye "Gui" veya Nuxt\'a "Nakst" denmesi gibi) yola çıkan okunuştur.'
-        : 'Follows the developer tradition of reading acronyms as a friendly word (like "Mui" for MUI, "Gui" for GUI, or "Nuxt").',
-      advantage: isTR
-        ? 'Ekip içi günlük konuşmalarda ("Abi Uksi\'nin tablo bileşenini güncelledim") söylemesi çok pratiktir, ağızda yuvarlanmaz ve markaya samimi, akılda kalıcı bir karakter katar.'
-        : 'Super practical in daily team standups ("I just updated UXI’s table component") — rolls off the tongue and gives the brand a warm, memorable personality.',
-    },
-    {
-      badge: isTR ? '3. RİTMİK & HİBRİT OKUNUŞ' : '3. RHYTHMIC & HYBRID',
-      tone: 'info' as const,
-      title: isTR ? 'Hibrit Okunuş: "Yu-Eksi"' : 'Hybrid Pronunciation: "Yu-Eksi"',
-      ipa: '/juː - eksi/',
-      speechText: 'U X E',
-      howItSounds: isTR
-        ? 'İlk iki harfi İngilizce kısaltma gibi okuyup sonunu birleştirerek okumaktır.'
-        : 'Combines the English "UX" prefix with a smooth "-ee" ending.',
-      advantage: isTR
-        ? 'Hem UX (Kullanıcı Deneyimi) vurgusunu korur hem de "Pixi (PixiJS)" gibi popüler grafik kütüphanelerinin telaffuz ritmine benzer modern bir tını yakalar.'
-        : 'Preserves the strong "UX" emphasis while catching a modern phonetic rhythm similar to popular graphics libraries like PixiJS.',
-    },
-  ];
 
   const faqs = isTR
     ? [
         {
-          q: 'Neden proje adı UXI (Yu-Eks-Ay / Yuksi) olarak seçildi?',
-          a: 'UXI; User Experience (UX) ve User Interface (UI) disiplinlerinin tek bir çatı altında birleşimini simgeler. Resmi dokümantasyonda "Yu-Eks-Ay" (/juː-eks-aɪ/), topluluk ve ekip içi günlük dilde ise "Yuksi / Uksi" olarak okunur.',
+          q: 'Neden proje adı uxiGL olarak seçildi?',
+          a: 'uxiGL; User Experience (UX), User Interface (UI) ve donanım hızlandırmalı GL (SheetGL & FileManGL) ekosisteminin tek bir çatı altında birleşimini simgeler.',
         },
         {
-          q: 'UXI içinde hem SheetGL hem de FileManGL hazır geliyor mu?',
-          a: 'Evet! SheetGL (60 FPS WebGL veri tablosu + 4 kurumsal senaryo) ve FileManGL (WebGL2 sanal dosya yöneticisi) UXI mimarisine tam entegredir. Ayrıca hafif tablolar için sıfır GPU yüküyle çalışan native <DataTable /> bileşeni de mevcuttur.',
+          q: 'uxiGL içinde hem SheetGL hem de FileManGL hazır geliyor mu?',
+          a: 'Evet! SheetGL (WebGL veri tablosu + 4 kurumsal senaryo) ve FileManGL (WebGL2 sanal dosya yöneticisi) uxiGL mimarisine tam entegredir. Ayrıca hafif tablolar için sıfır GPU yüküyle çalışan native <DataTable /> bileşeni de mevcuttur.',
         },
         {
           q: 'Border Radius, Font Ölçeği ve Tema seçimleri sayfa yenilenince (F5) korunuyor mu?',
@@ -254,21 +263,18 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
       ]
     : [
         {
-          q: 'Why is the project named UXI (/juː-eks-aɪ/ or "yook-see")?',
-          a: 'UXI represents the convergence of User Experience (UX) and User Interface (UI). In official docs and videos it is pronounced "Yu-Eks-Ay" (/juː-eks-aɪ/), while in daily team conversations "yook-see" ("Yuksi / Uksi") is encouraged.',
+          q: 'Why is the project named uxiGL?',
+          a: 'uxiGL represents the convergence of User Experience (UX), User Interface (UI), and our GL engine family (SheetGL & FileManGL) into a unified design system.',
         },
         {
-          q: 'Are SheetGL and FileManGL built directly into UXI?',
-          a: 'Yes! Both SheetGL (60 FPS Canvas/WebGL DataGrid) and FileManGL (WebGL2 Virtual File System) are natively integrated alongside UXI’s lightweight semantic <DataTable />.',
+          q: 'Are SheetGL and FileManGL built directly into uxiGL?',
+          a: 'Yes! Both SheetGL (Canvas/WebGL DataGrid) and FileManGL (WebGL2 Virtual File System) are natively integrated alongside uxiGL’s lightweight semantic <DataTable />.',
         },
         {
           q: 'Do Border Radius, Font Scale, and Theme preferences persist across F5 reloads?',
           a: 'Yes. All theme tokens (Dark/Light mode, 6 seed palettes, 0px–32px Border Radius, 80%–125% font scale) and URL routes persist automatically.',
         },
       ];
-
-  const readmeBadgeSnippet = `> **UXI** *(pronounced \`/juː-eks-aɪ/\` "Yu-Eks-Ay" or simply **"yook-see"** / **"Yuksi"**)*
-> Next-Gen Apple HIG Liquid Glass × Google Material You Design System for React.`;
 
   return (
     <div
@@ -343,7 +349,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                     "-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif",
                 }}
               >
-                UX
+                uxi
                 <span
                   style={{
                     background:
@@ -352,7 +358,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                     WebkitTextFillColor: 'transparent',
                   }}
                 >
-                  I
+                  GL
                 </span>
               </span>
               <span
@@ -393,22 +399,6 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                 }}
               >
                 {isTR ? 'Canlı Önizleme' : 'Live Preview'}
-              </a>
-
-              <a
-                href="#pronunciation"
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection('pronunciation');
-                }}
-                style={{
-                  color: isDark ? '#38BDF8' : '#0284C7',
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                }}
-              >
-                {isTR ? 'Yu-Eks-Ay / Yuksi' : 'Pronunciation'}
               </a>
 
               <a
@@ -584,7 +574,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                     : 'Studio'
                   : isTR
                   ? 'Uygulamaya Git'
-                  : 'Launch UXI'}
+                  : 'Launch uxiGL'}
               </span>
               <span style={{ fontSize: isMobile ? 13 : 15 }}>→</span>
             </a>
@@ -711,54 +701,6 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
           <UXILogo size={isMobile ? 96 : 138} glow={true} />
         </div>
 
-        {/* PHONETIC PRONUNCIATION PILL BADGE */}
-        <div
-          style={{
-            display: 'inline-flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            padding: '6px 16px',
-            borderRadius: 999,
-            backgroundColor: isDark
-              ? 'rgba(56, 189, 248, 0.10)'
-              : 'rgba(2, 132, 199, 0.08)',
-            border: `1px solid ${
-              isDark ? 'rgba(56, 189, 248, 0.30)' : 'rgba(2, 132, 199, 0.22)'
-            }`,
-            marginBottom: 18,
-            fontSize: 12.5,
-            fontFamily: "'JetBrains Mono', monospace",
-          }}
-        >
-          <strong style={{ color: isDark ? '#38BDF8' : '#0284C7' }}>UXI</strong>
-          <span style={{ color: colors.muted }}>
-            pronounced <code>/juː-eks-aɪ/</code> (&ldquo;Yu-Eks-Ay&rdquo;) or simply{' '}
-            <strong>&ldquo;yook-see&rdquo;</strong> (&ldquo;Yuksi / Uksi&rdquo;)
-          </span>
-          <button
-            type="button"
-            onClick={() => speakPronunciation('U X I')}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              padding: '2px 8px',
-              borderRadius: 999,
-              border: 'none',
-              background: isDark ? 'rgba(56, 189, 248, 0.2)' : 'rgba(2, 132, 199, 0.15)',
-              color: isDark ? '#7DD3FC' : '#0369A1',
-              fontSize: 11,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-            title="Dinle: Yu-Eks-Ay"
-          >
-            <Volume2 size={12} /> Dinle
-          </button>
-        </div>
-
         {/* HERO TITLE */}
         <h1
           style={{
@@ -773,7 +715,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
         >
           {isTR ? (
             <>
-              React İçin Yeni Nesil{' '}
+              Yeni Nesil{' '}
               <span
                 style={{
                   background:
@@ -782,7 +724,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                Apple Liquid Glass × Material 3
+                Liquid Glass × Material 3
               </span>{' '}
               Tasarım Sistemi
             </>
@@ -797,9 +739,9 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                   WebkitTextFillColor: 'transparent',
                 }}
               >
-                Apple Liquid Glass × Material 3
+                Liquid Glass × Material 3
               </span>{' '}
-              Design System for React
+              Design System
             </>
           )}
         </h1>
@@ -815,8 +757,8 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
           }}
         >
           {isTR
-            ? 'UX ve UI dünyasını tek bir mimaride birleştiren UXI; Apple HIG Liquid Glass & Standart Malzemeleri, Google Material You tohum paletleri, 0–32px canlı Border Radius motoru, SheetGL 60 FPS WebGL DataGrid ve FileManGL WebGL2 dosya yöneticisiyle eksiksiz bir kurumsal ekosistem sunar.'
-            : 'Uniting UX and UI in a single architecture: Apple HIG Liquid Glass & Standard Materials, Google Material You tonal palettes, a live 0–32px Border Radius engine, SheetGL 60 FPS WebGL DataGrid, and FileManGL WebGL2 Virtual File System.'}
+            ? 'UX, UI ve WebGL dünyasını tek bir mimaride birleştiren uxiGL; Liquid Glass & Standart Yüzey Malzemeleri, Google Material You tohum paletleri, 0–32px canlı Border Radius motoru, SheetGL WebGL DataGrid ve FileManGL WebGL2 dosya yöneticisiyle eksiksiz bir kurumsal ekosistem sunar.'
+            : 'Uniting UX, UI, and WebGL in a single architecture: Liquid Glass & Standard Materials, Google Material You tonal palettes, a live 0–32px Border Radius engine, SheetGL WebGL DataGrid, and FileManGL WebGL2 Virtual File System.'}
         </p>
 
         {/* PRIMARY CTA BUTTONS (All with Real Route Hrefs) */}
@@ -910,6 +852,187 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
           </a>
         </div>
 
+        {/* ==================================================================
+            INTERACTIVE NPM / NPX / PNPM / BUN CLI & REACT USAGE BAR
+        ================================================================== */}
+        <div
+          style={{
+            maxWidth: 820,
+            margin: '0 auto 34px',
+            borderRadius: 16,
+            border: `1px solid ${colors.cardBorder}`,
+            backgroundColor: isDark ? 'rgba(9, 14, 26, 0.92)' : '#FFFFFF',
+            boxShadow: isDark
+              ? '0 18px 42px -12px rgba(0, 0, 0, 0.65)'
+              : '0 12px 32px -10px rgba(15, 23, 42, 0.08)',
+            overflow: 'hidden',
+            textAlign: 'left',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 8,
+              padding: '8px 14px',
+              borderBottom: `1px solid ${colors.border}`,
+              backgroundColor: isDark ? 'rgba(6, 10, 18, 0.9)' : '#F1F5F9',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+              {(
+                Object.keys(installCommands) as Array<keyof typeof installCommands>
+              ).map((key) => {
+                const item = installCommands[key];
+                const active = installTab === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setInstallTab(key)}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: 8,
+                      border: active
+                        ? '1px solid rgba(56, 189, 248, 0.45)'
+                        : '1px solid transparent',
+                      backgroundColor: active
+                        ? isDark
+                          ? 'rgba(2, 132, 199, 0.22)'
+                          : 'rgba(2, 132, 199, 0.12)'
+                        : 'transparent',
+                      color: active
+                        ? isDark
+                          ? '#7DD3FC'
+                          : '#0369A1'
+                        : colors.muted,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowQuickUsage((p) => !p)}
+              style={{
+                padding: '4px 10px',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                backgroundColor: showQuickUsage
+                  ? 'rgba(16, 185, 129, 0.18)'
+                  : isDark
+                  ? 'rgba(255, 255, 255, 0.04)'
+                  : '#FFFFFF',
+                color: showQuickUsage ? '#10B981' : colors.text,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              {showQuickUsage
+                ? isTR
+                  ? 'Örnek Kodu Gizle'
+                  : 'Hide Code'
+                : isTR
+                ? 'Örnek Kullanım (TSX)'
+                : 'Code Usage (TSX)'}
+            </button>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              padding: '12px 16px',
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 13,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, overflowX: 'auto' }}>
+              <span style={{ color: '#10B981', fontWeight: 800 }}>$</span>
+              <code style={{ color: colors.text, fontWeight: 700, whiteSpace: 'nowrap' }}>
+                {installCommands[installTab].cmd}
+              </code>
+              {!isMobile && (
+                <span style={{ fontSize: 11.5, color: colors.muted, fontFamily: 'Inter, sans-serif' }}>
+                  — {installCommands[installTab].hint}
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                copyCommand(`hero-${installTab}`, installCommands[installTab].cmd)
+              }
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : '#F8FAFC',
+                color: colors.text,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              {copiedCmdKey === `hero-${installTab}` ? (
+                <>
+                  <Check size={13} color="#10B981" />
+                  <span style={{ color: '#10B981' }}>
+                    {isTR ? 'Kopyalandı' : 'Copied'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Copy size={13} color="#38BDF8" />
+                  <span>{isTR ? 'Kopyala' : 'Copy'}</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {showQuickUsage && (
+            <div
+              style={{
+                padding: '12px 16px',
+                borderTop: `1px solid ${colors.border}`,
+                backgroundColor: isDark ? '#050811' : '#F8FAFC',
+              }}
+            >
+              <pre
+                style={{
+                  margin: 0,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 12,
+                  lineHeight: 1.6,
+                  color: isDark ? '#A5F3FC' : '#0F172A',
+                  overflowX: 'auto',
+                }}
+              >
+                <code>{uxiUsageSnippet}</code>
+              </pre>
+            </div>
+          )}
+        </div>
+
         {/* 4-PILLAR QUICK-JUMP STRIP (FileManGL & SheetGL Style) */}
         <div
           style={{
@@ -925,7 +1048,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
           {[
             {
               icon: <Sparkles size={16} color="#2FF58E" />,
-              title: 'Apple HIG Liquid Glass',
+              title: 'Liquid Glass Yüzeyler',
               tag: 'Regular & Clear',
               href: '/components/surfaces/card',
               sec: 'components-surfaces',
@@ -942,7 +1065,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
             {
               icon: <Table2 size={16} color="#818CF8" />,
               title: 'SheetGL + Native Tablo',
-              tag: '60 FPS WebGL',
+              tag: 'WebGL + HTML',
               href: '/dashboard/crm-orders',
               sec: 'dashboard',
               sub: 'crm-orders',
@@ -1033,8 +1156,8 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
               />
               <strong style={{ fontSize: 13.5 }}>
                 {isTR
-                  ? 'Canlı İnteraktif UXI Sahnesi (Hemen Aşağıda Test Edin)'
-                  : 'Live Interactive UXI Stage (Test Below)'}
+                  ? 'Canlı İnteraktif uxiGL Sahnesi (Hemen Aşağıda Test Edin)'
+                  : 'Live Interactive uxiGL Stage (Test Below)'}
               </strong>
             </div>
 
@@ -1043,8 +1166,8 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
               value={previewTab}
               onChange={setPreviewTab}
               options={[
-                { value: 'components', label: isTR ? 'UXI Bileşen & Tema Sahnesi' : 'UXI Components & Theme' },
-                { value: 'sheetgl', label: 'SheetGL 60 FPS Tablo' },
+                { value: 'components', label: isTR ? 'uxiGL Bileşen & Tema Sahnesi' : 'uxiGL Components & Theme' },
+                { value: 'sheetgl', label: isTR ? 'SheetGL Tablo' : 'SheetGL Grid' },
                 { value: 'filemangl', label: 'FileManGL Dosya' },
               ]}
             />
@@ -1065,7 +1188,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
               <div className="uxu-stage-grid-2">
                 <Card
                   variant="glass"
-                  eyebrow="APPLE HIG LIQUID GLASS × MATERIAL 3"
+                  eyebrow="LIQUID GLASS × MATERIAL 3"
                   title="Canlı Tema, Renk Paleti & Border Radius"
                   subtitle="Değişiklikler tüm UXI bileşenlerine ve localStorage’a anında uygulanır"
                 >
@@ -1109,21 +1232,81 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                     />
 
                     <Switch
-                      label="Apple HIG Geçici Liquid Glass Kontrolleri"
+                      label="Geçici Liquid Glass Kontrolleri"
                       description="Kaydırıcı ve anahtarlar etkileşim anında sıvı cam kapsülüne dönüşür"
                       value={demoSwitch}
                       onChange={setDemoSwitch}
                     />
+
+                    <div>
+                      <div className="uxu-field__label" style={{ marginBottom: 6 }}>
+                        Google Fonts Tipografi Ailesi
+                      </div>
+                      <div className="uxu-stage-row">
+                        {availableFontPresets.map((fp) => (
+                          <Chip
+                            key={fp.id}
+                            size="sm"
+                            tone="info"
+                            selected={
+                              (preferences.fontFamilyPreset ?? 'inter-jakarta') ===
+                              fp.id
+                            }
+                            onClick={() =>
+                              setFontFamilyPreset(fp.id as FontFamilyPreset)
+                            }
+                          >
+                            {fp.name}
+                          </Chip>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </Card>
 
                 <Card
                   variant="tonal"
-                  eyebrow="UXI PRIMITIVES & NATIVE TABLE"
-                  title="Etkileşimli Bileşen Örnekleri"
-                  subtitle="Butonlar, dairesel ilerleme halkaları, avatarlar ve hafif native tablo"
+                  eyebrow="GOOGLE MATERIAL SYMBOLS & UXI PRIMITIVES"
+                  title="Değişken Google Font İkonları & Bileşenler"
+                  subtitle="Google Material Symbols (Rounded / Outlined / Sharp • FILL / wght), ilerleme halkaları ve tablo"
                 >
                   <div className="uxu-stack-md">
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 10,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <SegmentedControl<GoogleIconStyle>
+                        size="sm"
+                        value={preferences.iconStyle ?? 'rounded'}
+                        onChange={setIconStyle}
+                        options={[
+                          { value: 'rounded', label: 'Rounded' },
+                          { value: 'outlined', label: 'Outlined' },
+                          { value: 'sharp', label: 'Sharp' },
+                        ]}
+                      />
+                      <Chip
+                        size="sm"
+                        tone="primary"
+                        selected={Boolean(preferences.iconFilled)}
+                        onClick={() => setIconFilled(!preferences.iconFilled)}
+                      >
+                        FILL: {preferences.iconFilled ? '1 (Dolgulu)' : '0 (Kontur)'}
+                      </Chip>
+                      <div className="uxu-stage-row" style={{ gap: 8 }}>
+                        <GoogleIcon name="auto_awesome" tone="primary" size={22} />
+                        <GoogleIcon name="dashboard" tone="info" size={22} />
+                        <GoogleIcon name="table_chart" tone="success" size={22} />
+                        <GoogleIcon name="folder_open" tone="warning" size={22} />
+                        <GoogleIcon name="bolt" tone="danger" size={22} />
+                      </div>
+                    </div>
+
                     <div className="uxu-stage-row">
                       <Progress
                         variant="circular"
@@ -1163,27 +1346,27 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                       data={[
                         {
                           id: '1',
-                          pkg: '@uxi/core',
-                          pronounce: '/juː-eks-aɪ/ (Yu-Eks-Ay)',
-                          nick: 'Yuksi / Uksi',
+                          pkg: 'uxigl',
+                          arch: 'Liquid Glass × Material 3 UI',
+                          tag: 'v2.5.0',
                         },
                         {
                           id: '2',
                           pkg: 'sheetgl',
-                          pronounce: '60 FPS WebGL DataGrid',
-                          nick: '4 Senaryo',
+                          arch: 'WebGL / Canvas DataGrid',
+                          tag: '4 Senaryo',
                         },
                         {
                           id: '3',
                           pkg: 'filemangl',
-                          pronounce: 'WebGL2 VFS Explorer',
-                          nick: 'ACL + 0755',
+                          arch: 'WebGL2 VFS Explorer',
+                          tag: 'ACL + 0755',
                         },
                       ]}
                       columns={[
                         { key: 'pkg', header: 'Modül', sortable: true },
-                        { key: 'pronounce', header: 'Mimari / Okunuş' },
-                        { key: 'nick', header: 'Etiket', align: 'right' },
+                        { key: 'arch', header: 'Mimari' },
+                        { key: 'tag', header: 'Etiket', align: 'right' },
                       ]}
                     />
                   </div>
@@ -1198,228 +1381,6 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
             {previewTab === 'filemangl' && (
               <FileManGLExplorerAdapter height={500} />
             )}
-          </div>
-        </div>
-      </section>
-
-      {/* ====================================================================
-          BRAND IDENTITY & PRONUNCIATION GUIDE (#pronunciation)
-      ==================================================================== */}
-      <section
-        id="pronunciation"
-        style={{
-          maxWidth: 1260,
-          margin: '0 auto',
-          padding: isMobile ? '28px 14px 36px' : '44px 24px 56px',
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <Badge tone="primary" variant="tonal" size="sm">
-            MARKA KİMLİĞİ &amp; FONETİK REHBER
-          </Badge>
-          <h2
-            style={{
-              fontSize: isMobile ? 24 : 34,
-              fontWeight: 800,
-              marginTop: 10,
-              marginBottom: 10,
-              letterSpacing: '-0.025em',
-            }}
-          >
-            {isTR
-              ? 'UXI Nasıl Okunur? ("Yu-Eks-Ay" • "Yuksi / Uksi" • "Yu-Eksi")'
-              : 'How to Pronounce UXI ("Yu-Eks-Ay" • "Yook-see" • "Yu-Eksi")'}
-          </h2>
-          <p
-            style={{
-              fontSize: 15,
-              color: colors.muted,
-              maxWidth: 780,
-              margin: '0 auto',
-              lineHeight: 1.65,
-            }}
-          >
-            {isTR
-              ? 'UX (User Experience) ve UI (User Interface) kavramlarının kusursuz birleşiminden doğan UXI markası; hem küresel sunumlarda hem de ekip içi günlük konuşmalarda doğal ve akılda kalıcı üç telaffuz alternatifine sahiptir:'
-              : 'Born from the union of UX (User Experience) and UI (User Interface), UXI supports three natural pronunciations for global presentations and daily engineering standups:'}
-          </p>
-        </div>
-
-        {/* 3 PRONUNCIATION CARDS */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
-            gap: 20,
-            marginBottom: 24,
-          }}
-        >
-          {pronunciationModes.map((mode, idx) => (
-            <div
-              key={idx}
-              style={{
-                padding: 24,
-                borderRadius: currentRadiusPx + 2,
-                backgroundColor: colors.card,
-                border: `1px solid ${colors.cardBorder}`,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                gap: 14,
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                    marginBottom: 12,
-                  }}
-                >
-                  <Badge tone={mode.tone} variant="tonal" size="xs">
-                    {mode.badge}
-                  </Badge>
-                  <button
-                    type="button"
-                    onClick={() => speakPronunciation(mode.speechText)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      padding: '4px 10px',
-                      borderRadius: 999,
-                      border: `1px solid ${colors.border}`,
-                      background: 'transparent',
-                      color: colors.text,
-                      fontSize: 11.5,
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Volume2 size={13} /> {mode.ipa}
-                  </button>
-                </div>
-
-                <h3
-                  style={{
-                    fontSize: 19,
-                    fontWeight: 800,
-                    marginBottom: 10,
-                    color: colors.text,
-                  }}
-                >
-                  {mode.title}
-                </h3>
-
-                <p
-                  style={{
-                    fontSize: 13.5,
-                    color: colors.muted,
-                    lineHeight: 1.6,
-                    marginBottom: 12,
-                  }}
-                >
-                  {mode.howItSounds}
-                </p>
-              </div>
-
-              <div
-                style={{
-                  padding: '12px 14px',
-                  borderRadius: 10,
-                  backgroundColor: isDark
-                    ? 'rgba(255, 255, 255, 0.03)'
-                    : 'rgba(15, 23, 42, 0.03)',
-                  border: `1px solid ${colors.border}`,
-                  fontSize: 13,
-                  lineHeight: 1.55,
-                  color: colors.text,
-                }}
-              >
-                <strong style={{ color: isDark ? '#38BDF8' : '#0284C7' }}>
-                  {isTR ? 'Avantajı: ' : 'Advantage: '}
-                </strong>
-                {mode.advantage}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* OFFICIAL README.MD PHONETIC CALLOUT BOX */}
-        <div
-          style={{
-            padding: '20px 24px',
-            borderRadius: currentRadiusPx + 2,
-            backgroundColor: colors.card,
-            border: `1px solid ${colors.cardBorder}`,
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 16,
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 280 }}>
-            <div style={{ fontWeight: 800, fontSize: 15.5, marginBottom: 4 }}>
-              {isTR
-                ? 'Hangisini Seçmelisin? — Kurumsal README.md Fonetik Notu'
-                : 'Which One Should You Choose? — Official README.md Phonetic Note'}
-            </div>
-            <div style={{ fontSize: 13.5, color: colors.muted, lineHeight: 1.6 }}>
-              {isTR ? (
-                <>
-                  <strong>Resmi tanıtımlarda, dokümantasyonda ve videolarda:</strong> Kesinlikle{' '}
-                  <strong>&ldquo;Yu-Eks-Ay&rdquo;</strong> (veya <em>&ldquo;Yu-Eks-Ay Admin&rdquo;</em>).{' '}
-                  <strong>Günlük dilde ve topluluk içinde:</strong> Ekip arkadaşlarının{' '}
-                  <strong>&ldquo;Uksi / Yuksi&rdquo;</strong> demesini teşvik edebilirsin; akılda
-                  kalıcılığı çok yüksektir.
-                </>
-              ) : (
-                <>
-                  <strong>In official docs and videos:</strong> Use{' '}
-                  <strong>&ldquo;Yu-Eks-Ay&rdquo;</strong> (<code>/juː-eks-aɪ/</code>).{' '}
-                  <strong>In daily community &amp; team chats:</strong> Encourage{' '}
-                  <strong>&ldquo;yook-see&rdquo; (&ldquo;Yuksi / Uksi&rdquo;)</strong>.
-                </>
-              )}
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '10px 14px',
-              borderRadius: 10,
-              backgroundColor: isDark ? '#090D18' : '#F1F5F9',
-              border: `1px solid ${colors.border}`,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 12.5,
-            }}
-          >
-            <code>
-              <strong>UXI</strong> (pronounced /juː-eks-aɪ/ or simply &quot;yook-see&quot;)
-            </code>
-            <Button
-              variant="tonal"
-              size="xs"
-              leadingIcon={copiedReadme ? <Check size={13} /> : <Copy size={13} />}
-              onClick={() => {
-                navigator.clipboard?.writeText(readmeBadgeSnippet);
-                setCopiedReadme(true);
-                setTimeout(() => setCopiedReadme(false), 2000);
-                notify({
-                  title: 'README Fonetik Notu Kopyalandı',
-                  description: 'UXI (pronounced /juː-eks-aɪ/ or simply "yook-see")',
-                  tone: 'success',
-                });
-              }}
-            >
-              {copiedReadme ? 'Kopyalandı' : 'Kopyala'}
-            </Button>
           </div>
         </div>
       </section>
@@ -1591,7 +1552,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
         >
           <UXILogo size={20} />
           <span style={{ fontWeight: 800, color: colors.text }}>
-            UX
+            uxi
             <span
               style={{
                 background:
@@ -1600,7 +1561,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              I
+              GL
             </span>
           </span>
           <span
@@ -1612,11 +1573,6 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
             }}
           >
             v2.5.0
-          </span>
-          <span>•</span>
-          <span>
-            pronounced <code>/juː-eks-aɪ/</code> (&ldquo;Yu-Eks-Ay&rdquo;) or{' '}
-            <strong>&ldquo;yook-see&rdquo;</strong> (&ldquo;Yuksi / Uksi&rdquo;)
           </span>
         </div>
 
@@ -1700,7 +1656,93 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
           </a>
         </nav>
 
-        <div>MIT License • © 2026 UXI Design System Team</div>
+        {/* Quick Copyable NPM & NPX Usage Pills in Footer */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            marginBottom: 14,
+          }}
+        >
+          {[
+            { id: 'ft-sheetgl', cmd: 'npm i sheetgl' },
+            { id: 'ft-filemangl', cmd: 'npm i filemangl' },
+            { id: 'ft-npx-fm', cmd: 'npx filemangl init' },
+            { id: 'ft-npx-sg', cmd: 'npx sheetgl init' },
+          ].map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => copyCommand(item.id, item.cmd)}
+              title={isTR ? 'Panoya kopyala' : 'Copy to clipboard'}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '5px 11px',
+                borderRadius: 8,
+                border: `1px solid ${colors.border}`,
+                backgroundColor: isDark ? 'rgba(15, 23, 42, 0.75)' : '#FFFFFF',
+                color: colors.text,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 11.5,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ color: '#10B981', fontWeight: 800 }}>$</span>
+              <span>{item.cmd}</span>
+              {copiedCmdKey === item.id ? (
+                <Check size={12} color="#10B981" />
+              ) : (
+                <Copy size={12} color={colors.muted} />
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+            paddingTop: 12,
+            borderTop: `1px solid ${colors.border}`,
+            maxWidth: 960,
+            margin: '0 auto',
+          }}
+        >
+          <span>MIT License • © {new Date().getFullYear()} uxiGL Design System</span>
+          <span>•</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span>Crafted with ❤️ by</span>
+            <a
+              href="https://www.truncgil.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                padding: '3px 10px',
+                borderRadius: 999,
+                background:
+                  'linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(249, 115, 22, 0.16), rgba(244, 63, 94, 0.16))',
+                border: '1px solid rgba(249, 115, 22, 0.4)',
+                color: isDark ? '#FDBA74' : '#EA580C',
+                fontWeight: 800,
+                textDecoration: 'none',
+              }}
+            >
+              🍊 Trunçgil Teknoloji
+            </a>
+          </span>
+        </div>
       </footer>
     </div>
   );
