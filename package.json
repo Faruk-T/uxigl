@@ -26,36 +26,56 @@
     "ui-components"
   ],
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "bin": {
+    "uxigl": "bin/cli.mjs",
+    "create-uxigl": "bin/cli.mjs"
+  },
+  "main": "./dist/lib/uxigl.cjs",
+  "module": "./dist/lib/uxigl.js",
+  "types": "./dist/lib/types/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./styles": "./src/styles/uxu-tokens.css",
+    ".": {
+      "types": "./dist/lib/types/index.d.ts",
+      "import": "./dist/lib/uxigl.js",
+      "require": "./dist/lib/uxigl.cjs"
+    },
+    "./styles": "./dist/lib/style.css",
+    "./style.css": "./dist/lib/style.css",
+    "./uxu-tokens.css": "./dist/lib/style.css",
     "./package.json": "./package.json"
   },
   "files": [
-    "dist",
-    "src",
+    "dist/lib",
+    "bin",
     "README.md",
     "docs"
   ],
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "prepublishOnly": "npm run build",
+    "build:demo": "tsc -b && vite build",
+    "build:lib": "tsc -p tsconfig.lib.json && vite build --config vite.lib.config.ts",
+    "build": "npm run build:demo && npm run build:lib",
+    "prepublishOnly": "npm run build:lib",
+    "cli": "node ./bin/cli.mjs",
+    "doctor": "node ./bin/cli.mjs doctor",
+    "pack:check": "npm pack --dry-run",
     "preview": "vite preview"
   },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
   "dependencies": {
-    "filemangl": "github:umitunc/filemangl",
+    "filemangl": "^1.0.5",
     "lucide-react": "^1.16.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "sheetgl": "^2.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
   }

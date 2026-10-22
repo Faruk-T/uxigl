@@ -12,6 +12,7 @@ import {
   HardDrive,
 } from 'lucide-react';
 import { UXILogo } from '../../components/brand/UXILogo';
+import { GithubIcon } from '../../components/brand/GithubIcon';
 import {
   Switch,
   Slider,
@@ -72,7 +73,7 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [previewTab, setPreviewTab] = useState<LandingPreviewTab>('components');
   const [installTab, setInstallTab] = useState<
-    'npm' | 'npx_filemangl' | 'npx_sheetgl' | 'pnpm' | 'yarn' | 'bun'
+    'npm' | 'npx' | 'pnpm' | 'yarn' | 'bun'
   >('npm');
   const [copiedCmdKey, setCopiedCmdKey] = useState<string | null>(null);
   const [showQuickUsage, setShowQuickUsage] = useState<boolean>(false);
@@ -88,52 +89,46 @@ export const UXILandingPage: React.FC<UXILandingPageProps> = ({
   const installCommands = {
     npm: {
       label: 'npm',
-      cmd: 'npm install sheetgl filemangl lucide-react',
+      cmd: 'npm install uxigl',
       hint: isTR
-        ? 'uxiGL ekosistemi + SheetGL + FileManGL kurulumu'
-        : 'Install uxiGL ecosystem + SheetGL + FileManGL',
+        ? 'Tek komutla uxiGL + SheetGL + FileManGL kurulumu'
+        : 'Single-command install: uxiGL + SheetGL + FileManGL',
     },
-    npx_filemangl: {
-      label: 'npx filemangl',
-      cmd: 'npx filemangl init',
+    npx: {
+      label: 'npx init',
+      cmd: 'npx uxigl init',
       hint: isTR
-        ? 'Hazır <FileManGLWorkspace /> bileşenini oluşturur'
-        : 'Scaffolds ready-to-use <FileManGLWorkspace />',
-    },
-    npx_sheetgl: {
-      label: 'npx sheetgl',
-      cmd: 'npx sheetgl init',
-      hint: isTR
-        ? 'Hazır <SheetGL /> veri tablosu bileşenini oluşturur'
-        : 'Scaffolds ready-to-use <SheetGL /> data grid',
+        ? 'Hazır <UXIWorkspace /> bileşenini ve tema sağlayıcısını oluşturur'
+        : 'Scaffolds ready-to-use <UXIWorkspace /> & theme provider',
     },
     pnpm: {
       label: 'pnpm',
-      cmd: 'pnpm add sheetgl filemangl lucide-react',
+      cmd: 'pnpm add uxigl',
       hint: 'PNPM Workspace',
     },
     yarn: {
       label: 'yarn',
-      cmd: 'yarn add sheetgl filemangl lucide-react',
+      cmd: 'yarn add uxigl',
       hint: 'Yarn Package Manager',
     },
     bun: {
       label: 'bun',
-      cmd: 'bun add sheetgl filemangl lucide-react',
+      cmd: 'bun add uxigl',
       hint: 'Bun Runtime',
     },
   } as const;
 
-  const uxiUsageSnippet = `import { ThemeProvider } from './providers/ThemeProvider';
-import { SheetGL } from 'sheetgl';
-import { FileManGL, DEFAULT_FILE_MANAGER_CONFIG } from 'filemangl';
-import 'filemangl/style.css';
+  const uxiUsageSnippet = `import { ThemeProvider, ToastProvider, Button, Card, SheetGLGridAdapter, FileManGLExplorerAdapter } from 'uxigl';
+import 'uxigl/styles';
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <FileManGL config={{ ...DEFAULT_FILE_MANAGER_CONFIG, borderRadius: 'squircle' }} />
-      <SheetGL dataSource={rows} columns={columns} theme="apple-dark" />
+    <ThemeProvider defaultTheme="system" defaultRadius={12}>
+      <ToastProvider>
+        <Card variant="glass" title="uxiGL Enterprise Dashboard">
+          <SheetGLGridAdapter scenario="saas_finance" />
+        </Card>
+      </ToastProvider>
     </ThemeProvider>
   );
 }`;
@@ -371,7 +366,7 @@ export default function App() {
                   opacity: 0.92,
                 }}
               >
-                v2.5.0
+                v2.5.1
               </span>
             </div>
           </a>
@@ -482,6 +477,24 @@ export default function App() {
                 }}
               >
                 {isTR ? 'SSS' : 'FAQ'}
+              </a>
+
+              <a
+                href="https://github.com/umitunc/uxigl"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  color: isDark ? '#D1D5DB' : '#334155',
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                }}
+              >
+                <GithubIcon size={15} />
+                <span>GitHub</span>
               </a>
             </nav>
           )}
@@ -1699,10 +1712,10 @@ export default function App() {
           }}
         >
           {[
+            { id: 'ft-uxigl', cmd: 'npm i uxigl' },
+            { id: 'ft-npx-uxi', cmd: 'npx uxigl init' },
             { id: 'ft-sheetgl', cmd: 'npm i sheetgl' },
             { id: 'ft-filemangl', cmd: 'npm i filemangl' },
-            { id: 'ft-npx-fm', cmd: 'npx filemangl init' },
-            { id: 'ft-npx-sg', cmd: 'npx sheetgl init' },
           ].map((item) => (
             <button
               key={item.id}

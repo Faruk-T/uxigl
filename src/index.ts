@@ -4,8 +4,12 @@
  * ============================================================================
  */
 
+// Styles & Tokens
+import './styles/uxu-tokens.css';
+
 // 1. Brand Emblem
 export { UXILogo, type UXILogoProps } from './components/brand/UXILogo';
+export { GithubIcon, type GithubIconProps } from './components/brand/GithubIcon';
 
 // 2. Primitives (Button, Input, Switch, Checkbox, Slider, Badge, Chip, Avatar, Progress, Skeleton, Tooltip, GoogleIcon)
 export * from './components/primitives';

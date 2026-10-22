@@ -652,7 +652,7 @@ export const App: React.FC = () => {
                 }}
               >
                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
-                  <strong style={{ color: 'var(--uxu-text-primary)' }}>uxiGL v2.5.0</strong>
+                  <strong style={{ color: 'var(--uxu-text-primary)' }}>uxiGL v2.5.1</strong>
                   <span>•</span>
                   <code
                     style={{
@@ -665,7 +665,7 @@ export const App: React.FC = () => {
                       color: 'var(--uxu-primary)',
                     }}
                   >
-                    $ npm i sheetgl filemangl lucide-react
+                    $ npm i uxigl
                   </code>
                   <code
                     style={{
@@ -678,7 +678,7 @@ export const App: React.FC = () => {
                       color: 'var(--uxu-text-primary)',
                     }}
                   >
-                    $ npx filemangl init
+                    $ npx uxigl init
                   </code>
                 </div>
 

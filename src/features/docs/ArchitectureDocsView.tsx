@@ -55,23 +55,21 @@ export interface ArchitectureDocsViewProps {
   onOpenCommandPalette?: () => void;
 }
 
-const INSTALL_SNIPPET = `# 1. uxiGL Tasarım Sistemi, SheetGL (DataGrid) ve FileManGL (VFS) Paketlerini Kurun
-npm install sheetgl filemangl lucide-react
-# veya: pnpm add sheetgl filemangl lucide-react | yarn add ... | bun add ...
+const INSTALL_SNIPPET = `# 1. Tek Komutla uxiGL Kurulumu (SheetGL, FileManGL ve Simgeler Dahildir)
+npm install uxigl
+# veya: pnpm add uxigl | yarn add uxigl | bun add uxigl
 
-# 2. NPX CLI ile Hazır Bileşenleri Otomatik Oluşturun
-npx filemangl init
-npx sheetgl init
+# 2. NPX CLI ile Hazır Çalışma Alanı Bileşenini Otomatik Oluşturun
+npx uxigl init
 
 # 3. Geliştirme Sunucusunu Başlatın
 npm run dev`;
 
 const PROVIDER_SETUP_SNIPPET = `import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ThemeProvider } from './providers/ThemeProvider';
-import { ToastProvider } from './providers/ToastProvider';
+import { ThemeProvider, ToastProvider } from 'uxigl';
+import 'uxigl/styles';
 import { App } from './App';
-import './styles/uxu-tokens.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -84,10 +82,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );`;
 
 const QUICK_START_COMPONENT_SNIPPET = `import { useState } from 'react';
-import { Card } from '@/components/composites';
-import { Input, Switch, Button, Badge } from '@/components/primitives';
-import { useToast } from '@/providers/ToastProvider';
-import { Mail, Lock, Sparkles } from 'lucide-react';
+import { Card, Input, Switch, Button, Badge, useToast } from 'uxigl';
+import { Mail, Sparkles } from 'lucide-react';
 
 export function QuickWorkspaceCard() {
   const { notify } = useToast();
@@ -134,8 +130,7 @@ export function QuickWorkspaceCard() {
   );
 }`;
 
-const THEME_HOOK_SNIPPET = `import { useTheme } from '@/providers/ThemeProvider';
-import { Button } from '@/components/primitives';
+const THEME_HOOK_SNIPPET = `import { useTheme, Button } from 'uxigl';
 
 export function ThemeSwitcherButton() {
   const {
@@ -161,9 +156,8 @@ export function ThemeSwitcherButton() {
   );
 }`;
 
-const LAYOUT_SHELL_SNIPPET = `import { Sidebar, TopHeader } from '@/components/composites';
-import type { SidebarNavGroup } from '@/core/contracts/NavigationContract';
-import { LayoutDashboard, Sliders } from 'lucide-react';
+const LAYOUT_SHELL_SNIPPET = `import { Sidebar, TopHeader, type SidebarNavGroup } from 'uxigl';
+import { LayoutDashboard } from 'lucide-react';
 
 const SIDEBAR_GROUPS: SidebarNavGroup[] = [
   {
@@ -188,17 +182,16 @@ const SIDEBAR_GROUPS: SidebarNavGroup[] = [
 export function EnterpriseLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="uxu-app-frame">
-      <Sidebar groups={SIDEBAR_GROUPS} ... />
+      <Sidebar groups={SIDEBAR_GROUPS} />
       <div className="uxu-app-body">
-        <TopHeader breadcrumbs={[{ id: '1', label: 'Ana Sayfa' }]} ... />
+        <TopHeader breadcrumbs={[{ id: '1', label: 'Ana Sayfa' }]} />
         <main className="uxu-workspace-viewport">{children}</main>
       </div>
     </div>
   );
 }`;
 
-const TOAST_CMD_SNIPPET = `import { useToast } from '@/providers/ToastProvider';
-import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
+const TOAST_CMD_SNIPPET = `import { useToast, useKeyboardShortcut } from 'uxigl';
 
 export function NotificationAndShortcutDemo() {
   const { notify } = useToast();
@@ -219,7 +212,7 @@ export function NotificationAndShortcutDemo() {
   };
 
   return <button onClick={handleSave}>Kaydet</button>;
-}`;
+};`;
 
 export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
   activeTopic = 'getting-started',

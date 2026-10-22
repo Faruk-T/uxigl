@@ -58,28 +58,64 @@ The [`UXILogo`](src/components/brand/UXILogo.tsx) emblem reduces the three lette
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Single-Command Setup)
+
+### 1. Install `uxiGL` (All-in-One Design System)
 
 ```bash
-# 1. Install dependencies
-npm install
-
-# 2. Start the development server
-npm run dev
-
-# 3. Type-check and build for production
-npm run build
+# SheetGL (WebGL DataGrid), FileManGL (WebGL2 VFS) and Lucide Icons are bundled directly!
+npm install uxigl
+# or: pnpm add uxigl | yarn add uxigl | bun add uxigl
 ```
 
-### Ecosystem Packages (`SheetGL` & `FileManGL`)
+### 2. Scaffold Ready-to-Use Workspace via NPX
 
 ```bash
-# Install SheetGL & FileManGL alongside uxiGL
-npm install sheetgl filemangl lucide-react
+# Generates a pre-configured <UXIWorkspace /> component & theme setup
+npx uxigl init
+```
 
-# Or scaffold standalone workspaces via NPX
-npx filemangl init
-npx sheetgl init
+### 3. Usage Example
+
+```tsx
+import React from 'react';
+import {
+  ThemeProvider,
+  ToastProvider,
+  Button,
+  Card,
+  SheetGLGridAdapter,
+  FileManGLExplorerAdapter,
+} from 'uxigl';
+import 'uxigl/styles';
+
+export default function App() {
+  return (
+    <ThemeProvider defaultTheme="system" defaultRadius={12}>
+      <ToastProvider>
+        <Card variant="glass" title="uxiGL Enterprise Dashboard">
+          <SheetGLGridAdapter scenario="saas_finance" />
+        </Card>
+      </ToastProvider>
+    </ThemeProvider>
+  );
+}
+```
+
+### 4. Local Development & NPM Library Build
+
+```bash
+# Start Vite development server
+npm run dev
+
+# Build both demo SPA (dist/index.html) and npm library bundle (dist/lib)
+npm run build
+
+# Or compile the npm library & TypeScript declarations only
+npm run build:lib
+
+# Run package diagnostics
+npm run doctor
 ```
 
 ---

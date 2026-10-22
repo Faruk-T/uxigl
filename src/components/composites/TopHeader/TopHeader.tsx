@@ -16,6 +16,7 @@ import { RouteService } from '../../../core/services/RouteService';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { useToast } from '../../../providers/ToastProvider';
 import { Button, Tooltip } from '../../primitives';
+import { GithubIcon } from '../../brand/GithubIcon';
 
 /**
  * ============================================================================
@@ -294,6 +295,30 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <span className="uxu-hide-mobile">Ara...</span>
           <kbd className="uxu-spotlight-trigger__kbd">⌘K</kbd>
         </button>
+
+        {/* GitHub Repository Link */}
+        <Tooltip content="GitHub: umitunc/uxigl">
+          <a
+            href="https://github.com/umitunc/uxigl"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="uxu-btn uxu-btn--glass uxu-btn--sm"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              textDecoration: 'none',
+              height: 32,
+              padding: '0 10px',
+              borderRadius: 'var(--uxu-radius-sm, 8px)',
+              color: 'var(--uxu-text-primary)',
+            }}
+            aria-label="GitHub Deposu"
+          >
+            <GithubIcon size={15} />
+            <span className="uxu-hide-mobile" style={{ fontSize: '0.8rem', fontWeight: 600 }}>GitHub</span>
+          </a>
+        </Tooltip>
 
         <Tooltip content="Tema & Font Stüdyosu">
           <Button
