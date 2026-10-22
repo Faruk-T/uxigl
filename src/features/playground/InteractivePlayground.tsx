@@ -100,7 +100,7 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
   const [isPill, setIsPill] = useState(false);
 
   // Component interactive states
-  const [inputValue, setInputValue] = useState('uxu@design.system');
+  const [inputValue, setInputValue] = useState('uxi@design.system');
   const [inputSurface, setInputSurface] = useState<InputSurfaceStyle>('glass');
   const [inputError, setInputError] = useState(false);
 
@@ -147,7 +147,7 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
             loading: isLoading || undefined,
             disabled: isDisabled || undefined,
           },
-          childrenCode: 'UXU Eylemi Başlat',
+          childrenCode: 'UXI Eylemi Başlat',
         });
       case 'input':
         return CodeGeneratorService.generateSnippet({
@@ -361,7 +361,7 @@ export function CloudFileManagerExample() {
                   })
                 }
               >
-                UXU Eylemi Başlat
+                UXI Eylemi Başlat
               </Button>
             </div>
 
