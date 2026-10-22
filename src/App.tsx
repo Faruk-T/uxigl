@@ -147,7 +147,7 @@ export const App: React.FC = () => {
             label: 'Tanıtım Sayfası (/)',
             href: '/',
             icon: <Home size={16} />,
-            badge: 'UXI',
+            badge: 'uxiGL',
             badgeTone: 'info',
           },
           {
@@ -327,7 +327,7 @@ export const App: React.FC = () => {
     const items: BreadcrumbItem[] = [
       {
         id: 'root',
-        label: 'UXI OS',
+        label: 'uxiGL',
         href: '/',
         onClick: () => handleSidebarSelect('landing', 'home'),
       },
@@ -521,6 +521,77 @@ export const App: React.FC = () => {
                   onOpenCommandPalette={() => setCmdPaletteOpen(true)}
                 />
               )}
+
+              {/* Workspace Footer with NPM Usages & Trunçgil Signature */}
+              <footer
+                style={{
+                  marginTop: 28,
+                  paddingTop: 16,
+                  borderTop: '1px solid var(--uxu-border-subtle)',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  fontSize: '0.78rem',
+                  color: 'var(--uxu-text-secondary)',
+                }}
+              >
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+                  <strong style={{ color: 'var(--uxu-text-primary)' }}>uxiGL v2.5.0</strong>
+                  <span>•</span>
+                  <code
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: 'var(--uxu-radius-sm)',
+                      background: 'var(--uxu-surface-tonal)',
+                      border: '1px solid var(--uxu-border-subtle)',
+                      fontFamily: 'var(--uxu-font-mono)',
+                      fontSize: '0.72rem',
+                      color: 'var(--uxu-primary)',
+                    }}
+                  >
+                    $ npm i sheetgl filemangl lucide-react
+                  </code>
+                  <code
+                    style={{
+                      padding: '2px 8px',
+                      borderRadius: 'var(--uxu-radius-sm)',
+                      background: 'var(--uxu-surface-tonal)',
+                      border: '1px solid var(--uxu-border-subtle)',
+                      fontFamily: 'var(--uxu-font-mono)',
+                      fontSize: '0.72rem',
+                      color: 'var(--uxu-text-primary)',
+                    }}
+                  >
+                    $ npx filemangl init
+                  </code>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>MIT License • © {new Date().getFullYear()} Crafted with ❤️ by</span>
+                  <a
+                    href="https://www.truncgil.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      padding: '2px 9px',
+                      borderRadius: 9999,
+                      background:
+                        'linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(249, 115, 22, 0.16), rgba(244, 63, 94, 0.16))',
+                      border: '1px solid rgba(249, 115, 22, 0.4)',
+                      color: resolvedMode === 'dark' ? '#fdba74' : '#ea580c',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    🍊 Trunçgil Teknoloji
+                  </a>
+                </div>
+              </footer>
             </main>
           </div>
         </>

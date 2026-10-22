@@ -56,7 +56,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     notify({
       title: next ? 'WebGL Açık' : 'Eko Mod Aktif',
       description: next
-        ? '30 FPS hafif arka plan açıldı.'
+        ? 'Hafif ambiyans arka planı açıldı.'
         : 'WebGL kapatıldı (0% GPU yükü).',
       tone: next ? 'info' : 'success',
     });

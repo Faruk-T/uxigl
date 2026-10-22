@@ -14,9 +14,12 @@ import {
   Slider,
   Switch,
   Badge,
+  GoogleIcon,
 } from '../../components/primitives';
 import { SegmentedControl } from '../../components/composites';
 import type {
+  FontFamilyPreset,
+  GoogleIconStyle,
   RadiusScale,
   ThemeMode,
   UIDensity,
@@ -36,12 +39,17 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
     preferences,
     resolvedMode,
     availablePalettes,
+    availableFontPresets,
     setMode,
     setSeedPalette,
     setRadiusScale,
     setCustomRadiusPx,
     setDensity,
     setFontScale,
+    setFontFamilyPreset,
+    setIconStyle,
+    setIconFilled,
+    setIconWeight,
     setGlassIntensity,
     setReducedMotion,
     setWebglEnabled,
@@ -61,13 +69,13 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
       <aside
         className="uxu-theme-drawer"
         onClick={(e) => e.stopPropagation()}
-        aria-label="UXI Tema & Görünüm Stüdyosu"
+        aria-label="uxiGL Tema & Görünüm Stüdyosu"
       >
         <div className="uxu-theme-drawer__header">
           <div className="uxu-theme-drawer__title-group">
             <Palette size={19} className="uxu-text-primary" />
             <div>
-              <h3>UXI Tasarım &amp; Tema Stüdyosu</h3>
+              <h3>uxiGL Tasarım &amp; Tema Stüdyosu</h3>
               <span>Dark/Light Mod, Renk Paletleri &amp; Border Radius</span>
             </div>
           </div>
@@ -149,8 +157,43 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
             </div>
           </div>
 
-          {/* 3. Global Font Size Scale */}
+          {/* 3. Google Fonts Family Pairing & Global Font Size Scale */}
           <div className="uxu-studio-section">
+            <div className="uxu-studio-section__header">
+              <span>Google Fonts Yazı Tipi Ailesi</span>
+              <Badge tone="primary" size="xs">
+                {
+                  availableFontPresets.find(
+                    (f) => f.id === (preferences.fontFamilyPreset ?? 'inter-jakarta')
+                  )?.name ?? 'Inter × Jakarta'
+                }
+              </Badge>
+            </div>
+            <div className="uxu-palette-grid">
+              {availableFontPresets.map((preset) => {
+                const isSelected =
+                  (preferences.fontFamilyPreset ?? 'inter-jakarta') === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => setFontFamilyPreset(preset.id as FontFamilyPreset)}
+                    className={`uxu-palette-card ${
+                      isSelected ? 'uxu-palette-card--active' : ''
+                    }`}
+                    style={{ fontFamily: preset.sansStack }}
+                  >
+                    <div className="uxu-palette-card__info">
+                      <strong style={{ fontFamily: preset.displayStack }}>
+                        {preset.name}
+                      </strong>
+                      <small>{preset.badge}</small>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
             <Slider
               label="Genel Yazı Boyutu (Font Ölçeği)"
               value={preferences.fontScale ?? 100}
@@ -175,6 +218,73 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
                 >
                   %{pct}
                 </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* 3B. Google Material Symbols Variable Font Icons */}
+          <div className="uxu-studio-section">
+            <div className="uxu-studio-section__header">
+              <span>Google Material Symbols (Font İkonlar)</span>
+              <Badge tone="info" size="xs">
+                {(preferences.iconStyle ?? 'rounded').toUpperCase()} • wght:{' '}
+                {preferences.iconWeight ?? 400}
+              </Badge>
+            </div>
+            <SegmentedControl<GoogleIconStyle>
+              value={preferences.iconStyle ?? 'rounded'}
+              onChange={setIconStyle}
+              fullWidth
+              size="sm"
+              options={[
+                { value: 'rounded', label: 'Rounded' },
+                { value: 'outlined', label: 'Outlined' },
+                { value: 'sharp', label: 'Sharp' },
+              ]}
+            />
+            <Slider
+              label="İkon Çizgi Kalınlığı (wght: 100 – 700)"
+              value={preferences.iconWeight ?? 400}
+              onChange={setIconWeight}
+              min={100}
+              max={700}
+              step={100}
+              showTicks
+            />
+            <Switch
+              label="Dolgulu İkon Modu (FILL: 1)"
+              description="Google Material Symbols FILL eksenini 0 ile 1 arasında değiştirir"
+              value={Boolean(preferences.iconFilled)}
+              onChange={setIconFilled}
+              size="sm"
+            />
+            <div
+              className="uxu-stage-row"
+              style={{
+                justifyContent: 'space-between',
+                padding: '10px 12px',
+                borderRadius: 'var(--uxu-radius-md)',
+                background: 'var(--uxu-surface-tonal)',
+                border: '1px solid var(--uxu-border-subtle)',
+              }}
+            >
+              {[
+                { name: 'auto_awesome', tone: 'primary' as const },
+                { name: 'dashboard', tone: 'info' as const },
+                { name: 'palette', tone: 'secondary' as const },
+                { name: 'table_chart', tone: 'success' as const },
+                { name: 'folder_open', tone: 'warning' as const },
+                { name: 'bolt', tone: 'danger' as const },
+                { name: 'verified', tone: 'primary' as const },
+                { name: 'terminal', tone: 'info' as const },
+              ].map((ic) => (
+                <GoogleIcon
+                  key={ic.name}
+                  name={ic.name}
+                  tone={ic.tone}
+                  size={22}
+                  title={ic.name}
+                />
               ))}
             </div>
           </div>
@@ -313,7 +423,7 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
             leadingIcon={<RotateCcw size={15} />}
             onClick={resetPreferences}
           >
-            Varsayılan UXI Ayarlarına Sıfırla
+            Varsayılan uxiGL Ayarlarına Sıfırla
           </Button>
         </div>
       </aside>

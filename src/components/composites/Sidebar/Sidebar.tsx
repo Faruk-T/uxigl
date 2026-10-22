@@ -107,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <a
             href="/"
             className="uxu-sidebar__brand"
-            title="UXI Tanıtım Sayfası (/)"
+            title="uxiGL Tanıtım Sayfası (/)"
             onClick={(e) => {
               if (RouteService.isModifiedClick(e)) return;
               e.preventDefault();
@@ -118,13 +118,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!collapsed && (
               <div className="uxu-sidebar__brand-text">
                 <div className="uxu-sidebar__brand-row">
-                  <span className="uxu-brand__name">UXI OS</span>
+                  <span className="uxu-brand__name">
+                    uxi
+                    <span
+                      style={{
+                        background:
+                          'linear-gradient(110deg, #2FF58E 0%, #00C8FF 45%, #818CF8 75%, #C084FC 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                      }}
+                    >
+                      GL
+                    </span>
+                  </span>
                   <Badge tone="primary" variant="tonal" size="xs">
                     PRO
                   </Badge>
                 </div>
                 <span className="uxu-sidebar__brand-sub">
-                  /juː-eks-aɪ/ • Yuksi
+                  UX × UI × WebGL
                 </span>
               </div>
             )}
