@@ -219,6 +219,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <li key={item.id} className="uxu-sidebar__li">
                       <a
                         href={parentHref}
+                        target={parentHref.startsWith('http') ? '_blank' : undefined}
+                        rel={parentHref.startsWith('http') ? 'noopener noreferrer' : undefined}
                         className={[
                           'uxu-sidebar__item',
                           isParentActive ? 'uxu-sidebar__item--active' : '',
@@ -232,6 +234,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         }
                         onClick={(e) => {
                           if (RouteService.isModifiedClick(e)) return;
+                          if (parentHref.startsWith('http')) return;
                           e.preventDefault();
                           if (hasSub) {
                             toggleSubMenu(

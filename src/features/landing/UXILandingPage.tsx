@@ -558,6 +558,28 @@ export default function App() {
             </button>
 
             <a
+              href="https://github.com/umitunc/uxigl"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="GitHub Deposu (umitunc/uxigl)"
+              aria-label="GitHub Repository"
+              style={{
+                width: isMobile ? 34 : 38,
+                height: isMobile ? 34 : 38,
+                borderRadius: 10,
+                border: `1px solid ${colors.border}`,
+                backgroundColor: isDark ? '#0D1322' : '#F1F5F9',
+                color: colors.text,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textDecoration: 'none',
+              }}
+            >
+              <GithubIcon size={16} />
+            </a>
+
+            <a
               href="/dashboard/overview"
               onClick={(e) => {
                 if (RouteService.isModifiedClick(e)) return;
@@ -686,6 +708,26 @@ export default function App() {
               }}
             >
               📚 Dokümantasyon (/docs/getting-started)
+            </a>
+            <a
+              href="https://github.com/umitunc/uxigl"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                padding: '10px 12px',
+                borderRadius: 8,
+                backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                color: colors.text,
+                fontSize: 14,
+                fontWeight: 600,
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <GithubIcon size={16} />
+              <span>GitHub (umitunc/uxigl)</span>
             </a>
           </div>
         )}

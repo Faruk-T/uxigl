@@ -24,6 +24,7 @@ import {
   Shield,
   HelpCircle,
 } from 'lucide-react';
+import { GithubIcon } from './components/brand/GithubIcon';
 import { useTheme } from './providers/ThemeProvider';
 import { useToast } from './providers/ToastProvider';
 import { useKeyboardShortcut } from './hooks/useKeyboardShortcut';
@@ -360,6 +361,14 @@ export const App: React.FC = () => {
             icon: <Home size={16} />,
             badge: 'uxiGL',
             badgeTone: 'info',
+          },
+          {
+            id: 'github-repo',
+            label: 'GitHub Deposu',
+            href: 'https://github.com/umitunc/uxigl',
+            icon: <GithubIcon size={16} />,
+            badge: 'v2.5.1',
+            badgeTone: 'primary',
           },
         ],
       },
