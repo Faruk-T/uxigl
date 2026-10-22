@@ -401,12 +401,12 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
           sparklineData={[54, 62, 71, 79, 86, 93, 100]}
         />
         <StatCard
-          label="Arayüz Hızı"
-          value="120 FPS"
-          delta="8.3 ms / kare"
+          label="Tepki Süresi"
+          value="8.3 ms"
+          delta="Anlık yanıt"
           trend="up"
           tone="info"
-          subtitle="Akıcı animasyon"
+          subtitle="Akıcı etkileşim"
           icon={<Activity size={17} />}
           sparklineData={[118, 120, 119, 120, 120, 120, 120]}
         />
@@ -562,7 +562,7 @@ export const AppleGoogleAppShowcase: React.FC<AppleGoogleAppShowcaseProps> = ({
           }
           subtitle={
             overviewEngineTab === 'sheetgl'
-              ? '60 FPS WebGL/Canvas sanallaştırma, 14 sütun tipi, Cascading Lookup ve Batch CRUD'
+              ? 'WebGL/Canvas sanallaştırma, 14 sütun tipi, Cascading Lookup ve Batch CRUD'
               : 'WebGL2 3D Spatial & Disk Haritası, Çift Panel (Dual-Pane), ACL/POSIX İzin Motoru ve ZIP Arşivleme'
           }
           headerIcon={

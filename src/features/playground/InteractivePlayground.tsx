@@ -617,7 +617,7 @@ export function CloudFileManagerExample() {
             <Card
               variant={segmentValue === 'tonal' ? 'tonal' : 'glass'}
               title={`Seçili Görünüm: ${segmentValue.toUpperCase()}`}
-              subtitle="Kayan kapsül (thumb) CSS değişkenleri ile 60fps yay fiziği kullanır."
+              subtitle="Kayan kapsül (thumb) CSS değişkenleri ile akıcı yay fiziği kullanır."
             >
               <p className="uxu-muted-p">
                 Seçeneklerde ikon (<code>icon</code>), sayaç rozeti (
@@ -832,7 +832,7 @@ export function CloudFileManagerExample() {
                     label="Bulut Yedekleme & Dosya Aktarım İlerlemesi"
                     value={sliderValue}
                     indeterminate={isLoading}
-                    speed={animDurationSec}
+                    speed={skeletonAnimated || isLoading ? animDurationSec : undefined}
                     tone={semanticTone}
                     size={controlSize}
                   />
@@ -918,20 +918,44 @@ export function CloudFileManagerExample() {
                 </div>
 
                 <div className="uxu-stack-md">
-                  <div className="uxu-stack-sm">
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                    }}
+                  >
                     <Skeleton
-                      variant="text"
-                      width="75%"
-                      height={controlSize === 'xs' ? 10 : controlSize === 'lg' ? 18 : 14}
+                      variant="circular"
+                      width={controlSize === 'xs' ? 34 : controlSize === 'lg' ? 52 : 42}
+                      height={controlSize === 'xs' ? 34 : controlSize === 'lg' ? 52 : 42}
                       animated={skeletonAnimated}
                       speed={animDurationSec}
+                      style={{ flexShrink: 0 }}
                     />
-                    <Skeleton
-                      variant="squircle"
-                      width="100%"
-                      height={controlSize === 'xs' ? 26 : controlSize === 'lg' ? 46 : 36}
-                      animated={skeletonAnimated}
+                    <div className="uxu-stack-sm" style={{ flex: 1, minWidth: 0 }}>
+                      <Skeleton
+                        variant="text"
+                        width="75%"
+                        height={controlSize === 'xs' ? 10 : controlSize === 'lg' ? 18 : 14}
+                        animated={skeletonAnimated}
+                        speed={animDurationSec}
+                      />
+                      <Skeleton
+                        variant="squircle"
+                        width="100%"
+                        height={controlSize === 'xs' ? 24 : controlSize === 'lg' ? 40 : 30}
+                        animated={skeletonAnimated}
+                        speed={animDurationSec}
+                      />
+                    </div>
+                    <Progress
+                      variant="circular"
+                      indeterminate={skeletonAnimated || isLoading}
+                      value={skeletonAnimated || isLoading ? 0 : 75}
                       speed={animDurationSec}
+                      tone="info"
+                      size={controlSize === 'lg' ? 'md' : 'sm'}
                     />
                   </div>
 

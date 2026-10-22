@@ -25,6 +25,7 @@ import {
   Input,
   Switch,
   Slider,
+  GoogleIcon,
 } from '../../components/primitives';
 import { useTheme } from '../../providers/ThemeProvider';
 import { useToast } from '../../providers/ToastProvider';
@@ -33,6 +34,8 @@ import { CodeGeneratorService } from '../../core/services/CodeGeneratorService';
 import { RouteService } from '../../core/services/RouteService';
 import { COMPONENT_CATALOG } from '../catalog/componentCatalog';
 import type {
+  FontFamilyPreset,
+  GoogleIconStyle,
   RadiusScale,
   ThemeMode,
   UIDensity,
@@ -52,10 +55,15 @@ export interface ArchitectureDocsViewProps {
   onOpenCommandPalette?: () => void;
 }
 
-const INSTALL_SNIPPET = `# 1. UXI Tasarım Sistemi ve İkon Paketini Yükleyin
-npm install lucide-react
+const INSTALL_SNIPPET = `# 1. UXI Tasarım Sistemi, SheetGL (DataGrid) ve FileManGL (VFS) Paketlerini Kurun
+npm install sheetgl filemangl lucide-react
+# veya: pnpm add sheetgl filemangl lucide-react | yarn add ... | bun add ...
 
-# 2. Geliştirme Sunucusunu Başlatın
+# 2. NPX CLI ile Hazır Bileşenleri Otomatik Oluşturun
+npx filemangl init
+npx sheetgl init
+
+# 3. Geliştirme Sunucusunu Başlatın
 npm run dev`;
 
 const PROVIDER_SETUP_SNIPPET = `import React from 'react';
@@ -224,12 +232,17 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
     resolvedMode,
     activePalette,
     availablePalettes,
+    availableFontPresets,
     setMode,
     setSeedPalette,
     setRadiusScale,
     setCustomRadiusPx,
     setDensity,
     setFontScale,
+    setFontFamilyPreset,
+    setIconStyle,
+    setIconFilled,
+    setIconWeight,
     setGlassIntensity,
     setWebglEnabled,
     setWebglPreset,
@@ -300,9 +313,9 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
       <Card
         variant="glass"
         padding="md"
-        eyebrow="UXI GELİŞTİRİCİ REHBERİ • /juː-eks-aɪ/ ('Yu-Eks-Ay' / 'Yuksi')"
-        title="UXI Hızlı Başlangıç & Sistem Dokümantasyonu"
-        subtitle="UXI (pronounced /juː-eks-aɪ/ or simply 'yook-see') — Kurulum, tema/font ölçekleme, yerleşim ve tüm bileşenlerin uygulamalı kullanımı."
+        eyebrow="UXIGL GELİŞTİRİCİ REHBERİ"
+        title="uxiGL Hızlı Başlangıç & Sistem Dokümantasyonu"
+        subtitle="Kurulum, tema/font ölçekleme, yerleşim ve tüm bileşenlerin uygulamalı kullanımı."
         headerIcon={<Rocket size={20} />}
         headerAction={
           <Badge tone="primary" variant="tonal" pulse size="sm">
@@ -574,7 +587,7 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
 
                 <Switch
                   label="7. Opsiyonel WebGL Ambiyansı (Varsayılan: Kapalı)"
-                  description="Kapalıyken 0% GPU yükü. Açıldığında 30 FPS hafif ambiyans çalışır."
+                  description="Kapalıyken 0% GPU yükü. Açıldığında hafif ambiyans arka planı çalışır."
                   value={preferences.webglEnabled}
                   onChange={setWebglEnabled}
                   size="sm"
@@ -669,6 +682,159 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
               </div>
             </Card>
           </div>
+
+          {/* GOOGLE FONTS & GOOGLE MATERIAL SYMBOLS INTERACTIVE STUDIO */}
+          <Card
+            variant="glass"
+            eyebrow="GOOGLE FONTS × GOOGLE MATERIAL SYMBOLS VARIABLE ICONS"
+            title="Google Fonts Tipografi Aileleri & Değişken Font İkonları (<GoogleIcon />)"
+            subtitle="5 Google Font eşleşmesi (Inter, Plus Jakarta Sans, Outfit, DM Sans, Space Grotesk, JetBrains Mono, Fira Code) ve 4 eksenli (FILL, wght, GRAD, opsz) Google Material Symbols (Rounded / Outlined / Sharp)"
+            headerIcon={<GoogleIcon name="font_download" tone="primary" size={22} />}
+          >
+            <div className="uxu-stage-grid-2">
+              <div className="uxu-stack-md">
+                <div className="uxu-field__label">
+                  1. Google Fonts Ailesi Seçimi (Tüm Uygulamaya Anında Uygulanır)
+                </div>
+                <div className="uxu-palette-grid">
+                  {availableFontPresets.map((preset) => {
+                    const isSelected =
+                      (preferences.fontFamilyPreset ?? 'inter-jakarta') ===
+                      preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() =>
+                          setFontFamilyPreset(preset.id as FontFamilyPreset)
+                        }
+                        className={`uxu-palette-card ${
+                          isSelected ? 'uxu-palette-card--active' : ''
+                        }`}
+                        style={{ fontFamily: preset.sansStack }}
+                      >
+                        <div className="uxu-palette-card__info">
+                          <strong style={{ fontFamily: preset.displayStack }}>
+                            {preset.name}
+                          </strong>
+                          <small>{preset.badge}</small>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <SegmentedControl<GoogleIconStyle>
+                  label="2. Google Material Symbols İkon Ailesi"
+                  value={preferences.iconStyle ?? 'rounded'}
+                  onChange={setIconStyle}
+                  fullWidth
+                  size="sm"
+                  options={[
+                    { value: 'rounded', label: 'Material Symbols Rounded' },
+                    { value: 'outlined', label: 'Material Symbols Outlined' },
+                    { value: 'sharp', label: 'Material Symbols Sharp' },
+                  ]}
+                />
+
+                <Slider
+                  label="3. Değişken İkon Kalınlığı (wght: 100 – 700)"
+                  value={preferences.iconWeight ?? 400}
+                  onChange={setIconWeight}
+                  min={100}
+                  max={700}
+                  step={100}
+                  showTicks
+                />
+
+                <Switch
+                  label="4. Dolgulu İkon Eksen Modu (FILL: 0 ↔ 1)"
+                  description="Aktif edildiğinde tüm <GoogleIcon /> bileşenleri yumuşak geçişle dolgulu (filled) görünüm alır"
+                  value={Boolean(preferences.iconFilled)}
+                  onChange={setIconFilled}
+                  size="sm"
+                />
+              </div>
+
+              <div className="uxu-stack-md">
+                <div className="uxu-field__label">
+                  Canlı Google Material Symbols İkon Galerisi (Kopyalamak İçin Tıklayın)
+                </div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(112px, 1fr))',
+                    gap: 10,
+                  }}
+                >
+                  {[
+                    { name: 'auto_awesome', tone: 'primary' as const },
+                    { name: 'dashboard', tone: 'info' as const },
+                    { name: 'palette', tone: 'secondary' as const },
+                    { name: 'table_chart', tone: 'success' as const },
+                    { name: 'folder_open', tone: 'warning' as const },
+                    { name: 'bolt', tone: 'danger' as const },
+                    { name: 'verified', tone: 'primary' as const },
+                    { name: 'deployed_code', tone: 'info' as const },
+                    { name: 'terminal', tone: 'secondary' as const },
+                    { name: 'tune', tone: 'success' as const },
+                    { name: 'rocket_launch', tone: 'warning' as const },
+                    { name: 'shield_lock', tone: 'danger' as const },
+                  ].map((item) => {
+                    const snippet = `<GoogleIcon name="${item.name}" tone="${item.tone}" size={22} />`;
+                    return (
+                      <button
+                        key={item.name}
+                        type="button"
+                        onClick={() => {
+                          copy(snippet);
+                          notify({
+                            title: 'GoogleIcon Kodu Kopyalandı',
+                            description: snippet,
+                            tone: 'success',
+                          });
+                        }}
+                        className="uxu-token-swatch"
+                        style={{
+                          cursor: 'pointer',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          textAlign: 'center',
+                          padding: '12px 8px',
+                          gap: 6,
+                        }}
+                      >
+                        <GoogleIcon
+                          name={item.name}
+                          tone={item.tone}
+                          size={26}
+                        />
+                        <code style={{ fontSize: '0.7rem' }}>{item.name}</code>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {renderCodeBox(
+                  'GoogleIcon & Google Fonts Kullanımı',
+                  `import { GoogleIcon } from '@/components/primitives';
+import { useTheme } from '@/providers/ThemeProvider';
+
+export function IconDemo() {
+  const { setFontFamilyPreset, setIconStyle, setIconFilled } = useTheme();
+  return (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <GoogleIcon name="auto_awesome" tone="primary" size="lg" />
+      <GoogleIcon name="table_chart" iconStyle="rounded" filled weight={500} />
+      <GoogleIcon name="folder_open" iconStyle="sharp" tone="warning" size={24} />
+    </div>
+  );
+}`
+                )}
+              </div>
+            </div>
+          </Card>
         </div>
       )}
 

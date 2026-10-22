@@ -583,7 +583,7 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
       {
         id: 'segmented-basic',
         title: '1. İkonlu ve Sayaç Rozetli Segment Seçici',
-        description: 'Aktif sekme CSS değişkenleriyle 60fps kayarak yer değiştirir.',
+        description: 'Aktif sekme CSS değişkenleriyle akıcı biçimde kayarak yer değiştirir.',
         code: `<SegmentedControl
   label="Veri Görünüm Modu"
   value={viewMode}
@@ -890,7 +890,7 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
     turkishTitle: 'SheetGL Çoklu Tablo & Basit Native Tablo',
     category: 'feedback',
     summary:
-      'Büyük veri setleri için 4 farklı kurumsal şemaya sahip 60 FPS SheetGL WebGL/Canvas DataGrid (Finans, Bulut Telemetri, İK & Bordro, Stok) ve hafif listeler için 4 varyantlı basit Native HTML <DataTable />.',
+      'Büyük veri setleri için 4 farklı kurumsal şemaya sahip SheetGL WebGL/Canvas DataGrid (Finans, Bulut Telemetri, İK & Bordro, Stok) ve hafif listeler için 4 varyantlı basit Native HTML <DataTable />.',
     importPath: 'sheetgl / src/components/composites/DataTable',
     importStatement:
       "import { SheetGL } from 'sheetgl';\nimport { DataTable, SheetGLGridAdapter } from './components/composites';",
