@@ -58,6 +58,13 @@ export const Skeleton: React.FC<SkeletonProps> = ({
         } as React.CSSProperties
       }
       aria-hidden="true"
-    />
+    >
+      {animated && (
+        <span
+          className="uxu-skeleton__shimmer"
+          style={{ animationDuration: durationStr }}
+        />
+      )}
+    </div>
   );
 };

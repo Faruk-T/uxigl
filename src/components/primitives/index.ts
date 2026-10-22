@@ -9,3 +9,4 @@ export * from './Progress/Progress';
 export * from './Tooltip/Tooltip';
 export * from './Skeleton/Skeleton';
 export * from './Checkbox/Checkbox';
+export * from './GoogleIcon/GoogleIcon';

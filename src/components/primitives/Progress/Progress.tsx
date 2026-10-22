@@ -95,7 +95,10 @@ export const Progress: React.FC<ProgressProps> = ({
           className={indeterminate ? 'uxu-progress-circular__svg--spin' : ''}
           style={
             indeterminate
-              ? ({ '--uxu-anim-duration': animDuration } as React.CSSProperties)
+              ? ({
+                  '--uxu-anim-duration': animDuration,
+                  animationDuration: animDuration,
+                } as React.CSSProperties)
               : undefined
           }
         >
@@ -167,10 +170,20 @@ export const Progress: React.FC<ProgressProps> = ({
           }`}
           style={
             indeterminate
-              ? ({ '--uxu-anim-duration': animDuration } as React.CSSProperties)
+              ? ({
+                  '--uxu-anim-duration': animDuration,
+                  animationDuration: animDuration,
+                } as React.CSSProperties)
               : { width: `${percentage}%` }
           }
-        />
+        >
+          {!indeterminate && speed !== undefined && (
+            <span
+              className="uxu-progress-linear__shimmer"
+              style={{ animationDuration: animDuration }}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
