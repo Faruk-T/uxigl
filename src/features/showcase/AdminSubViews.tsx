@@ -18,14 +18,26 @@ import {
   Bell,
   Sliders,
   ArrowUpRight,
+  Building2,
+  Phone,
+  CreditCard,
+  Filter,
+  RefreshCw,
 } from 'lucide-react';
 import {
+  Alert,
   Avatar,
   Badge,
   Button,
   Checkbox,
   Chip,
+  CurrencyInput,
+  type CurrencyCode,
+  DateTimePickerInput,
+  FileUploadDropzone,
+  type UploadedFileItem,
   Input,
+  MultiSelectTagInput,
   Progress,
   Slider,
   Switch,
@@ -207,11 +219,45 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
     'native'
   );
 
-  // Forms view state
+  // Forms view state (Enterprise B2B / Muhasebe / E-Ticaret Form Studio)
   const [formProjectName, setFormProjectName] = useState(
-    'uxiGL Enterprise Portal'
+    'Anadolu Bulut Teknoloji A.Ş.'
   );
-  const [formAdminEmail, setFormAdminEmail] = useState('admin@uxigl.dev');
+  const [formAdminEmail, setFormAdminEmail] = useState('finans@anadolubulut.com.tr');
+  const [formPhone, setFormPhone] = useState('+90 (532) 480 19 23');
+  const [formTaxId, setFormTaxId] = useState('8940284910');
+  const [formIban, setFormIban] = useState('TR33 0006 1005 1978 6457 8413 26');
+  const [formCard, setFormCard] = useState('4543 6012 8941 0098');
+  const [formAmount, setFormAmount] = useState<number>(248500);
+  const [formCurrency, setFormCurrency] = useState<CurrencyCode>('TRY');
+  const [formInvoiceDate, setFormInvoiceDate] = useState('2026-10-25');
+  const [formInvoiceTime, setFormInvoiceTime] = useState('14:30');
+  const [formTags, setFormTags] = useState<string[]>([
+    'B2B Kurumsal',
+    'e-Fatura Mükellefi',
+    'Öncelikli SLA',
+    'KDV %20',
+  ]);
+  const [formFiles, setFormFiles] = useState<UploadedFileItem[]>([
+    {
+      id: 'doc-1',
+      name: 'Kurumsal_Cerceve_Sozlesmesi_2026.pdf',
+      sizeKb: 1840,
+      type: 'pdf',
+      status: 'completed',
+      progress: 100,
+    },
+    {
+      id: 'doc-2',
+      name: 'Imza_Sirkuleri_ve_Vergi_Levhasi.pdf',
+      sizeKb: 642,
+      type: 'pdf',
+      status: 'completed',
+      progress: 100,
+    },
+  ]);
+  const [formAdvancedExpanded, setFormAdvancedExpanded] = useState<boolean>(true);
+  const [formEInvoiceSync, setFormEInvoiceSync] = useState<boolean>(true);
   const [formRegion, setFormRegion] = useState<'eu' | 'us' | 'tr'>('tr');
   const [formQuota, setFormQuota] = useState<number>(75);
   const [formAutoScale, setFormAutoScale] = useState<boolean>(true);
@@ -381,150 +427,342 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
     );
   }
 
-  // 3. FORMS VIEW
+  // 3. FORMS VIEW (B2B / Muhasebe / E-Ticaret Kurumsal Form Stüdyosu)
   if (viewId === 'forms') {
+    const isIbanValid = formIban.replace(/\s/g, '').length === 26;
+    const isEmailValid = formAdminEmail.includes('@');
+    const isTaxValid = formTaxId.length >= 10;
+
     return (
-      <div className="uxu-stage-grid-2">
-        <Card
-          variant="glass"
-          glowOnHover
-          eyebrow="FORMS STUDIO • KURUMSAL FORM KONTROLLERİ"
-          title="Yeni Bulut Kümesi & Çalışma Alanı Oluştur"
-          subtitle="Input, SegmentedControl, Slider, Switch ve Checkbox doğrulama örneği"
-          headerIcon={<FileText size={18} />}
-          headerAction={
-            <Badge tone="success" size="xs" pulse>
-              Canlı Doğrulama
-            </Badge>
-          }
-          footer={
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-              <Button
-                variant="outlined"
-                size="sm"
-                onClick={() => {
-                  setFormProjectName('uxiGL Enterprise Portal');
-                  setFormQuota(75);
+      <div className="uxu-stack-md">
+        <div className="uxu-stage-grid-2">
+          {/* Left Column: B2B Cari Hesap, Maskeli Girdiler & Döviz/Vade */}
+          <Card
+            variant="glass"
+            glowOnHover
+            eyebrow="FORMS STUDIO • B2B, MUHASEBE & E-TİCARET KONTROLLERİ"
+            title="Kurumsal Cari Hesap & e-Fatura Oluşturucu"
+            subtitle="Maskeli Input (Telefon, TR IBAN, VKN/TCKN, Kart), Döviz/KDV ve Vade Seçici"
+            headerIcon={<FileText size={18} />}
+            headerAction={
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Button
+                  variant="glass"
+                  size="xs"
+                  toggleable
+                  statusDot
+                  pressed={formEInvoiceSync}
+                  leadingIcon={<RefreshCw size={12} />}
+                  onToggle={setFormEInvoiceSync}
+                >
+                  GİB e-Fatura ({formEInvoiceSync ? 'Açık' : 'Kapalı'})
+                </Button>
+                <Badge tone="success" size="xs" pulse>
+                  Canlı Doğrulama
+                </Badge>
+              </div>
+            }
+            footer={
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: 10,
                 }}
               >
-                Sıfırla
-              </Button>
-              <Button
-                variant="filled"
-                size="sm"
-                leadingIcon={<Sparkles size={15} />}
-                onClick={() =>
-                  notify({
-                    title: 'Form Başarıyla Kaydedildi',
-                    description: `${formProjectName} (${formRegion.toUpperCase()}) yapılandırıldı.`,
-                    tone: 'success',
-                  })
-                }
-              >
-                Yapılandırmayı Kaydet
-              </Button>
-            </div>
-          }
-        >
-          <div className="uxu-stack-md">
-            <Input
-              label="Proje / Çalışma Alanı Adı"
-              value={formProjectName}
-              onChange={setFormProjectName}
-              clearable
-              helperText="URL ve telemetri etiketlerinde kullanılacak benzersiz ad"
-            />
-            <Input
-              label="Yönetici E-Posta Adresi"
-              value={formAdminEmail}
-              onChange={setFormAdminEmail}
-              clearable
-              errorText={
-                !formAdminEmail.includes('@')
-                  ? 'Lütfen geçerli bir kurumsal e-posta girin'
-                  : undefined
-              }
-            />
-            <SegmentedControl<'tr' | 'eu' | 'us'>
-              label="Birincil Veri Merkezi Bölgesi"
-              value={formRegion}
-              onChange={setFormRegion}
-              fullWidth
-              size="sm"
-              options={[
-                { value: 'tr', label: 'İstanbul (tr-1)' },
-                { value: 'eu', label: 'Frankfurt (eu-1)' },
-                { value: 'us', label: 'Virginia (us-1)' },
-              ]}
-            />
-            <Slider
-              label="Ayrılmış GPU & Bellek Kotası"
-              value={formQuota}
-              onChange={setFormQuota}
-              min={10}
-              max={100}
-              step={5}
-              valueSuffix="%"
-              showTicks
-            />
-            <Switch
-              label="Otomatik Yatay Ölçekleme (Auto-Scaling)"
-              description="Yük %80'i aştığında ek yedek düğümleri devreye al"
-              value={formAutoScale}
-              onChange={setFormAutoScale}
-              tone="primary"
-            />
-            <Switch
-              label="Zero-Trust Uçtan Uca Şifreleme"
-              description="Tüm WebGL ve VFS veri akışını TLS 1.3 ile imzala"
-              value={formZeroTrust}
-              onChange={setFormZeroTrust}
-              tone="success"
-            />
-            <Checkbox
-              label="Kurumsal Hizmet Seviyesi Sözleşmesini (SLA %99.98) onaylıyorum"
-              value={formTerms}
-              onChange={setFormTerms}
-              tone="primary"
-            />
-          </div>
-        </Card>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  collapsible
+                  expanded={formAdvancedExpanded}
+                  leadingIcon={<Filter size={14} />}
+                  onExpandChange={setFormAdvancedExpanded}
+                >
+                  {formAdvancedExpanded
+                    ? 'Altyapı & SLA Ayarlarını Daralt'
+                    : 'Altyapı & SLA Ayarlarını Göster'}
+                </Button>
 
-        <Card
-          variant="tonal"
-          eyebrow="CANLI FORM ÖZETİ • JSON PAYLOAD"
-          title="Anlık Form Durumu & Çıktı Önizlemesi"
-          subtitle="Soldaki her değişiklik anında doğrulama motoruna yansır"
-          headerIcon={<Sliders size={18} />}
-        >
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <Button
+                    variant="outlined"
+                    size="sm"
+                    onClick={() => {
+                      setFormProjectName('Anadolu Bulut Teknoloji A.Ş.');
+                      setFormAmount(248500);
+                      setFormQuota(75);
+                    }}
+                  >
+                    Sıfırla
+                  </Button>
+                  <Button
+                    variant="filled"
+                    size="sm"
+                    leadingIcon={<Sparkles size={15} />}
+                    splitAction
+                    splitItems={[
+                      {
+                        id: 'draft',
+                        label: 'Taslak Fatura Olarak Kaydet',
+                        onClick: () =>
+                          notify({
+                            title: 'Taslak Kaydedildi',
+                            description: `${formProjectName} taslak havuzuna eklendi.`,
+                            tone: 'info',
+                            placement: 'top-right',
+                          }),
+                      },
+                      {
+                        id: 'gib',
+                        label: 'GİB e-Fatura Olarak İmzala & Gönder',
+                        onClick: () =>
+                          notify({
+                            title: 'e-Fatura GİB Kuyruğuna İletildi',
+                            description: `${formAmount} ${formCurrency} tutarındaki fatura onaylandı.`,
+                            tone: 'success',
+                            placement: 'bottom-right',
+                          }),
+                      },
+                    ]}
+                    onClick={() =>
+                      notify({
+                        title: 'Kurumsal Form Kaydedildi',
+                        description: `${formProjectName} • ${formAmount} ${formCurrency}`,
+                        tone: 'success',
+                        placement: 'bottom-right',
+                      })
+                    }
+                  >
+                    Faturayı & Cariyi Kaydet
+                  </Button>
+                </div>
+              </div>
+            }
+          >
+            <div className="uxu-stack-md">
+              <div className="uxu-stage-grid-2">
+                <Input
+                  label="Kurumsal Cari Unvanı"
+                  value={formProjectName}
+                  onChange={setFormProjectName}
+                  clearable
+                  leadingIcon={<Building2 size={15} />}
+                  validationState={formProjectName.length > 3 ? 'success' : 'default'}
+                  successText="Ticaret sicil kaydı doğrulandı"
+                />
+                <Input
+                  label="Finans / Muhasebe E-Posta"
+                  value={formAdminEmail}
+                  onChange={setFormAdminEmail}
+                  clearable
+                  validationState={isEmailValid ? 'success' : 'error'}
+                  successText="KEP / e-Fatura alıcı posta kutusu aktif"
+                  errorText={
+                    !isEmailValid
+                      ? 'Lütfen geçerli bir kurumsal e-posta girin'
+                      : undefined
+                  }
+                />
+              </div>
+
+              <div className="uxu-stage-grid-2">
+                <Input
+                  label="Yetkili Telefon (mask='phone')"
+                  value={formPhone}
+                  onChange={setFormPhone}
+                  mask="phone"
+                  leadingIcon={<Phone size={15} />}
+                />
+                <Input
+                  label="Vergi Kimlik / TCKN (mask='tax-id')"
+                  value={formTaxId}
+                  onChange={setFormTaxId}
+                  mask="tax-id"
+                  prefixText="VKN"
+                  maxLength={11}
+                  showCount
+                  validationState={isTaxValid ? 'success' : 'warning'}
+                  warningText="10 haneli VKN veya 11 haneli TCKN giriniz"
+                  successText="Mükellef sorgusu başarılı"
+                />
+              </div>
+
+              <div className="uxu-stage-grid-2">
+                <Input
+                  label="Banka Hesabı TR IBAN (mask='iban')"
+                  value={formIban}
+                  onChange={setFormIban}
+                  mask="iban"
+                  leadingIcon={<Building2 size={15} />}
+                  validationState={isIbanValid ? 'success' : 'warning'}
+                  successText="TR IBAN 26 hane kontrolü doğrulandı"
+                  warningText="TR IBAN 26 karakter olmalıdır"
+                />
+                <Input
+                  label="Kurumsal Ticari Kart (mask='credit-card')"
+                  value={formCard}
+                  onChange={setFormCard}
+                  mask="credit-card"
+                  leadingIcon={<CreditCard size={15} />}
+                  suffixText="CORP"
+                />
+              </div>
+
+              <div className="uxu-stage-grid-2">
+                <CurrencyInput
+                  label="Sözleşme / Fatura Net Tutarı"
+                  value={formAmount}
+                  onChange={setFormAmount}
+                  currency={formCurrency}
+                  onCurrencyChange={setFormCurrency}
+                  vatRate={20}
+                />
+                <DateTimePickerInput
+                  label="Fatura & Ödeme Vade Tarihi"
+                  dateValue={formInvoiceDate}
+                  timeValue={formInvoiceTime}
+                  onDateChange={setFormInvoiceDate}
+                  onTimeChange={setFormInvoiceTime}
+                />
+              </div>
+
+              {formAdvancedExpanded && (
+                <div className="uxu-collapse-demo-panel uxu-stack-md">
+                  <SegmentedControl<'tr' | 'eu' | 'us'>
+                    label="Birincil Veri Merkezi Bölgesi"
+                    value={formRegion}
+                    onChange={setFormRegion}
+                    fullWidth
+                    size="sm"
+                    options={[
+                      { value: 'tr', label: 'İstanbul (tr-1)' },
+                      { value: 'eu', label: 'Frankfurt (eu-1)' },
+                      { value: 'us', label: 'Virginia (us-1)' },
+                    ]}
+                  />
+                  <Slider
+                    label="Ayrılmış GPU & Bellek Kotası"
+                    value={formQuota}
+                    onChange={setFormQuota}
+                    min={10}
+                    max={100}
+                    step={5}
+                    valueSuffix="%"
+                    showTicks
+                  />
+                  <div className="uxu-stage-grid-2">
+                    <Switch
+                      label="Otomatik Ölçekleme"
+                      description="Yük %80'i aştığında ek düğüm aç"
+                      value={formAutoScale}
+                      onChange={setFormAutoScale}
+                      tone="primary"
+                    />
+                    <Switch
+                      label="Zero-Trust Şifreleme"
+                      description="TLS 1.3 + Mali Mühür imzası"
+                      value={formZeroTrust}
+                      onChange={setFormZeroTrust}
+                      tone="success"
+                    />
+                  </div>
+                  <Checkbox
+                    label="Kurumsal Hizmet Seviyesi Sözleşmesini (SLA %99.98) ve Mesafeli Ticari Şartları onaylıyorum"
+                    value={formTerms}
+                    onChange={setFormTerms}
+                    tone="primary"
+                  />
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Right Column: Etiketler, Dosya Yükleme, Uyarılar & JSON Çıktısı */}
           <div className="uxu-stack-md">
-            <pre
-              className="uxu-code-block"
-              style={{ margin: 0, fontSize: '0.8rem' }}
+            <Card
+              variant="glass"
+              eyebrow="ETİKETLER & BELGE EKLERİ"
+              title="Çoklu Etiket Seçimi & Dosya Yükleme Alanı"
+              subtitle="MultiSelectTagInput ve sürükle-bırak FileUploadDropzone bileşenleri"
+              headerIcon={<Layers size={18} />}
             >
-              <code>
-                {JSON.stringify(
-                  {
-                    projectName: formProjectName,
-                    adminEmail: formAdminEmail,
-                    region: formRegion,
-                    allocatedQuotaPct: formQuota,
-                    autoScaling: formAutoScale,
-                    zeroTrustEncryption: formZeroTrust,
-                    slaAccepted: formTerms,
-                  },
-                  null,
-                  2
-                )}
-              </code>
-            </pre>
-            <Progress
-              label="Form Tamamlanma Oranı"
-              value={formProjectName && formAdminEmail.includes('@') && formTerms ? 100 : 66}
-              tone="success"
-            />
+              <div className="uxu-stack-md">
+                <MultiSelectTagInput
+                  label="Müşteri Segmenti & Muhasebe Etiketleri"
+                  tags={formTags}
+                  onChange={setFormTags}
+                  maxTags={8}
+                  helperText="Etiket eklemek için yazıp Enter tuşuna basın veya önerilere tıklayın."
+                />
+                <FileUploadDropzone
+                  label="Sözleşme, Vergi Levhası & Dekont Ekleri"
+                  files={formFiles}
+                  onChange={setFormFiles}
+                />
+              </div>
+            </Card>
+
+            <Card
+              variant="tonal"
+              eyebrow="CANLI FORM ÖZETİ • JSON PAYLOAD"
+              title="Anlık Doğrulama & ERP Çıktı Önizlemesi"
+              subtitle="Form alanlarındaki her değişiklik anında doğrulama motoruna yansır"
+              headerIcon={<Sliders size={18} />}
+            >
+              <div className="uxu-stack-md">
+                <Alert
+                  tone={isIbanValid && isEmailValid && isTaxValid ? 'success' : 'warning'}
+                  variant="tonal"
+                  title={
+                    isIbanValid && isEmailValid && isTaxValid
+                      ? 'Tüm B2B & Muhasebe Doğrulamaları Başarılı'
+                      : 'Bazı Alanlar Format Kontrolü Bekliyor'
+                  }
+                  description="VKN, TR IBAN (26 hane) ve KDV (%20) hesaplamaları GİB UBL-TR standardına uygundur."
+                />
+
+                <pre
+                  className="uxu-code-block"
+                  style={{ margin: 0, fontSize: '0.77rem', maxHeight: 240 }}
+                >
+                  <code>
+                    {JSON.stringify(
+                      {
+                        companyName: formProjectName,
+                        financeEmail: formAdminEmail,
+                        phone: formPhone,
+                        taxId: formTaxId,
+                        iban: formIban,
+                        netAmount: formAmount,
+                        currency: formCurrency,
+                        dueDate: `${formInvoiceDate} ${formInvoiceTime}`,
+                        tags: formTags,
+                        attachmentsCount: formFiles.length,
+                        eInvoiceSync: formEInvoiceSync,
+                        region: formRegion,
+                        slaAccepted: formTerms,
+                      },
+                      null,
+                      2
+                    )}
+                  </code>
+                </pre>
+
+                <Progress
+                  label="Kurumsal Form Tamamlanma Oranı"
+                  value={
+                    isIbanValid && isEmailValid && isTaxValid && formTerms
+                      ? 100
+                      : 78
+                  }
+                  tone="success"
+                />
+              </div>
+            </Card>
           </div>
-        </Card>
+        </div>
       </div>
     );
   }

@@ -1,0 +1,25 @@
+{
+  "extends": ["development"],
+  "hints": {
+    "no-inline-styles": "off",
+    "compat-api/css": [
+      "default",
+      {
+        "ignore": [
+          "backdrop-filter",
+          "-webkit-backdrop-filter",
+          "user-select",
+          "-webkit-user-select",
+          "scrollbar-width",
+          "scrollbar-color",
+          "color-mix"
+        ]
+      }
+    ],
+    "axe/forms": "off",
+    "axe/name-role-value": "off",
+    "axe/aria": "off",
+    "button-type": "off"
+  }
+}
+

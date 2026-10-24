@@ -21,6 +21,17 @@ import {
   CheckCircle2,
   XCircle,
   Keyboard,
+  Filter,
+  Download,
+  Plus,
+  RefreshCw,
+  AlertTriangle,
+  CreditCard,
+  Building2,
+  Phone,
+  Share2,
+  FileSpreadsheet,
+  Archive,
 } from 'lucide-react';
 import {
   COMPONENT_CATALOG,
@@ -31,6 +42,15 @@ import {
   type ButtonVariant,
   Input,
   type InputSurfaceStyle,
+  type InputMaskPreset,
+  type InputValidationState,
+  CurrencyInput,
+  type CurrencyCode,
+  DateTimePickerInput,
+  MultiSelectTagInput,
+  FileUploadDropzone,
+  type UploadedFileItem,
+  Alert,
   Switch,
   Slider,
   Badge,
@@ -48,6 +68,7 @@ import {
   Tabs,
   Accordion,
   Modal,
+  type ModalVariant,
   StatCard,
   DataTable,
   SheetGLGridAdapter,
@@ -59,6 +80,10 @@ import type {
   SemanticTone,
   SurfaceVariant,
 } from '../../core/contracts/ComponentContracts';
+import type {
+  ToastPlacement,
+  ToastTone,
+} from '../../core/contracts/NotificationContract';
 import type { RadiusScale } from '../../core/contracts/ThemeContract';
 import { CodeGeneratorService } from '../../core/services/CodeGeneratorService';
 import { RouteService } from '../../core/services/RouteService';
@@ -92,6 +117,17 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
 
   // Shared live playground controls
   const [btnVariant, setBtnVariant] = useState<ButtonVariant>('filled');
+  const [buttonMode, setButtonMode] = useState<
+    'standard' | 'switch-toggle' | 'collapse-expand' | 'split' | 'icon-only'
+  >('standard');
+  const [toggleStates, setToggleStates] = useState<Record<string, boolean>>({
+    autoSync: true,
+    liveWebhook: false,
+    auditTrail: true,
+    zeroTrust: true,
+  });
+  const [collapseExpanded, setCollapseExpanded] = useState<boolean>(true);
+
   const [controlSize, setControlSize] = useState<ComponentSize>('md');
   const [semanticTone, setSemanticTone] = useState<SemanticTone>('primary');
   const [surfaceVariant, setSurfaceVariant] = useState<SurfaceVariant>('glass');
@@ -103,6 +139,52 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
   const [inputValue, setInputValue] = useState('uxi@design.system');
   const [inputSurface, setInputSurface] = useState<InputSurfaceStyle>('glass');
   const [inputError, setInputError] = useState(false);
+  const [inputValidation, setInputValidation] =
+    useState<InputValidationState>('default');
+  const [inputMaskPreset, setInputMaskPreset] = useState<
+    'none' | InputMaskPreset
+  >('none');
+
+  // Enterprise Input Showcase states
+  const [phoneVal, setPhoneVal] = useState('+90 (532) 480 19 23');
+  const [ibanVal, setIbanVal] = useState(
+    'TR33 0006 1005 1978 6457 8413 26'
+  );
+  const [taxIdVal, setTaxIdVal] = useState('8940284910');
+  const [cardVal, setCardVal] = useState('4543 6012 8941 0098');
+  const [secretKeyVal, setSecretKeyVal] = useState('uxigl_live_98a4f2c1b7e');
+  const [subdomainVal, setSubdomainVal] = useState('kurumsal-erp');
+  const [currencyAmount, setCurrencyAmount] = useState<number>(148500);
+  const [currencyCode, setCurrencyCode] = useState<CurrencyCode>('TRY');
+  const [invoiceDate, setInvoiceDate] = useState('2026-10-25');
+  const [invoiceTime, setInvoiceTime] = useState('14:30');
+  const [selectedEnterpriseTags, setSelectedEnterpriseTags] = useState<
+    string[]
+  >(['B2B Kurumsal', 'e-Fatura Mükellefi', 'Öncelikli SLA']);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFileItem[]>([
+    {
+      id: 'f-1',
+      name: 'B2B_Tedarikci_Sozlesmesi_2026.pdf',
+      sizeKb: 1480,
+      type: 'pdf',
+      status: 'completed',
+      progress: 100,
+    },
+    {
+      id: 'f-2',
+      name: 'Ekim_Mutabakat_Tablosu.xlsx',
+      sizeKb: 428,
+      type: 'doc',
+      status: 'completed',
+      progress: 100,
+    },
+  ]);
+
+  // Modal, Alert & Toast interactive states
+  const [toastPlacement, setToastPlacement] =
+    useState<ToastPlacement>('bottom-right');
+  const [toastTone, setToastTone] = useState<ToastTone>('primary');
+  const [modalVariant, setModalVariant] = useState<ModalVariant>('default');
 
   const [switchChecked, setSwitchChecked] = useState(true);
   const [checkboxChecked, setCheckboxChecked] = useState(true);
@@ -144,26 +226,73 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
             variant: btnVariant,
             size: controlSize,
             pill: isPill || undefined,
+            toggleable: buttonMode === 'switch-toggle' ? true : undefined,
+            pressed:
+              buttonMode === 'switch-toggle'
+                ? toggleStates.autoSync
+                : undefined,
+            statusDot: buttonMode === 'switch-toggle' ? true : undefined,
+            collapsible: buttonMode === 'collapse-expand' ? true : undefined,
+            expanded:
+              buttonMode === 'collapse-expand' ? collapseExpanded : undefined,
+            splitAction: buttonMode === 'split' ? true : undefined,
+            iconOnly: buttonMode === 'icon-only' ? true : undefined,
             loading: isLoading || undefined,
             disabled: isDisabled || undefined,
           },
-          childrenCode: 'uxiGL Eylemi Başlat',
+          childrenCode:
+            buttonMode === 'icon-only'
+              ? '<Sparkles size={16} />'
+              : buttonMode === 'switch-toggle'
+              ? 'Canlı Senkronizasyon'
+              : buttonMode === 'collapse-expand'
+              ? 'Gelişmiş Filtreleri Göster'
+              : 'uxiGL Eylemi Başlat',
         });
       case 'input':
         return CodeGeneratorService.generateSnippet({
           componentName: 'Input',
           importPath: activeEntry.importPath,
           props: {
-            label: 'Kurumsal E-Posta',
-            value: inputValue,
+            label:
+              inputMaskPreset === 'iban'
+                ? 'Kurumsal TR IBAN'
+                : inputMaskPreset === 'phone'
+                ? 'Kurumsal Telefon'
+                : 'Kurumsal E-Posta',
+            value:
+              inputMaskPreset === 'iban'
+                ? ibanVal
+                : inputMaskPreset === 'phone'
+                ? phoneVal
+                : inputValue,
             surface: inputSurface,
             size: controlSize,
+            mask: inputMaskPreset !== 'none' ? inputMaskPreset : undefined,
+            validationState:
+              inputValidation !== 'default' ? inputValidation : undefined,
             clearable: true,
             shortcutHint: '⌘K',
-            errorText: inputError ? 'Geçerli bir adres giriniz' : undefined,
+            errorText:
+              inputError || inputValidation === 'error'
+                ? 'Geçerli bir değer giriniz'
+                : undefined,
             disabled: isDisabled || undefined,
           },
         });
+      case 'modal-command':
+        return `import { Modal, Alert, useToast } from '@uxigl/ui';
+
+const { notify } = useToast();
+
+// 5 Yönlü & 6 Tonlu Canlı Toast Bildirimi
+notify({
+  title: 'Fatura #INV-2026-842 Onaylandı',
+  description: 'Muhasebe fişi ERP sistemine başarıyla işlendi.',
+  tone: '${toastTone}',
+  placement: '${toastPlacement}',
+  durationMs: 4200,
+});`;
       case 'switch':
         return CodeGeneratorService.generateSnippet({
           componentName: 'Switch',
@@ -320,13 +449,22 @@ export function CloudFileManagerExample() {
   }, [
     activeEntry,
     btnVariant,
+    buttonMode,
+    toggleStates.autoSync,
+    collapseExpanded,
     controlSize,
     isPill,
     isLoading,
     isDisabled,
     inputValue,
+    ibanVal,
+    phoneVal,
     inputSurface,
     inputError,
+    inputValidation,
+    inputMaskPreset,
+    toastTone,
+    toastPlacement,
     switchChecked,
     checkboxChecked,
     semanticTone,
@@ -344,31 +482,163 @@ export function CloudFileManagerExample() {
       case 'button':
         return (
           <div className="uxu-stage-showcase">
-            <div className="uxu-stage-primary-demo">
-              <Button
-                variant={btnVariant}
-                size={controlSize}
-                pill={isPill}
-                disabled={isDisabled}
-                loading={isLoading}
-                loadingText="İşleniyor..."
-                leadingIcon={<Sparkles size={16} />}
-                onClick={() =>
-                  notify({
-                    title: 'Button Etkileşimi Tetiklendi',
-                    description: `Varyant: ${btnVariant} • Boyut: ${controlSize}`,
-                    tone: 'primary',
-                  })
-                }
-              >
-                uxiGL Eylemi Başlat
-              </Button>
+            {/* 1. Primary Live Demo (Driven by Prop Inspector & Button Mode) */}
+            <div className="uxu-stage-primary-demo" style={{ gap: 12, flexWrap: 'wrap' }}>
+              {buttonMode === 'standard' && (
+                <Button
+                  variant={btnVariant}
+                  size={controlSize}
+                  pill={isPill}
+                  disabled={isDisabled}
+                  loading={isLoading}
+                  loadingText="İşleniyor..."
+                  leadingIcon={<Sparkles size={16} />}
+                  onClick={() =>
+                    notify({
+                      title: 'Standart Buton Etkileşimi',
+                      description: `Varyant: ${btnVariant} • Boyut: ${controlSize}`,
+                      tone: 'primary',
+                    })
+                  }
+                >
+                  uxiGL Eylemi Başlat
+                </Button>
+              )}
+
+              {buttonMode === 'switch-toggle' && (
+                <Button
+                  variant={btnVariant}
+                  size={controlSize}
+                  pill={isPill}
+                  disabled={isDisabled}
+                  loading={isLoading}
+                  toggleable
+                  statusDot
+                  pressed={toggleStates.autoSync}
+                  leadingIcon={<RefreshCw size={15} />}
+                  onToggle={(next) => {
+                    setToggleStates((prev) => ({ ...prev, autoSync: next }));
+                    notify({
+                      title: next
+                        ? 'Canlı Senkronizasyon Açıldı'
+                        : 'Canlı Senkronizasyon Duraklatıldı',
+                      description: `aria-pressed="${String(next)}" olarak güncellendi.`,
+                      tone: next ? 'success' : 'warning',
+                    });
+                  }}
+                >
+                  Canlı ERP Senkronizasyonu ({toggleStates.autoSync ? 'Açık' : 'Kapalı'})
+                </Button>
+              )}
+
+              {buttonMode === 'collapse-expand' && (
+                <Button
+                  variant={btnVariant}
+                  size={controlSize}
+                  pill={isPill}
+                  disabled={isDisabled}
+                  loading={isLoading}
+                  collapsible
+                  expanded={collapseExpanded}
+                  badgeCount={4}
+                  leadingIcon={<Filter size={15} />}
+                  onExpandChange={(next) => setCollapseExpanded(next)}
+                >
+                  {collapseExpanded
+                    ? 'Gelişmiş Filtre Panelini Daralt'
+                    : 'Gelişmiş Filtre Panelini Genişlet'}
+                </Button>
+              )}
+
+              {buttonMode === 'split' && (
+                <Button
+                  variant={btnVariant}
+                  size={controlSize}
+                  pill={isPill}
+                  disabled={isDisabled}
+                  loading={isLoading}
+                  leadingIcon={<Download size={15} />}
+                  splitAction
+                  splitItems={[
+                    {
+                      id: 'xlsx',
+                      label: 'Excel (.xlsx) Olarak İndir',
+                      icon: <FileSpreadsheet size={14} />,
+                      onClick: () =>
+                        notify({
+                          title: 'Excel Raporu Hazırlanıyor',
+                          description: 'Finansal mutabakat tablosu dışa aktarılıyor.',
+                          tone: 'success',
+                        }),
+                    },
+                    {
+                      id: 'csv',
+                      label: 'CSV Veri Akışı İndir',
+                      icon: <Download size={14} />,
+                      onClick: () =>
+                        notify({
+                          title: 'CSV İndirildi',
+                          description: 'UTF-8 BOM formatında kaydedildi.',
+                          tone: 'info',
+                        }),
+                    },
+                    {
+                      id: 'archive',
+                      label: 'Şifreli ZIP Arşivi Oluştur',
+                      icon: <Archive size={14} />,
+                      onClick: () =>
+                        notify({
+                          title: 'ZIP Arşivi Oluşturuldu',
+                          description: 'AES-256 korumalı paket hazır.',
+                          tone: 'primary',
+                        }),
+                    },
+                  ]}
+                  onClick={() =>
+                    notify({
+                      title: 'Varsayılan Rapor İndirildi',
+                      description: 'Ana aksiyon tetiklendi (Split Button).',
+                      tone: 'primary',
+                    })
+                  }
+                >
+                  Finansal Raporu Dışa Aktar
+                </Button>
+              )}
+
+              {buttonMode === 'icon-only' && (
+                <div className="uxu-stage-row">
+                  {(['xs', 'sm', 'md', 'lg'] as ComponentSize[]).map((sz) => (
+                    <Tooltip key={sz} content={`Icon-Only (${sz.toUpperCase()})`}>
+                      <Button
+                        variant={btnVariant}
+                        size={sz}
+                        pill={isPill}
+                        disabled={isDisabled}
+                        loading={isLoading}
+                        iconOnly
+                        aria-label={`Hızlı Eylem ${sz}`}
+                        onClick={() =>
+                          notify({
+                            title: `Icon-Only Buton (${sz.toUpperCase()})`,
+                            description: 'Kompakt araç çubuğu aksiyonu çalıştı.',
+                            tone: 'info',
+                          })
+                        }
+                      >
+                        <Sparkles size={sz === 'xs' ? 13 : sz === 'lg' ? 19 : 16} />
+                      </Button>
+                    </Tooltip>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="uxu-stage-divider" />
 
+            {/* 2. Surface & Semantic Variants Matrix */}
             <div className="uxu-stage-matrix-label">
-              Tüm Yüzey Varyantları (Tıklayarak Aktif Varyantı Seçin)
+              Tüm Yüzey & Semantik Varyantlar (Tıklayarak Aktif Varyantı Seçin)
             </div>
             <div className="uxu-stage-row">
               {(
@@ -378,6 +648,8 @@ export function CloudFileManagerExample() {
                   'glass',
                   'outlined',
                   'ghost',
+                  'success',
+                  'warning',
                   'danger',
                 ] as ButtonVariant[]
               ).map((v) => (
@@ -394,12 +666,289 @@ export function CloudFileManagerExample() {
                 </Button>
               ))}
             </div>
+
+            <div className="uxu-stage-divider" />
+
+            {/* 3. Rich Button Variations Showcase Grid */}
+            <div className="uxu-stage-grid-2">
+              {/* Switch / Toggle Buttons */}
+              <Card
+                variant="tonal"
+                padding="md"
+                title="1. Switch (Toggle) Butonlar"
+                subtitle="aria-pressed, canlı durum noktası (statusDot) ve çoklu filtre seçimi"
+              >
+                <div className="uxu-stage-row">
+                  <Button
+                    variant="glass"
+                    size={controlSize}
+                    pill={isPill}
+                    disabled={isDisabled}
+                    toggleable
+                    statusDot
+                    pressed={toggleStates.autoSync}
+                    leadingIcon={<RefreshCw size={14} />}
+                    onToggle={(next) =>
+                      setToggleStates((prev) => ({ ...prev, autoSync: next }))
+                    }
+                  >
+                    Otomatik Eşitleme
+                  </Button>
+                  <Button
+                    variant="tonal"
+                    size={controlSize}
+                    pill={isPill}
+                    disabled={isDisabled}
+                    toggleable
+                    statusDot
+                    pressed={toggleStates.liveWebhook}
+                    leadingIcon={<Zap size={14} />}
+                    onToggle={(next) =>
+                      setToggleStates((prev) => ({ ...prev, liveWebhook: next }))
+                    }
+                  >
+                    Webhook Akışı
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size={controlSize}
+                    pill={isPill}
+                    disabled={isDisabled}
+                    toggleable
+                    statusDot
+                    pressed={toggleStates.zeroTrust}
+                    leadingIcon={<ShieldCheck size={14} />}
+                    onToggle={(next) =>
+                      setToggleStates((prev) => ({ ...prev, zeroTrust: next }))
+                    }
+                  >
+                    Zero-Trust Kalkanı
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Collapse / Expand Action Button */}
+              <Card
+                variant="tonal"
+                padding="md"
+                title="2. Collapse / Expand Aksiyon Butonları"
+                subtitle="Dönen chevron ikonu, aria-expanded ve açılır/kapanır detay yüzeyi"
+              >
+                <div className="uxu-stack-sm">
+                  <div className="uxu-stage-row">
+                    <Button
+                      variant="glass"
+                      size={controlSize}
+                      pill={isPill}
+                      disabled={isDisabled}
+                      collapsible
+                      expanded={collapseExpanded}
+                      badgeCount={3}
+                      leadingIcon={<Filter size={15} />}
+                      onExpandChange={setCollapseExpanded}
+                    >
+                      {collapseExpanded ? 'Filtreleri Gizle' : 'Filtreleri Göster'}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size={controlSize}
+                      pill={isPill}
+                      disabled={isDisabled}
+                      collapsible
+                      expanded={!collapseExpanded}
+                      onExpandChange={(next) => setCollapseExpanded(!next)}
+                    >
+                      Hızlı Detay Özeti
+                    </Button>
+                  </div>
+
+                  {collapseExpanded && (
+                    <div className="uxu-collapse-demo-panel">
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: 6,
+                        }}
+                      >
+                        <strong style={{ fontSize: '0.8rem' }}>
+                          Aktif Kurumsal Filtre Kriterleri
+                        </strong>
+                        <Badge tone="success" size="xs">
+                          3 Kural Aktif
+                        </Badge>
+                      </div>
+                      <p className="uxu-text-xs">
+                        Bölge: EMEA • Fatura Limiti: &gt; ₺50.000 • Durum: Onay
+                        Bekleyen Siparişler
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </Card>
+
+              {/* Split Buttons */}
+              <Card
+                variant="tonal"
+                padding="md"
+                title="3. Split (Bölünmüş) Aksiyon Butonları"
+                subtitle="Birincil eylem + açılır bağlamsal menü seçenekleri"
+              >
+                <div className="uxu-stage-row">
+                  <Button
+                    variant="filled"
+                    size={controlSize}
+                    pill={isPill}
+                    disabled={isDisabled}
+                    leadingIcon={<Send size={14} />}
+                    splitAction
+                    splitItems={[
+                      {
+                        id: 'now',
+                        label: 'Hemen Gönder (Canlı Küme)',
+                        icon: <Zap size={14} />,
+                        onClick: () =>
+                          notify({
+                            title: 'Canlı Dağıtım Başlatıldı',
+                            description: 'Tüm uç düğümlere iletildi.',
+                            tone: 'success',
+                          }),
+                      },
+                      {
+                        id: 'schedule',
+                        label: 'Gece 03:00 İçin Zamanla',
+                        icon: <RefreshCw size={14} />,
+                        onClick: () =>
+                          notify({
+                            title: 'Zamanlanmış Görev Eklendi',
+                            description: 'Gece 03:00 bakım penceresine alındı.',
+                            tone: 'info',
+                          }),
+                      },
+                      {
+                        id: 'rollback',
+                        label: 'Önceki Sürüme Geri Dön',
+                        icon: <AlertTriangle size={14} />,
+                        danger: true,
+                        onClick: () =>
+                          notify({
+                            title: 'Rollback Başlatıldı',
+                            description: 'v2.4.9 kararlı sürümüne dönülüyor.',
+                            tone: 'danger',
+                          }),
+                      },
+                    ]}
+                    onClick={() =>
+                      notify({
+                        title: 'Yayınlama Başlatıldı',
+                        description: 'Birincil Split Button aksiyonu çalıştı.',
+                        tone: 'primary',
+                      })
+                    }
+                  >
+                    Üretime Yayınla
+                  </Button>
+
+                  <Button
+                    variant="glass"
+                    size={controlSize}
+                    pill={isPill}
+                    disabled={isDisabled}
+                    leadingIcon={<Download size={14} />}
+                    splitAction
+                    splitItems={[
+                      {
+                        id: 'pdf',
+                        label: 'İmzalı e-Fatura PDF İndir',
+                        onClick: () =>
+                          notify({ title: 'PDF İndirildi', tone: 'success' }),
+                      },
+                      {
+                        id: 'ubl',
+                        label: 'GİB UBL-TR XML İndir',
+                        onClick: () =>
+                          notify({ title: 'UBL-TR XML İndirildi', tone: 'info' }),
+                      },
+                    ]}
+                    onClick={() =>
+                      notify({ title: 'Dışa Aktarma Başladı', tone: 'primary' })
+                    }
+                  >
+                    e-Fatura İndir
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Icon-Only & Loading Variations */}
+              <Card
+                variant="tonal"
+                padding="md"
+                title="4. Icon-Only, Rozetli & Loading Durumları"
+                subtitle="Araç çubuğu ikon butonları, bildirim sayaçları ve asenkron yükleme"
+              >
+                <div className="uxu-stage-row">
+                  <Tooltip content="Yeni Kayıt Oluştur">
+                    <Button
+                      variant="filled"
+                      size={controlSize}
+                      pill={isPill}
+                      iconOnly
+                      aria-label="Yeni Ekle"
+                    >
+                      <Plus size={16} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip content="Paylaşım Bağlantısı">
+                    <Button
+                      variant="glass"
+                      size={controlSize}
+                      pill={isPill}
+                      iconOnly
+                      aria-label="Paylaş"
+                    >
+                      <Share2 size={16} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip content="Bildirim Merkezi">
+                    <Button
+                      variant="tonal"
+                      size={controlSize}
+                      pill={isPill}
+                      iconOnly
+                      aria-label="Bildirimler"
+                    >
+                      <Bell size={16} />
+                    </Button>
+                  </Tooltip>
+                  <Button
+                    variant="glass"
+                    size={controlSize}
+                    pill={isPill}
+                    badgeCount={12}
+                    leadingIcon={<Bell size={15} />}
+                  >
+                    Onay Bekleyenler
+                  </Button>
+                  <Button
+                    variant="tonal"
+                    size={controlSize}
+                    pill={isPill}
+                    loading
+                    loadingText="Doğrulanıyor..."
+                  >
+                    Gönder
+                  </Button>
+                </div>
+              </Card>
+            </div>
           </div>
         );
 
       case 'input':
         return (
           <div className="uxu-stage-showcase">
+            {/* 1. Standard, Validation States, Password Reveal & Affixes */}
             <div className="uxu-stage-grid-2">
               <Input
                 label="Spotlight & Material Hibrit Giriş"
@@ -411,50 +960,198 @@ export function CloudFileManagerExample() {
                 disabled={isDisabled}
                 clearable
                 shortcutHint="⌘K"
+                validationState={inputError ? 'error' : inputValidation}
                 leadingIcon={<Search size={16} />}
-                helperText="Sağdaki X ikonuyla metni tek tıkla temizleyebilirsiniz."
+                helperText="Sağdaki denetçiden doğrulama (success/warning/error) durumlarını test edin."
+                successText={
+                  inputValidation === 'success'
+                    ? 'Kurumsal alan adı doğrulandı (MX kaydı aktif).'
+                    : undefined
+                }
+                warningText={
+                  inputValidation === 'warning'
+                    ? 'Bu e-posta adresi harici bir organizasyona ait.'
+                    : undefined
+                }
                 errorText={
-                  inputError
+                  inputError || inputValidation === 'error'
                     ? 'Format doğrulaması başarısız oldu.'
                     : undefined
                 }
               />
 
               <Input
-                label="Karakter Sayaçlı Güvenlik Anahtarı"
-                placeholder="API anahtarınızı girin..."
-                value={inputValue}
-                onChange={setInputValue}
-                surface="tonal"
+                label="Göster/Gizle Destekli API & Parola Girişi"
+                placeholder="Gizli anahtarınızı girin..."
+                value={secretKeyVal}
+                onChange={setSecretKeyVal}
+                surface={inputSurface}
                 size={controlSize}
                 disabled={isDisabled}
+                revealablePassword
                 maxLength={42}
                 showCount
                 leadingIcon={<Lock size={16} />}
-                helperText="maxLength={42} ve showCount={true} aktif."
+                helperText="Göz ikonuna tıklayarak parolayı gösterebilir veya gizleyebilirsiniz."
               />
             </div>
 
-            <div className="uxu-stage-row">
-              <Button
+            {/* 2. Masked Enterprise Inputs (Phone, IBAN, Tax ID, Credit Card) */}
+            <Card
+              variant="tonal"
+              padding="md"
+              eyebrow="B2B • FİNANS • MUHASEBE FORMAT MASKELERİ"
+              title="Maskeli Kurumsal Giriş Alanları (Input Masking)"
+              subtitle="Yazım sırasında otomatik formatlanan Telefon, TR IBAN, Vergi/TCKN ve Kredi Kartı alanları"
+            >
+              <div className="uxu-stage-grid-2">
+                <Input
+                  label="Kurumsal Telefon (mask='phone')"
+                  value={phoneVal}
+                  onChange={setPhoneVal}
+                  mask="phone"
+                  surface={inputSurface}
+                  size={controlSize}
+                  disabled={isDisabled}
+                  leadingIcon={<Phone size={15} />}
+                  validationState={phoneVal.length >= 19 ? 'success' : 'default'}
+                  successText={
+                    phoneVal.length >= 19 ? 'SMS doğrulamasına hazır' : undefined
+                  }
+                />
+
+                <Input
+                  label="Banka Hesabı TR IBAN (mask='iban')"
+                  value={ibanVal}
+                  onChange={setIbanVal}
+                  mask="iban"
+                  surface={inputSurface}
+                  size={controlSize}
+                  disabled={isDisabled}
+                  leadingIcon={<Building2 size={15} />}
+                  validationState={
+                    ibanVal.replace(/\s/g, '').length === 26
+                      ? 'success'
+                      : 'warning'
+                  }
+                  successText="TR IBAN 26 hane kontrolü başarılı"
+                  warningText="TR IBAN 26 karakter olmalıdır"
+                />
+
+                <Input
+                  label="Vergi Kimlik / TCKN (mask='tax-id')"
+                  value={taxIdVal}
+                  onChange={setTaxIdVal}
+                  mask="tax-id"
+                  surface={inputSurface}
+                  size={controlSize}
+                  disabled={isDisabled}
+                  prefixText="VKN"
+                  showCount
+                  maxLength={11}
+                  helperText="Sadece rakam kabul eder (10 hane VKN veya 11 hane TCKN)"
+                />
+
+                <Input
+                  label="Kurumsal Ticari Kart (mask='credit-card')"
+                  value={cardVal}
+                  onChange={setCardVal}
+                  mask="credit-card"
+                  surface={inputSurface}
+                  size={controlSize}
+                  disabled={isDisabled}
+                  leadingIcon={<CreditCard size={15} />}
+                  suffixText="VISA"
+                  helperText="16 haneli kart numarası 4'lü bloklar halinde gruplanır"
+                />
+              </div>
+            </Card>
+
+            {/* 3. Currency Input & Date/Time Picker */}
+            <div className="uxu-stage-grid-2">
+              <Card
                 variant="tonal"
-                size="sm"
-                onClick={() => setInputError((prev) => !prev)}
+                padding="md"
+                title="Para Birimi & KDV Hesaplayıcı (CurrencyInput)"
+                subtitle="Çoklu döviz seçimi (TRY, USD, EUR, GBP), hızlı tutar adımları ve otomatik %20 KDV"
               >
-                {inputError ? 'Hata Durumunu Kaldır' : 'Hata Durumunu Test Et'}
-              </Button>
-              {(['glass', 'tonal', 'outlined'] as InputSurfaceStyle[]).map(
-                (surf) => (
-                  <Button
-                    key={surf}
-                    variant={inputSurface === surf ? 'filled' : 'outlined'}
-                    size="sm"
-                    onClick={() => setInputSurface(surf)}
-                  >
-                    Yüzey: {surf}
-                  </Button>
-                )
-              )}
+                <div className="uxu-stack-md">
+                  <CurrencyInput
+                    label="Fatura Net Hizmet Bedeli"
+                    value={currencyAmount}
+                    onChange={setCurrencyAmount}
+                    currency={currencyCode}
+                    onCurrencyChange={setCurrencyCode}
+                    size={controlSize}
+                    disabled={isDisabled}
+                    vatRate={20}
+                    helperText="Alt satırda KDV (%20) dahil genel toplam anlık hesaplanır."
+                  />
+                  <Input
+                    label="Kurumsal Kiracı (Tenant) Alt Alan Adı"
+                    value={subdomainVal}
+                    onChange={setSubdomainVal}
+                    surface={inputSurface}
+                    size={controlSize}
+                    disabled={isDisabled}
+                    prefixText="https://"
+                    suffixText=".uxigl.cloud"
+                    validationState="success"
+                    successText="Alt alan adı SSL sertifikası ile kullanıma hazır."
+                  />
+                </div>
+              </Card>
+
+              <Card
+                variant="tonal"
+                padding="md"
+                title="Tarih & Saat Seçici (DateTimePickerInput)"
+                subtitle="Hızlı vade kısayolları (Bugün, Yarın, +7 Gün, +30 Gün Vade) ve saat seçimi"
+              >
+                <DateTimePickerInput
+                  label="e-Fatura Düzenleme & Vade Tarihi"
+                  dateValue={invoiceDate}
+                  timeValue={invoiceTime}
+                  onDateChange={setInvoiceDate}
+                  onTimeChange={setInvoiceTime}
+                  size={controlSize}
+                  disabled={isDisabled}
+                  helperText="Vade butonlarıyla hızlıca ileri tarihli ödeme planı seçebilirsiniz."
+                />
+              </Card>
+            </div>
+
+            {/* 4. Multi-Select Tag Input & File Upload Dropzone */}
+            <div className="uxu-stage-grid-2">
+              <Card
+                variant="tonal"
+                padding="md"
+                title="Çoklu Seçim & Etiket Girişi (MultiSelectTagInput)"
+                subtitle="Klavyeden Enter/Virgül ile etiket ekleme ve öneri havuzu"
+              >
+                <MultiSelectTagInput
+                  label="Müşteri Segmenti & Muhasebe Etiketleri"
+                  tags={selectedEnterpriseTags}
+                  onChange={setSelectedEnterpriseTags}
+                  maxTags={8}
+                  disabled={isDisabled}
+                  helperText="Listeden seçin veya yeni etiket yazıp Enter'a basın."
+                />
+              </Card>
+
+              <Card
+                variant="tonal"
+                padding="md"
+                title="Sürükle-Bırak Dosya Yükleme Alanı (FileUploadDropzone)"
+                subtitle="Çoklu belge yükleme, boyut kontrolü ve canlı durum listesi"
+              >
+                <FileUploadDropzone
+                  label="Sözleşme, İrsaliye & Dekont Ekleri"
+                  files={uploadedFiles}
+                  onChange={setUploadedFiles}
+                  disabled={isDisabled}
+                />
+              </Card>
             </div>
           </div>
         );
@@ -990,6 +1687,7 @@ export function CloudFileManagerExample() {
       case 'modal-command':
         return (
           <div className="uxu-stage-showcase">
+            {/* 1. Primary Action Bar */}
             <div className="uxu-stage-row">
               <Button
                 variant="filled"
@@ -1000,7 +1698,7 @@ export function CloudFileManagerExample() {
                 leadingIcon={<Layers size={16} />}
                 onClick={() => setDemoModalOpen(true)}
               >
-                macOS &amp; Material Hibrit Diyaloğu Aç
+                Modal Diyaloğu Aç ({modalVariant.toUpperCase()})
               </Button>
               <Button
                 variant="glass"
@@ -1020,25 +1718,263 @@ export function CloudFileManagerExample() {
                 leadingIcon={<Bell size={16} />}
                 onClick={() =>
                   notify({
-                    title: 'Canlı Sistem Bildirimi',
-                    description: 'İşlem başarıyla sıraya alındı.',
-                    tone: semanticTone,
-                    actionLabel: 'Geri Al',
+                    title: `Canlı Bildirim (${toastPlacement})`,
+                    description: `Seçili ton: ${toastTone} • Konum: ${toastPlacement}`,
+                    tone: toastTone,
+                    placement: toastPlacement,
+                    actionLabel: 'Detayı Gör',
                     onAction: () => {},
                   })
                 }
               >
-                Canlı Bildirim (Toast) Gönder
+                Seçili Yönde Toast Tetikle ({toastPlacement})
               </Button>
             </div>
+
+            {/* 2. Live Multi-Direction & Multi-Tone Toast Launcher Matrix */}
+            <Card
+              variant="tonal"
+              padding="md"
+              eyebrow="5 EKRAN YÖNÜ × 6 SEMANTİK & GLASS TONU"
+              title="Canlı Toast Bildirim Stüdyosu (Multi-Viewport Toast Engine)"
+              subtitle="Bildirimleri ekranın 5 farklı köşesinde ve 6 farklı semantik/glass tonda canlı test edin"
+              headerAction={
+                <Button
+                  variant="glass"
+                  size="xs"
+                  leadingIcon={<Sparkles size={13} />}
+                  onClick={() => {
+                    const demoCorners: Array<{
+                      placement: ToastPlacement;
+                      tone: ToastTone;
+                      label: string;
+                    }> = [
+                      {
+                        placement: 'top-left',
+                        tone: 'info',
+                        label: 'Sol Üst (Top-Left) • Bilgi',
+                      },
+                      {
+                        placement: 'top-center',
+                        tone: 'glass',
+                        label: 'Üst Orta (Top-Center) • Liquid Glass',
+                      },
+                      {
+                        placement: 'top-right',
+                        tone: 'success',
+                        label: 'Sağ Üst (Top-Right) • Başarılı',
+                      },
+                      {
+                        placement: 'bottom-left',
+                        tone: 'warning',
+                        label: 'Sol Alt (Bottom-Left) • Uyarı',
+                      },
+                      {
+                        placement: 'bottom-right',
+                        tone: 'danger',
+                        label: 'Sağ Alt (Bottom-Right) • Kritik Alarm',
+                      },
+                    ];
+                    demoCorners.forEach((item, idx) => {
+                      window.setTimeout(() => {
+                        notify({
+                          title: item.label,
+                          description: `Yön: ${item.placement} • Ton: ${item.tone}`,
+                          placement: item.placement,
+                          tone: item.tone,
+                          durationMs: 4500,
+                        });
+                      }, idx * 140);
+                    });
+                  }}
+                >
+                  5 Yönü Aynı Anda Ateşle
+                </Button>
+              }
+            >
+              <div className="uxu-stack-md">
+                <div>
+                  <div className="uxu-stage-matrix-label" style={{ marginBottom: 8 }}>
+                    1. Ekran Yönü Seçin ve Anında Tetikleyin (placement)
+                  </div>
+                  <div className="uxu-stage-row">
+                    {(
+                      [
+                        { id: 'top-left', label: '↖ Sol Üst (top-left)' },
+                        { id: 'top-center', label: '↑ Üst Orta (top-center)' },
+                        { id: 'top-right', label: '↗ Sağ Üst (top-right)' },
+                        { id: 'bottom-left', label: '↙ Sol Alt (bottom-left)' },
+                        { id: 'bottom-right', label: '↘ Sağ Alt (bottom-right)' },
+                      ] as Array<{ id: ToastPlacement; label: string }>
+                    ).map((pos) => (
+                      <Button
+                        key={pos.id}
+                        variant={toastPlacement === pos.id ? 'filled' : 'glass'}
+                        size="sm"
+                        pill={isPill}
+                        onClick={() => {
+                          setToastPlacement(pos.id);
+                          notify({
+                            title: `${pos.label} Bildirimi`,
+                            description: `Aktif renk tonu: ${toastTone.toUpperCase()}`,
+                            placement: pos.id,
+                            tone: toastTone,
+                            actionLabel: 'Onayla',
+                            onAction: () => {},
+                          });
+                        }}
+                      >
+                        {pos.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="uxu-stage-matrix-label" style={{ marginBottom: 8 }}>
+                    2. Semantik Renk veya Liquid Glass Tonu Seçip Tetikleyin (tone)
+                  </div>
+                  <div className="uxu-stage-row">
+                    {(
+                      [
+                        { tone: 'primary', label: 'Primary (Vurgu)', btn: 'filled' },
+                        { tone: 'success', label: 'Success (Başarılı)', btn: 'success' },
+                        { tone: 'warning', label: 'Warning (Uyarı)', btn: 'warning' },
+                        { tone: 'danger', label: 'Danger (Kritik Hata)', btn: 'danger' },
+                        { tone: 'info', label: 'Info (Sistem Bilgisi)', btn: 'tonal' },
+                        { tone: 'glass', label: 'Liquid Glass (Buzlu Cam)', btn: 'glass' },
+                      ] as Array<{
+                        tone: ToastTone;
+                        label: string;
+                        btn: ButtonVariant;
+                      }>
+                    ).map((item) => (
+                      <Button
+                        key={item.tone}
+                        variant={toastTone === item.tone ? item.btn : 'outlined'}
+                        size="sm"
+                        pill={isPill}
+                        onClick={() => {
+                          setToastTone(item.tone);
+                          notify({
+                            title: `${item.label} Bildirimi`,
+                            description: `Konum: ${toastPlacement} • Otomatik geri sayım çubuğu aktif.`,
+                            tone: item.tone,
+                            placement: toastPlacement,
+                            actionLabel: 'Geri Al',
+                            onAction: () => {},
+                          });
+                        }}
+                      >
+                        {item.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* 3. Modal Dialog Archetypes */}
+            <Card
+              variant="tonal"
+              padding="md"
+              title="Modal Diyalog Varyasyonları (6 Kurumsal Arketip)"
+              subtitle="Standart, Onay (Confirm), Yıkıcı İşlem (Danger), Uyarı (Alert), Alt Çekmece (Sheet) ve Saf Liquid Glass"
+            >
+              <div className="uxu-stage-row">
+                {(
+                  [
+                    { v: 'default', label: 'Standart Modal' },
+                    { v: 'confirm', label: 'Onay Diyaloğu (Confirm)' },
+                    { v: 'danger', label: 'Yıkıcı Silme Onayı (Danger)' },
+                    { v: 'alert', label: 'Sistem Uyarısı (Alert)' },
+                    { v: 'sheet', label: 'Alt Çekmece (Sheet)' },
+                    { v: 'glass', label: 'Saf Liquid Glass' },
+                  ] as Array<{ v: ModalVariant; label: string }>
+                ).map((m) => (
+                  <Button
+                    key={m.v}
+                    variant={
+                      m.v === 'danger'
+                        ? 'danger'
+                        : modalVariant === m.v
+                        ? 'filled'
+                        : 'glass'
+                    }
+                    size="sm"
+                    pill={isPill}
+                    onClick={() => {
+                      setModalVariant(m.v);
+                      setDemoModalOpen(true);
+                    }}
+                  >
+                    {m.label}
+                  </Button>
+                ))}
+              </div>
+            </Card>
+
+            {/* 4. Inline Alert Banners */}
+            <Card
+              variant="tonal"
+              padding="md"
+              title="Satır İçi Uyarı & Durum Bantları (<Alert />)"
+              subtitle="Sayfa içi bilgi, başarı, uyarı, kritik hata ve Liquid Glass bildirim yüzeyleri"
+            >
+              <div className="uxu-stack-sm">
+                <Alert
+                  tone="success"
+                  variant="tonal"
+                  title="e-Fatura GİB Entegrasyonu Aktif"
+                  description="Gelir İdaresi Başkanlığı (GİB) ağ geçidi ile çift yönlü zarf senkronizasyonu sorunsuz çalışıyor."
+                />
+                <Alert
+                  tone="warning"
+                  variant="tonal"
+                  title="Kredi Limiti Eşiği (%85) Aşıldı"
+                  description="Müşteri cari hesabının açık risk bakiyesi ₺850.000 seviyesine ulaştı. Ek teminat mektubu talep edilebilir."
+                />
+                <Alert
+                  tone="danger"
+                  variant="outlined"
+                  title="Kritik Güvenlik Uyarısı: İmza Sertifikası Süresi Doluyor"
+                  description="Mali mühür zaman damgası sertifikasının geçerlilik süresi 48 saat içinde sona erecek."
+                />
+                <Alert
+                  tone="glass"
+                  variant="glass"
+                  title="Liquid Glass Sistem Duyurusu"
+                  description="uxiGL v2.5 tema kalıtımı motoru ile tüm WebGL yüzeyleri (SheetGL & FileManGL) aktif paletle %100 senkronize edildi."
+                />
+              </div>
+            </Card>
 
             <Modal
               open={demoModalOpen}
               onClose={() => setDemoModalOpen(false)}
+              variant={modalVariant}
+              tone={
+                modalVariant === 'danger'
+                  ? 'danger'
+                  : modalVariant === 'alert'
+                  ? 'warning'
+                  : modalVariant === 'confirm'
+                  ? 'success'
+                  : semanticTone
+              }
               showMacTrafficLights
-              title="Sunucu Kümesi Yapılandırma Onayı"
-              subtitle="Liquid Glass Sheet + Google Material 3 Dialog"
-              icon={<ShieldCheck size={20} />}
+              title={
+                modalVariant === 'danger'
+                  ? 'Üretim Veritabanı Kümesini Kalıcı Olarak Sil?'
+                  : modalVariant === 'confirm'
+                  ? 'Toplu e-Fatura Gönderim Onayı'
+                  : modalVariant === 'alert'
+                  ? 'Yüksek Gecikme Süresi Algılandı'
+                  : modalVariant === 'sheet'
+                  ? 'Hızlı Denetim & Filtre Çekmecesi (Sheet)'
+                  : 'Sunucu Kümesi Yapılandırma Onayı'
+              }
+              subtitle={`Varyant: ${modalVariant.toUpperCase()} • Liquid Glass + Material 3 Dialog`}
               footer={
                 <div className="uxu-modal-footer-actions">
                   <Button
@@ -1048,27 +1984,44 @@ export function CloudFileManagerExample() {
                     Vazgeç
                   </Button>
                   <Button
-                    variant="filled"
+                    variant={modalVariant === 'danger' ? 'danger' : 'filled'}
                     leadingIcon={<Send size={15} />}
                     onClick={() => {
                       setDemoModalOpen(false);
                       notify({
-                        title: 'Değişiklikler Kaydedildi',
-                        description:
-                          'Tasarım tokenları başarıyla senkronize edildi.',
-                        tone: 'success',
+                        title:
+                          modalVariant === 'danger'
+                            ? 'Silme İşlemi Tamamlandı'
+                            : 'Değişiklikler Kaydedildi',
+                        description: `Modal (${modalVariant}) aksiyonu başarıyla uygulandı.`,
+                        tone: modalVariant === 'danger' ? 'danger' : 'success',
+                        placement: toastPlacement,
                       });
                     }}
                   >
-                    Onayla ve Uygula
+                    {modalVariant === 'danger'
+                      ? 'Evet, Kalıcı Olarak Sil'
+                      : 'Onayla ve Uygula'}
                   </Button>
                 </div>
               }
             >
-              <p className="uxu-muted-p">
-                Bu pencere klavyeden <code>ESC</code> tuşuna basıldığında veya
-                bulanık arka plana tıklandığında otomatik olarak kapanır.
-              </p>
+              <div className="uxu-stack-sm">
+                <p className="uxu-muted-p">
+                  Bu diyalog penceresi <code>variant=&quot;{modalVariant}&quot;</code>{' '}
+                  kipinde çalışmaktadır. Klavyeden <code>ESC</code> tuşuna
+                  basıldığında veya bulanık arka plana tıklandığında otomatik
+                  olarak kapanır.
+                </p>
+                {modalVariant === 'danger' && (
+                  <Alert
+                    tone="danger"
+                    variant="tonal"
+                    title="Geri Alınamaz İşlem"
+                    description="Bu işlem sonucunda 142 mikroservis düğümü ve anlık önbellek kopyaları sıfırlanacaktır."
+                  />
+                )}
+              </div>
             </Modal>
           </div>
         );
@@ -1518,54 +2471,191 @@ export function CloudFileManagerExample() {
 
             {/* 3. Component-Specific Quick Controls */}
             {activeEntry.id === 'button' && (
-              <div className="uxu-inspector-group">
-                <span className="uxu-inspector-label">Buton Varyantı (variant)</span>
-                <div className="uxu-tone-chips">
-                  {(
-                    [
-                      'filled',
-                      'tonal',
-                      'glass',
-                      'outlined',
-                      'ghost',
-                      'danger',
-                    ] as ButtonVariant[]
-                  ).map((v) => (
-                    <Chip
-                      key={v}
-                      size="xs"
-                      tone="primary"
-                      selected={btnVariant === v}
-                      onClick={() => setBtnVariant(v)}
-                    >
-                      {v}
-                    </Chip>
-                  ))}
+              <>
+                <div className="uxu-inspector-group">
+                  <span className="uxu-inspector-label">
+                    Buton Davranış Modu (mode)
+                  </span>
+                  <div className="uxu-tone-chips">
+                    {(
+                      [
+                        { id: 'standard', label: 'Standart' },
+                        { id: 'switch-toggle', label: 'Switch Buton' },
+                        { id: 'collapse-expand', label: 'Collapse/Expand' },
+                        { id: 'split', label: 'Split Buton' },
+                        { id: 'icon-only', label: 'Icon-Only' },
+                      ] as const
+                    ).map((m) => (
+                      <Chip
+                        key={m.id}
+                        size="xs"
+                        tone="info"
+                        selected={buttonMode === m.id}
+                        onClick={() => setButtonMode(m.id)}
+                      >
+                        {m.label}
+                      </Chip>
+                    ))}
+                  </div>
                 </div>
-              </div>
+
+                <div className="uxu-inspector-group">
+                  <span className="uxu-inspector-label">Buton Varyantı (variant)</span>
+                  <div className="uxu-tone-chips">
+                    {(
+                      [
+                        'filled',
+                        'tonal',
+                        'glass',
+                        'outlined',
+                        'ghost',
+                        'success',
+                        'warning',
+                        'danger',
+                      ] as ButtonVariant[]
+                    ).map((v) => (
+                      <Chip
+                        key={v}
+                        size="xs"
+                        tone="primary"
+                        selected={btnVariant === v}
+                        onClick={() => setBtnVariant(v)}
+                      >
+                        {v}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
 
             {activeEntry.id === 'input' && (
-              <div className="uxu-inspector-group">
-                <span className="uxu-inspector-label">Giriş Yüzeyi (surface)</span>
-                <SegmentedControl<InputSurfaceStyle>
-                  value={inputSurface}
-                  onChange={setInputSurface}
-                  size="sm"
-                  fullWidth
-                  options={[
-                    { value: 'glass', label: 'Glass' },
-                    { value: 'tonal', label: 'Tonal' },
-                    { value: 'outlined', label: 'Outlined' },
-                  ]}
-                />
-                <Switch
-                  size="sm"
-                  label="Hata Durumu (errorText)"
-                  value={inputError}
-                  onChange={setInputError}
-                />
-              </div>
+              <>
+                <div className="uxu-inspector-group">
+                  <span className="uxu-inspector-label">Giriş Yüzeyi (surface)</span>
+                  <SegmentedControl<InputSurfaceStyle>
+                    value={inputSurface}
+                    onChange={setInputSurface}
+                    size="sm"
+                    fullWidth
+                    options={[
+                      { value: 'glass', label: 'Glass' },
+                      { value: 'tonal', label: 'Tonal' },
+                      { value: 'outlined', label: 'Outlined' },
+                    ]}
+                  />
+                </div>
+
+                <div className="uxu-inspector-group">
+                  <span className="uxu-inspector-label">
+                    Doğrulama Durumu (validationState)
+                  </span>
+                  <div className="uxu-tone-chips">
+                    {(
+                      ['default', 'success', 'warning', 'error'] as InputValidationState[]
+                    ).map((st) => (
+                      <Chip
+                        key={st}
+                        size="xs"
+                        tone={
+                          st === 'error'
+                            ? 'danger'
+                            : st === 'default'
+                            ? 'primary'
+                            : st
+                        }
+                        selected={inputValidation === st}
+                        onClick={() => {
+                          setInputValidation(st);
+                          setInputError(st === 'error');
+                        }}
+                      >
+                        {st}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="uxu-inspector-group">
+                  <span className="uxu-inspector-label">
+                    Format Maskesi (mask)
+                  </span>
+                  <div className="uxu-tone-chips">
+                    {(
+                      ['none', 'phone', 'iban', 'tax-id', 'credit-card'] as const
+                    ).map((msk) => (
+                      <Chip
+                        key={msk}
+                        size="xs"
+                        tone="info"
+                        selected={inputMaskPreset === msk}
+                        onClick={() => setInputMaskPreset(msk)}
+                      >
+                        {msk}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeEntry.id === 'modal-command' && (
+              <>
+                <div className="uxu-inspector-group">
+                  <span className="uxu-inspector-label">
+                    Toast Ekran Yönü (placement)
+                  </span>
+                  <div className="uxu-tone-chips">
+                    {(
+                      [
+                        'top-left',
+                        'top-center',
+                        'top-right',
+                        'bottom-left',
+                        'bottom-right',
+                      ] as ToastPlacement[]
+                    ).map((pos) => (
+                      <Chip
+                        key={pos}
+                        size="xs"
+                        tone="info"
+                        selected={toastPlacement === pos}
+                        onClick={() => setToastPlacement(pos)}
+                      >
+                        {pos}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="uxu-inspector-group">
+                  <span className="uxu-inspector-label">
+                    Toast Renk Tonu (tone)
+                  </span>
+                  <div className="uxu-tone-chips">
+                    {(
+                      [
+                        'primary',
+                        'success',
+                        'warning',
+                        'danger',
+                        'info',
+                        'glass',
+                      ] as ToastTone[]
+                    ).map((t) => (
+                      <Chip
+                        key={t}
+                        size="xs"
+                        tone={t === 'glass' ? 'primary' : t}
+                        selected={toastTone === t}
+                        onClick={() => setToastTone(t)}
+                      >
+                        {t}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+              </>
             )}
 
             {(activeEntry.id === 'card' || activeEntry.id === 'tabs-accordion') && (
