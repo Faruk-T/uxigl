@@ -1,5 +1,7 @@
 export * from './Button/Button';
 export * from './Input/Input';
+export * from './EnterpriseInputs/EnterpriseInputs';
+export * from './Alert/Alert';
 export * from './Switch/Switch';
 export * from './Slider/Slider';
 export * from './Badge/Badge';
