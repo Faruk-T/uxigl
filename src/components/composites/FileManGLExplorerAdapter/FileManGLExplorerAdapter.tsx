@@ -251,9 +251,21 @@ export const FileManGLExplorerAdapter: React.FC<
         className={`uxu-filemangl-host ${
           resolvedMode === 'light' ? 'theme-light' : 'theme-dark'
         }`}
-        style={{
-          height: typeof height === 'number' ? `${height}px` : height,
-        }}
+        data-theme={resolvedMode}
+        data-seed={preferences.seedPalette}
+        style={
+          {
+            height: typeof height === 'number' ? `${height}px` : height,
+            '--fm-primary':
+              resolvedMode === 'dark'
+                ? activePalette.dark.primary
+                : activePalette.light.primary,
+            '--fm-primary-hover':
+              resolvedMode === 'dark'
+                ? activePalette.dark.primaryHover
+                : activePalette.light.primaryHover,
+          } as React.CSSProperties
+        }
       >
         <I18nProvider
           locale={config.locale}
