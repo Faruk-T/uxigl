@@ -11,28 +11,40 @@ import {
   Info,
   XCircle,
   Sparkles,
+  Layers,
   X,
 } from 'lucide-react';
 import type {
   CreateToastInput,
   INotificationService,
   ToastItem,
+  ToastPlacement,
 } from '../core/contracts/NotificationContract';
 
 /**
  * ============================================================================
- * uxiGL DESIGN SYSTEM — DYNAMIC ISLAND / MATERIAL SNACKBAR TOAST PROVIDER
+ * uxiGL DESIGN SYSTEM — MULTI-DIRECTIONAL DYNAMIC ISLAND / SNACKBAR TOASTS
  * ============================================================================
  * [DIP] Implements `INotificationService` contract.
- * [SRP] Decouples notification state queuing from visual toast rendering.
+ * [SRP] Decouples notification state queuing from directional toast rendering.
  */
 
 const ToastContext = createContext<INotificationService | undefined>(undefined);
+
+const ALL_PLACEMENTS: ToastPlacement[] = [
+  'top-right',
+  'top-left',
+  'top-center',
+  'bottom-right',
+  'bottom-left',
+];
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const [defaultPlacement, setDefaultPlacement] =
+    useState<ToastPlacement>('bottom-right');
 
   const dismiss = useCallback((id: string) => {
     setToasts((prev) => prev.filter((item) => item.id !== id));
@@ -40,16 +52,20 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const notify = useCallback(
     (input: CreateToastInput): string => {
-      const id = `uxu-toast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      const id = `uxu-toast-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 7)}`;
       const durationMs = input.durationMs ?? 4200;
+      const placement = input.placement ?? defaultPlacement;
       const newToast: ToastItem = {
         ...input,
         id,
         tone: input.tone ?? 'primary',
+        placement,
         durationMs,
       };
 
-      setToasts((prev) => [...prev.slice(-4), newToast]);
+      setToasts((prev) => [...prev.slice(-7), newToast]);
 
       if (durationMs > 0) {
         window.setTimeout(() => {
@@ -59,7 +75,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 
       return id;
     },
-    [dismiss]
+    [dismiss, defaultPlacement]
   );
 
   const clearAll = useCallback(() => {
@@ -67,8 +83,15 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const value = useMemo<INotificationService>(
-    () => ({ toasts, notify, dismiss, clearAll }),
-    [toasts, notify, dismiss, clearAll]
+    () => ({
+      toasts,
+      defaultPlacement,
+      setDefaultPlacement,
+      notify,
+      dismiss,
+      clearAll,
+    }),
+    [toasts, defaultPlacement, notify, dismiss, clearAll]
   );
 
   return (
@@ -97,53 +120,85 @@ const ToastViewport: React.FC<ToastViewportProps> = ({ toasts, onDismiss }) => {
         return <XCircle size={18} className="uxu-toast-icon--danger" />;
       case 'info':
         return <Info size={18} className="uxu-toast-icon--info" />;
+      case 'glass':
+        return <Layers size={18} className="uxu-toast-icon--glass" />;
       default:
         return <Sparkles size={18} className="uxu-toast-icon--primary" />;
     }
   };
 
   return (
-    <div
-      className="uxu-toast-viewport"
-      role="region"
-      aria-label="Sistem Bildirimleri"
-    >
-      {toasts.map((toast) => (
-        <div
-          key={toast.id}
-          className={`uxu-toast uxu-toast--${toast.tone ?? 'primary'}`}
-          role="status"
-        >
-          <div className="uxu-toast__leading">{getToneIcon(toast.tone)}</div>
-          <div className="uxu-toast__content">
-            <div className="uxu-toast__title">{toast.title}</div>
-            {toast.description && (
-              <div className="uxu-toast__desc">{toast.description}</div>
-            )}
-          </div>
-          {toast.actionLabel && toast.onAction && (
-            <button
-              type="button"
-              className="uxu-toast__action"
-              onClick={() => {
-                toast.onAction?.();
-                onDismiss(toast.id);
-              }}
-            >
-              {toast.actionLabel}
-            </button>
-          )}
-          <button
-            type="button"
-            className="uxu-toast__close"
-            onClick={() => onDismiss(toast.id)}
-            aria-label="Bildirimi kapat"
+    <>
+      {ALL_PLACEMENTS.map((placement) => {
+        const group = toasts.filter(
+          (t) => (t.placement ?? 'bottom-right') === placement
+        );
+        if (group.length === 0) return null;
+
+        return (
+          <div
+            key={placement}
+            className={`uxu-toast-viewport uxu-toast-viewport--${placement}`}
+            role="region"
+            aria-label={`Sistem Bildirimleri (${placement})`}
           >
-            <X size={15} />
-          </button>
-        </div>
-      ))}
-    </div>
+            {group.map((toast) => {
+              const tone = toast.tone ?? 'primary';
+              return (
+                <div
+                  key={toast.id}
+                  className={`uxu-toast uxu-toast--${tone} uxu-toast--dir-${placement}`}
+                  role="status"
+                >
+                  <div className="uxu-toast__leading">
+                    {getToneIcon(toast.tone)}
+                  </div>
+                  <div className="uxu-toast__content">
+                    <div className="uxu-toast__title-row">
+                      <span className="uxu-toast__title">{toast.title}</span>
+                      <span className="uxu-toast__placement-tag">
+                        {placement}
+                      </span>
+                    </div>
+                    {toast.description && (
+                      <div className="uxu-toast__desc">{toast.description}</div>
+                    )}
+                  </div>
+                  {toast.actionLabel && toast.onAction && (
+                    <button
+                      type="button"
+                      className="uxu-toast__action"
+                      onClick={() => {
+                        toast.onAction?.();
+                        onDismiss(toast.id);
+                      }}
+                    >
+                      {toast.actionLabel}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="uxu-toast__close"
+                    onClick={() => onDismiss(toast.id)}
+                    aria-label="Bildirimi kapat"
+                  >
+                    <X size={15} />
+                  </button>
+                  {toast.durationMs && toast.durationMs > 0 && (
+                    <span
+                      className="uxu-toast__progress"
+                      style={{
+                        animationDuration: `${toast.durationMs}ms`,
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </>
   );
 };
 

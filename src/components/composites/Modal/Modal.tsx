@@ -1,18 +1,37 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
-import type { IdentifiableProps } from '../../../core/contracts/ComponentContracts';
+import {
+  X,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Info,
+  Sparkles,
+} from 'lucide-react';
+import type {
+  IdentifiableProps,
+  SemanticTone,
+} from '../../../core/contracts/ComponentContracts';
 import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 
 /**
  * ============================================================================
- * uxiGL COMPOSITE — MODAL / DIALOG SHEET
+ * uxiGL COMPOSITE — MODAL / ALERT / CONFIRMATION / SHEET DIALOG
  * ============================================================================
  * Combines macOS Sonoma sheet vibrancy with Material Design 3 Dialog structure.
  *
  * SOLID Principles Applied:
  * - [SRP] Delegates Escape key listening to `useKeyboardShortcut`.
- * - [OCP] Header icon, actions, and footer slots are fully composable.
+ * - [OCP] Supports `default`, `alert`, `confirm`, `danger`, `sheet`, `glass`
+ *   variants and semantic tones.
  */
+
+export type ModalVariant =
+  | 'default'
+  | 'alert'
+  | 'confirm'
+  | 'danger'
+  | 'sheet'
+  | 'glass';
 
 export interface ModalProps extends IdentifiableProps {
   open: boolean;
@@ -21,7 +40,9 @@ export interface ModalProps extends IdentifiableProps {
   subtitle?: React.ReactNode;
   icon?: React.ReactNode;
   footer?: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: ModalVariant;
+  tone?: SemanticTone | 'glass';
   showMacTrafficLights?: boolean;
   children: React.ReactNode;
 }
@@ -37,6 +58,8 @@ export const Modal: React.FC<ModalProps> = ({
   icon,
   footer,
   size = 'md',
+  variant = 'default',
+  tone = 'primary',
   showMacTrafficLights = false,
   children,
 }) => {
@@ -53,17 +76,40 @@ export const Modal: React.FC<ModalProps> = ({
 
   if (!open) return null;
 
+  const resolvedTone = variant === 'danger' ? 'danger' : tone;
+
+  const getDefaultModalIcon = () => {
+    if (icon) return icon;
+    if (variant === 'default') return null;
+    switch (resolvedTone) {
+      case 'success':
+        return <CheckCircle2 size={20} />;
+      case 'warning':
+        return <AlertTriangle size={20} />;
+      case 'danger':
+        return <XCircle size={20} />;
+      case 'info':
+        return <Info size={20} />;
+      default:
+        return <Sparkles size={20} />;
+    }
+  };
+
+  const modalIcon = getDefaultModalIcon();
+
   return (
     <div
-      className="uxu-modal-backdrop"
+      className={`uxu-modal-backdrop ${
+        variant === 'sheet' ? 'uxu-modal-backdrop--sheet' : ''
+      }`}
       onClick={onClose}
       role="presentation"
     >
       <div
         id={id}
-        role="dialog"
+        role={variant === 'alert' || variant === 'danger' ? 'alertdialog' : 'dialog'}
         aria-modal="true"
-        className={`uxu-modal uxu-modal--${size} ${className}`}
+        className={`uxu-modal uxu-modal--${size} uxu-modal--variant-${variant} uxu-modal--tone-${resolvedTone} ${className}`}
         style={style}
         onClick={(e) => e.stopPropagation()}
       >
@@ -79,7 +125,13 @@ export const Modal: React.FC<ModalProps> = ({
                 <span className="uxu-traffic-light uxu-traffic-light--max" />
               </div>
             )}
-            {icon && <div className="uxu-modal__icon">{icon}</div>}
+            {modalIcon && (
+              <div
+                className={`uxu-modal__icon uxu-modal__icon--${resolvedTone}`}
+              >
+                {modalIcon}
+              </div>
+            )}
             <div>
               {title && <h2 className="uxu-modal__title">{title}</h2>}
               {subtitle && <p className="uxu-modal__subtitle">{subtitle}</p>}
