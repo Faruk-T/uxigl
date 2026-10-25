@@ -317,14 +317,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     onCloseMobile();
                                   }}
                                 >
-                                  <span
-                                    className="uxu-sidebar__subitem-dot"
-                                    style={
-                                      sub.dotColor
-                                        ? { background: sub.dotColor }
-                                        : undefined
-                                    }
-                                  />
+                                  {sub.icon ? (
+                                    <span className="uxu-sidebar__subitem-icon mr-2 shrink-0 inline-flex items-center justify-center w-4 h-4">
+                                      {sub.icon}
+                                    </span>
+                                  ) : (
+                                    <span
+                                      className="uxu-sidebar__subitem-dot"
+                                      style={
+                                        sub.dotColor
+                                          ? { background: sub.dotColor }
+                                          : undefined
+                                      }
+                                    />
+                                  )}
                                   <span className="uxu-sidebar__subitem-label">
                                     {sub.label}
                                   </span>

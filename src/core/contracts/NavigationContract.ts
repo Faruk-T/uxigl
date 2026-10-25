@@ -19,6 +19,7 @@ export interface SidebarSubMenuItem {
   badge?: string | number;
   badgeTone?: SemanticTone;
   dotColor?: string;
+  icon?: ReactNode;
 }
 
 export interface SidebarNavItem {

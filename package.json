@@ -1,5 +1,5 @@
 {
-  "name": "uxigl",
+  "name": "truncgil-uxigl",
   "version": "2.5.1",
   "description": "uxiGL — Liquid Glass & Google Material You Modular Design System with SheetGL DataGrid, FileManGL VFS & Interactive Analytics Charts",
   "license": "MIT",
@@ -27,6 +27,7 @@
   ],
   "type": "module",
   "bin": {
+    "truncgil-uxigl": "bin/cli.mjs",
     "uxigl": "bin/cli.mjs",
     "create-uxigl": "bin/cli.mjs"
   },
