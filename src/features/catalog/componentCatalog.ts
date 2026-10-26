@@ -52,54 +52,65 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
   {
     id: 'button',
     name: 'Button',
-    turkishTitle: 'Eylem Butonu',
+    turkishTitle: 'Eylem, Switch, Collapse & Split Butonlar',
     category: 'inputs',
     summary:
-      '6 yüzey varyantı (filled, tonal, glass, outlined, ghost, danger), 4 boyut ve yükleme durumu sunan eylem bileşeni.',
+      '8 varyant (filled, tonal, glass, outlined, ghost, success, warning, danger), Switch/Toggle modu, Collapse/Expand aksiyon modu, Split (bölünmüş menülü) buton, Icon-only ve Loading durumları sunan zengin eylem bileşeni.',
     importPath: '@/components/primitives',
     importStatement: "import { Button } from '@/components/primitives';",
     dos: [
       'Birincil eylem için variant="filled" kullanın.',
-      'İkincil eylemlerde "tonal" veya "glass" tercih edin.',
-      'Asenkron işlemlerde loading={true} aktif edin.',
+      'Durum değiştiren araç çubuğu filtrelerinde toggleable ve statusDot özelliklerini açın.',
+      'Panel açma/kapatma aksiyonlarında collapsible ve expanded prop’larını kullanın.',
+      'Alternatif dışa aktarma veya gönderim seçenekleri için splitAction ve splitItems tanımlayın.',
     ],
     donts: [
       'Yan yana birden fazla "filled" buton kullanmayın.',
-      'Sadece ikon içeren butonlarda aria-label unutmayın.',
+      'Sadece ikon içeren (iconOnly) butonlarda aria-label unutmayın.',
     ],
     accessibilityNotes: [
       'Tab ile odaklanır, Enter/Space ile tetiklenir.',
+      'toggleable modunda aria-pressed, collapsible modunda aria-expanded otomatik atanır.',
       'loading durumunda aria-busy="true" alır.',
     ],
     examples: [
       {
         id: 'btn-variants',
-        title: '1. Yüzey Varyantları Hiyerarşisi',
+        title: '1. Yüzey & Semantik Varyantlar + Switch / Collapse Modları',
         description:
-          'Birincil vurgudan hayalet (ghost) eyleme kadar 6 farklı görsel ağırlık.',
+          'Standart varyantların yanı sıra Switch (toggleable) ve Collapse/Expand (collapsible) butonlar.',
         code: `<div className="uxu-stage-row">
-  <Button variant="filled">Kaydet (Filled)</Button>
-  <Button variant="tonal">Taslak (Tonal)</Button>
-  <Button variant="glass">Önizle (Glass)</Button>
-  <Button variant="outlined">Dışa Aktar</Button>
-  <Button variant="ghost">Vazgeç</Button>
-  <Button variant="danger">Kalıcı Sil</Button>
+  <Button variant="filled">Kaydet</Button>
+  <Button variant="glass" toggleable statusDot pressed={isSync} onToggle={setIsSync}>
+    Canlı Senkronizasyon
+  </Button>
+  <Button variant="tonal" collapsible expanded={isOpen} badgeCount={3} onExpandChange={setIsOpen}>
+    Filtreleri Göster
+  </Button>
 </div>`,
       },
       {
-        id: 'btn-icons-loading',
-        title: '2. İkon Yuvaları & Asenkron Yükleme (Loading)',
+        id: 'btn-split-icon-loading',
+        title: '2. Split (Bölünmüş) Buton, Icon-Only & Loading',
         description:
-          'leadingIcon, trailingIcon ve işlem sırasındaki spinner kullanımı.',
+          'Birincil aksiyon + açılır menü (splitAction), kare ikon butonu ve asenkron yükleme.',
         code: `<div className="uxu-stage-row">
-  <Button variant="filled" leadingIcon={<Sparkles size={16} />}>
-    Yapay Zeka ile Üret
+  <Button
+    variant="filled"
+    leadingIcon={<Download size={15} />}
+    splitAction
+    splitItems={[
+      { id: 'xlsx', label: 'Excel (.xlsx) İndir', onClick: exportXlsx },
+      { id: 'pdf', label: 'İmzalı e-Fatura PDF', onClick: exportPdf },
+    ]}
+  >
+    Raporu Dışa Aktar
   </Button>
-  <Button variant="tonal" loading loadingText="Sunucuya Gönderiliyor...">
+  <Button variant="glass" iconOnly aria-label="Hızlı Ekle">
+    <Plus size={16} />
+  </Button>
+  <Button variant="tonal" loading loadingText="Doğrulanıyor...">
     Gönder
-  </Button>
-  <Button variant="glass" pill trailingIcon={<Send size={15} />}>
-    Hızlı Paylaş
   </Button>
 </div>`,
       },
@@ -107,9 +118,9 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
     propsTable: [
       {
         name: 'variant',
-        type: "'filled' | 'tonal' | 'glass' | 'outlined' | 'ghost' | 'danger'",
+        type: "'filled' | 'tonal' | 'glass' | 'outlined' | 'ghost' | 'success' | 'warning' | 'danger'",
         defaultValue: "'filled'",
-        description: 'Butonun görsel hiyerarşi ve yüzey stilini belirler.',
+        description: 'Butonun görsel hiyerarşi, yüzey ve semantik stilini belirler.',
       },
       {
         name: 'size',
@@ -118,104 +129,103 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
         description: 'Yükseklik, iç boşluk ve yazı boyutunu ayarlar.',
       },
       {
-        name: 'loading',
-        type: 'boolean',
+        name: 'toggleable / pressed / onToggle',
+        type: 'boolean / boolean / (next: boolean) => void',
         defaultValue: 'false',
+        description: 'Switch/Toggle buton modunu, basılı durumu ve durum noktası (statusDot) desteğini açar.',
+      },
+      {
+        name: 'collapsible / expanded / onExpandChange',
+        type: 'boolean / boolean / (next: boolean) => void',
+        defaultValue: 'false',
+        description: 'Collapse/Expand aksiyon butonu modunu ve dönen chevron ikonunu aktif eder.',
+      },
+      {
+        name: 'splitAction / splitItems',
+        type: 'boolean / SplitButtonMenuItem[]',
+        defaultValue: 'false / []',
+        description: 'Sağ kenarda ayrılmış tetikleyici ve açılır bağlamsal aksiyon menüsü oluşturur.',
+      },
+      {
+        name: 'loading / loadingText',
+        type: 'boolean / string',
+        defaultValue: 'false / undefined',
         description: 'Aktif olduğunda dönen yükleme ikonu gösterir ve tıklamayı kilitler.',
       },
       {
-        name: 'loadingText',
-        type: 'string',
-        defaultValue: 'undefined',
-        description: 'Yükleme esnasında mevcut metnin yerine gösterilecek durum metni.',
-      },
-      {
-        name: 'leadingIcon / trailingIcon',
-        type: 'ReactNode',
-        defaultValue: 'undefined',
-        description: 'Metnin soluna veya sağına ikon/bileşen yerleştirmek için kullanılır.',
-      },
-      {
-        name: 'pill',
-        type: 'boolean',
-        defaultValue: 'false',
-        description: 'Tam yuvarlak kapsül (9999px) köşe geometrisini zorlar.',
-      },
-      {
-        name: 'fullWidth',
-        type: 'boolean',
-        defaultValue: 'false',
-        description: 'Bulunduğu kapsayıcının %100 genişliğini kaplar.',
-      },
-      {
-        name: 'iconOnly',
-        type: 'boolean',
-        defaultValue: 'false',
-        description: 'Sadece ikon içeren kare/daire butonlar için iç boşluğu dengeler.',
+        name: 'iconOnly / badgeCount',
+        type: 'boolean / number | string',
+        defaultValue: 'false / undefined',
+        description: 'Kare/daire ikon butonu modu veya buton içi sayaç rozeti.',
       },
     ],
   },
   {
     id: 'input',
-    name: 'Input',
-    turkishTitle: 'Metin & Arama Girişi',
+    name: 'Input & Enterprise Forms',
+    turkishTitle: 'Maskeli Giriş, Döviz, Tarih/Saat, Etiket & Dosya Yükleme',
     category: 'inputs',
     summary:
-      'Etiket, doğrulama hatası, karakter sayacı, temizleme düğmesi (clearable) ve kısayol rozeti içeren metin alanı.',
+      'Maskeli giriş (Telefon, TR IBAN, VKN/TCKN, Kredi Kartı), CurrencyInput (KDV hesaplamalı döviz), DateTimePickerInput, MultiSelectTagInput ve FileUploadDropzone içeren kurumsal form ailesi.',
     importPath: '@/components/primitives',
-    importStatement: "import { Input } from '@/components/primitives';",
+    importStatement:
+      "import { Input, CurrencyInput, DateTimePickerInput, MultiSelectTagInput, FileUploadDropzone } from '@/components/primitives';",
     dos: [
-      'Her form alanında açıklayıcı bir label tanımlayın.',
-      'Arama kutularında clearable={true} özelliğini açın.',
-      'Sınırlı alanlarda maxLength ve showCount kullanın.',
+      'Finans ve muhasebe formlarında mask="iban" | "tax-id" | "phone" | "credit-card" kullanın.',
+      'Dövizli tutarlarda CurrencyInput ile otomatik KDV hesaplamasını aktif edin.',
+      'Doğrulama durumunu validationState="success" | "warning" | "error" ile görselleştirin.',
     ],
     donts: [
-      'Yalnızca placeholder metnine güvenmeyin.',
+      'Yalnızca placeholder metnine güvenmeyin; açıklayıcı label kullanın.',
     ],
     accessibilityNotes: [
       'useId() ile label ve input otomatik eşleştirilir.',
-      'errorText varken aria-invalid="true" alır.',
+      'errorText veya validationState="error" varken aria-invalid="true" alır.',
     ],
     examples: [
       {
-        id: 'input-surfaces',
-        title: '1. Cam (Glass), Tonal ve Çerçeveli (Outlined) Yüzeyler',
+        id: 'input-masks-currency',
+        title: '1. Maskeli Kurumsal Girişler (TR IBAN, Telefon, VKN) & Döviz/KDV',
         description:
-          'Bulunduğu arka plana göre 3 farklı yüzey varyantı seçilebilir.',
+          'B2B ve muhasebe uygulamaları için otomatik formatlanan alanlar ve para birimi seçici.',
         code: `<div className="uxu-stage-grid-2">
   <Input
-    label="Global Arama (Glass)"
-    surface="glass"
-    value={query}
-    onChange={setQuery}
-    leadingIcon={<Search size={16} />}
-    shortcutHint="⌘K"
-    clearable
+    label="Banka Hesabı TR IBAN"
+    mask="iban"
+    value={iban}
+    onChange={setIban}
+    validationState="success"
+    successText="TR IBAN 26 hane doğrulandı"
   />
-  <Input
-    label="Kurumsal E-Posta (Tonal)"
-    surface="tonal"
-    type="email"
-    value={email}
-    onChange={setEmail}
-    helperText="Bildirimler bu adrese gönderilecektir."
+  <CurrencyInput
+    label="Fatura Net Hizmet Bedeli"
+    value={amount}
+    onChange={setAmount}
+    currency={currency}
+    onCurrencyChange={setCurrency}
+    vatRate={20}
   />
 </div>`,
       },
       {
-        id: 'input-validation',
-        title: '2. Hata Doğrulaması & Karakter Sayacı',
+        id: 'input-tags-dropzone',
+        title: '2. Tarih/Saat Seçici, Çoklu Etiket & Dosya Yükleme Alanı',
         description:
-          'errorText dolu olduğunda alan otomatik olarak hata rengine bürünür.',
-        code: `<Input
-  label="API Erişim Anahtarı"
-  value={apiKey}
-  onChange={setApiKey}
-  maxLength={32}
-  showCount
-  required
-  errorText={apiKey.length < 8 ? 'Anahtar en az 8 karakter olmalıdır.' : undefined}
-/>`,
+          'Vade kısayollu tarih/saat seçici, etiket havuzu ve sürükle-bırak belge yükleme.',
+        code: `<div className="uxu-stage-grid-2">
+  <DateTimePickerInput
+    label="e-Fatura Vade Tarihi"
+    dateValue={date}
+    timeValue={time}
+    onDateChange={setDate}
+    onTimeChange={setTime}
+  />
+  <MultiSelectTagInput
+    label="Muhasebe Etiketleri"
+    tags={tags}
+    onChange={setTags}
+  />
+</div>`,
       },
     ],
     propsTable: [
@@ -227,40 +237,34 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
         description: 'Kontrollü metin değeri ve her tuş vuruşunda tetiklenen geri çağrı.',
       },
       {
-        name: 'label',
-        type: 'ReactNode',
+        name: 'mask',
+        type: "'phone' | 'iban' | 'tax-id' | 'credit-card' | 'date-mask'",
         defaultValue: 'undefined',
-        description: 'Giriş alanının üstünde yer alan başlık etiketi.',
+        description: 'Yazım esnasında otomatik kurumsal format maskesi uygular.',
       },
       {
-        name: 'surface',
-        type: "'glass' | 'tonal' | 'outlined'",
-        defaultValue: "'glass'",
-        description: 'Giriş kutusunun görsel yüzey stili.',
+        name: 'validationState',
+        type: "'default' | 'success' | 'warning' | 'error'",
+        defaultValue: "'default'",
+        description: 'Alanın çerçeve ve durum mesajı rengini semantik olarak değiştirir.',
       },
       {
-        name: 'helperText / errorText',
-        type: 'ReactNode',
-        defaultValue: 'undefined',
-        description: 'Alanın altında görünen bilgilendirme veya kırmızı doğrulama hatası.',
-      },
-      {
-        name: 'clearable',
-        type: 'boolean',
-        defaultValue: 'false',
-        description: 'Metin varken sağda hızlı temizleme (X) ikonu gösterir.',
-      },
-      {
-        name: 'maxLength / showCount',
-        type: 'number / boolean',
+        name: 'prefixText / suffixText / revealablePassword',
+        type: 'string / string / boolean',
         defaultValue: 'undefined / false',
-        description: 'Maksimum karakter sınırı ve sağ üstte canlı karakter sayacı (12/42).',
+        description: 'Sabit ön/son ek rozeti (örn. https://, VKN) ve parola göster/gizle düğmesi.',
       },
       {
-        name: 'shortcutHint',
-        type: 'string',
-        defaultValue: 'undefined',
-        description: 'Sağ kenarda klavye kısayol rozeti (örn. ⌘F veya ESC) görüntüler.',
+        name: 'currency / vatRate (CurrencyInput)',
+        type: "'TRY' | 'USD' | 'EUR' | 'GBP' / number",
+        defaultValue: "'TRY' / 20",
+        description: 'Döviz birimi seçici ve alt satırda otomatik KDV dahil toplam hesaplaması.',
+      },
+      {
+        name: 'tags / suggestions (MultiSelectTagInput)',
+        type: 'string[] / string[]',
+        defaultValue: '[]',
+        description: 'Seçili etiket dizisi ve hızlı ekleme öneri havuzu.',
       },
     ],
   },
@@ -692,52 +696,80 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
   },
   {
     id: 'modal-command',
-    name: 'Modal & CommandPalette',
-    turkishTitle: 'Diyalog & Komut Paleti',
+    name: 'Modal, Alert, Toast & CommandPalette',
+    turkishTitle: 'Diyalog, 5 Yönlü Toast, Uyarı Bandı & Komut Paleti',
     category: 'surfaces',
     summary:
-      'Onay pencereleri için Modal; klavye ile hızlı arama ve komut çalıştırmak için CommandPalette (⌘K).',
+      '6 varyantlı Modal diyalog (default, confirm, danger, alert, sheet, glass), 5 ekran yönünde (top-right, top-left, bottom-right, bottom-left, top-center) ve 6 semantik/glass tonda çalışan Toast bildirim motoru, satır içi Alert bandı ve CommandPalette (⌘K).',
     importPath: '@/components/composites',
-    importStatement: "import { Modal, CommandPalette } from '@/components/composites';",
+    importStatement:
+      "import { Modal, CommandPalette } from '@/components/composites';\nimport { Alert } from '@/components/primitives';\nimport { useToast } from '@/providers/ToastProvider';",
     dos: [
-      'macOS görünümü için showMacTrafficLights aktif edin.',
-      'Komut paletini global ⌘K kısayoluna bağlayın.',
+      'macOS görünümü için showMacTrafficLights aktif edin; yıkıcı işlemlerde variant="danger" Modal kullanın.',
+      'Toast bildirimlerinde ekran yönünü placement="top-right | top-left | bottom-right | bottom-left | top-center" ile belirleyin.',
+      'Sayfa içi kalıcı durum duyurularında <Alert tone="success | warning | danger | info | glass" /> kullanın.',
     ],
     donts: [
       'Basit bildirimler için Modal yerine useToast kullanın.',
     ],
     accessibilityNotes: [
       'ESC tuşu ve ok tuşlarıyla tam klavye navigasyonu.',
+      'Alert ve Toast bileşenleri role="status" / aria-live="polite" niteliklerine sahiptir.',
     ],
     examples: [
       {
-        id: 'modal-example',
-        title: '1. macOS Trafik Işıklı Diyalog ve Komut Paleti',
-        description: 'Başlık, gövde ve alt aksiyon butonlarıyla tam kontrol.',
-        code: `<Modal
+        id: 'modal-toast-example',
+        title: '1. 5 Yönlü & 6 Tonlu Canlı Toast Bildirimi + Modal Varyantları',
+        description:
+          'Farklı ekran köşelerinde ve semantik/glass tonlarda tetiklenen bildirimler ve diyalog arketipleri.',
+        code: `const { notify } = useToast();
+
+// Sağ Üstte Başarı Bildirimi
+notify({
+  title: 'e-Fatura GİB Kuyruğuna İletildi',
+  description: 'Zarf ID: #984102 başarıyla imzalandı.',
+  tone: 'success',        // 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'glass'
+  placement: 'top-right', // 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center'
+});
+
+// Yıkıcı İşlem Onay Diyaloğu
+<Modal
   open={isOpen}
   onClose={() => setIsOpen(false)}
+  variant="danger"
   showMacTrafficLights
-  title="Sunucu Kümesini Yeniden Başlat"
-  subtitle="Bu işlem aktif bağlantıları 5 saniyeliğine kesintiye uğratabilir."
-  footer={
-    <div className="uxu-modal-footer-actions">
-      <Button variant="ghost" onClick={() => setIsOpen(false)}>Vazgeç</Button>
-      <Button variant="danger" onClick={handleRestart}>Yeniden Başlat</Button>
-    </div>
-  }
+  title="Üretim Kümesini Kalıcı Olarak Sil?"
+  subtitle="Bu işlem geri alınamaz."
 >
-  <p>Onaylıyor musunuz?</p>
+  <Alert tone="danger" title="Kritik Uyarı" description="Tüm anlık görüntüler silinecektir." />
 </Modal>`,
       },
     ],
     propsTable: [
       {
-        name: 'open / onClose',
+        name: 'open / onClose (Modal)',
         type: 'boolean / () => void',
         defaultValue: 'zorunlu',
         required: true,
         description: 'Pencerenin açık/kapalı durumu ve kapatma fonksiyonu.',
+      },
+      {
+        name: 'variant (Modal)',
+        type: "'default' | 'alert' | 'confirm' | 'danger' | 'sheet' | 'glass'",
+        defaultValue: "'default'",
+        description: 'Modal diyaloğunun görsel ve davranışsal arketipi (alt çekmece sheet, yıkıcı danger vb.).',
+      },
+      {
+        name: 'placement (useToast)',
+        type: "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center'",
+        defaultValue: "'bottom-right'",
+        description: 'Toast bildiriminin ekranda belireceği köşe veya merkez konumu.',
+      },
+      {
+        name: 'tone (useToast & Alert)',
+        type: "'primary' | 'success' | 'warning' | 'danger' | 'info' | 'glass'",
+        defaultValue: "'info'",
+        description: 'Toast ve satır içi Alert bileşeninin semantik veya buzlu cam (Liquid Glass) renk tonu.',
       },
       {
         name: 'showMacTrafficLights (Modal)',

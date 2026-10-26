@@ -31,5 +31,8 @@ export * from './core/contracts/ThemeContract';
 export * from './core/tokens/designTokens';
 export { RouteService } from './core/services/RouteService';
 export { CodeGeneratorService } from './core/services/CodeGeneratorService';
-export { CssVariableThemeEngine } from './core/services/ThemeEngineService';
+export {
+  CssVariableThemeEngine,
+  buildInheritedSheetGLTheme,
+} from './core/services/ThemeEngineService';
 export { defaultThemeStorageAdapter } from './core/services/StorageService';

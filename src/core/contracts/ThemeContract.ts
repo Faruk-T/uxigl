@@ -43,6 +43,28 @@ export type WebGLShaderPreset =
   | 'material-lava'
   | 'cyber-horizon';
 
+export interface SeedPaletteModeTokens {
+  primary: string;
+  primaryHover: string;
+  primaryContainer: string;
+  onPrimaryContainer: string;
+  secondary: string;
+  accentGlow: string;
+  /** Tonal surface & background inheritance tokens (Material You × Liquid Glass) */
+  bgCanvas: string;
+  bgElevated: string;
+  surfaceGlass: string;
+  surfaceGlassHover: string;
+  surfaceTonal: string;
+  surfaceTonalHigh: string;
+  surfaceElevated: string;
+  borderSubtle: string;
+  borderStrong: string;
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+}
+
 export interface SeedPaletteDefinition {
   id: SeedPaletteId;
   name: string;
@@ -53,22 +75,8 @@ export interface SeedPaletteDefinition {
     colorB: [number, number, number];
     colorC: [number, number, number];
   };
-  light: {
-    primary: string;
-    primaryHover: string;
-    primaryContainer: string;
-    onPrimaryContainer: string;
-    secondary: string;
-    accentGlow: string;
-  };
-  dark: {
-    primary: string;
-    primaryHover: string;
-    primaryContainer: string;
-    onPrimaryContainer: string;
-    secondary: string;
-    accentGlow: string;
-  };
+  light: SeedPaletteModeTokens;
+  dark: SeedPaletteModeTokens;
 }
 
 export interface ThemePreferences {

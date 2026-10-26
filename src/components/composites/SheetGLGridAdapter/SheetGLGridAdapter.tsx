@@ -1,10 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   SheetGL,
-  appleDark,
-  appleLight,
-  googleDark,
-  googleLight,
   type ColumnDef,
   type IGridThemeTokens,
 } from 'sheetgl';
@@ -20,6 +16,7 @@ import {
   Package,
 } from 'lucide-react';
 import { useTheme } from '../../../providers/ThemeProvider';
+import { buildInheritedSheetGLTheme } from '../../../core/services/ThemeEngineService';
 
 /**
  * ============================================================================
@@ -589,40 +586,8 @@ export const SheetGLGridAdapter: React.FC<SheetGLGridAdapterProps> = ({
   );
 
   const sheetTheme = useMemo<IGridThemeTokens>(() => {
-    const base =
-      presetStyle === 'apple'
-        ? resolvedMode === 'dark'
-          ? appleDark
-          : appleLight
-        : resolvedMode === 'dark'
-        ? googleDark
-        : googleLight;
-
-    const palette =
-      resolvedMode === 'dark' ? activePalette.dark : activePalette.light;
-    const accent = palette.primary;
-    const scaleRatio = (preferences.fontScale || 100) / 100;
-
-    return {
-      ...base,
-      fontSize: Math.round(13.5 * scaleRatio),
-      headerFontSize: Math.round(12.5 * scaleRatio),
-      canvas: {
-        ...base.canvas,
-        selectionBorder: accent,
-        selectionFill: `${accent}24`,
-        fillHandleColor: accent,
-        searchHighlight: `${accent}38`,
-      },
-      dom: {
-        ...base.dom,
-        accentColor: accent,
-        inputFocusBorder: accent,
-        badgeBg: palette.primaryContainer,
-        badgeText: palette.onPrimaryContainer,
-      },
-    };
-  }, [resolvedMode, presetStyle, activePalette, preferences.fontScale]);
+    return buildInheritedSheetGLTheme(preferences, resolvedMode, presetStyle);
+  }, [preferences, resolvedMode, presetStyle]);
 
   const sparkColor =
     resolvedMode === 'dark'
