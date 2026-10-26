@@ -42,6 +42,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelect,
   onOpenCommandPalette,
   onOpenThemeStudio,
+  brandTitle,
+  brandSubtitle,
+  brandBadge,
+  brandLogo,
+  onBrandClick,
 }) => {
   // Keep track of expanded parent menu IDs (default: expand key sections so sub-menus are accessible)
   const [expandedIds, setExpandedIds] = useState<string[]>([
@@ -108,37 +113,70 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <a
             href="/"
             className="uxu-sidebar__brand"
-            title="uxiGL Tanıtım Sayfası (/)"
+            title={typeof brandTitle === 'string' ? brandTitle : 'Qmi'}
             onClick={(e) => {
+              if (onBrandClick) {
+                e.preventDefault();
+                onBrandClick();
+                return;
+              }
               if (RouteService.isModifiedClick(e)) return;
               e.preventDefault();
               onSelect('landing', 'home');
             }}
           >
-            <UXILogo size={30} glow />
+            {brandLogo !== undefined ? brandLogo : <UXILogo size={30} glow />}
             {!collapsed && (
               <div className="uxu-sidebar__brand-text">
                 <div className="uxu-sidebar__brand-row">
-                  <span className="uxu-brand__name">
-                    uxi
-                    <span
-                      style={{
-                        background:
-                          'linear-gradient(110deg, #2FF58E 0%, #00C8FF 45%, #818CF8 75%, #C084FC 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                      }}
-                    >
-                      GL
+                  {brandTitle !== undefined ? (
+                    typeof brandTitle === 'string' ? (
+                      <span className="uxu-brand__name">{brandTitle}</span>
+                    ) : (
+                      brandTitle
+                    )
+                  ) : (
+                    <span className="uxu-brand__name">
+                      uxi
+                      <span
+                        style={{
+                          background:
+                            'linear-gradient(110deg, #2FF58E 0%, #00C8FF 45%, #818CF8 75%, #C084FC 100%)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        GL
+                      </span>
                     </span>
-                  </span>
-                  <Badge tone="primary" variant="tonal" size="xs">
-                    PRO
-                  </Badge>
+                  )}
+                  {brandBadge !== undefined ? (
+                    typeof brandBadge === 'string' ? (
+                      <Badge tone="primary" variant="tonal" size="xs">
+                        {brandBadge}
+                      </Badge>
+                    ) : (
+                      brandBadge
+                    )
+                  ) : (
+                    <Badge tone="primary" variant="tonal" size="xs">
+                      PRO
+                    </Badge>
+                  )}
                 </div>
-                <span className="uxu-sidebar__brand-sub">
-                  UX × UI × WebGL
-                </span>
+                {brandSubtitle !== undefined ? (
+                  typeof brandSubtitle === 'string' ? (
+                    <span className="uxu-sidebar__brand-sub">
+                      {brandSubtitle}
+                    </span>
+                  ) : (
+                    brandSubtitle
+                  )
+                ) : (
+                  <span className="uxu-sidebar__brand-sub">
+                    UX × UI × WebGL
+                  </span>
+                )}
               </div>
             )}
           </a>
@@ -317,14 +355,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                     onCloseMobile();
                                   }}
                                 >
-                                  <span
-                                    className="uxu-sidebar__subitem-dot"
-                                    style={
-                                      sub.dotColor
-                                        ? { background: sub.dotColor }
-                                        : undefined
-                                    }
-                                  />
+                                  {sub.icon ? (
+                                    <span className="uxu-sidebar__subitem-icon mr-2 shrink-0 inline-flex items-center justify-center w-4 h-4">
+                                      {sub.icon}
+                                    </span>
+                                  ) : (
+                                    <span
+                                      className="uxu-sidebar__subitem-dot"
+                                      style={
+                                        sub.dotColor
+                                          ? { background: sub.dotColor }
+                                          : undefined
+                                      }
+                                    />
+                                  )}
                                   <span className="uxu-sidebar__subitem-label">
                                     {sub.label}
                                   </span>

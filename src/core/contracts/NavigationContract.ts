@@ -19,6 +19,7 @@ export interface SidebarSubMenuItem {
   badge?: string | number;
   badgeTone?: SemanticTone;
   dotColor?: string;
+  icon?: ReactNode;
 }
 
 export interface SidebarNavItem {
@@ -55,4 +56,14 @@ export interface SidebarProps extends IdentifiableProps {
   onSelect: (itemId: string, subItemId?: string) => void;
   onOpenCommandPalette: () => void;
   onOpenThemeStudio: () => void;
+  /** Custom Brand Title (e.g. 'Qmi' or 'Stellar Qmi') */
+  brandTitle?: ReactNode;
+  /** Custom Brand Subtitle (e.g. 'QA / QC / QMS' or 'Enterprise Quality') */
+  brandSubtitle?: ReactNode;
+  /** Custom Brand Badge (e.g. '2.0' or 'QMS') */
+  brandBadge?: ReactNode;
+  /** Custom Brand Logo element */
+  brandLogo?: ReactNode;
+  /** Custom Brand Click handler */
+  onBrandClick?: () => void;
 }
