@@ -10,11 +10,23 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-icons': ['lucide-react'],
-          'vendor-sheetgl': ['sheetgl'],
-          'vendor-filemangl': ['filemangl'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('sheetgl')) return 'vendor-sheetgl';
+            if (id.includes('filemangl')) return 'vendor-filemangl';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+            if (id.includes('react')) return 'vendor-react';
+          }
+          if (id.includes('/src/features/playground/')) {
+            return 'uxigl-playground';
+          }
+          if (id.includes('/src/features/showcase/')) {
+            return 'uxigl-showcase';
+          }
+          if (id.includes('/src/features/catalog/')) {
+            return 'uxigl-catalog';
+          }
+          return undefined;
         },
       },
     },
