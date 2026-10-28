@@ -3,6 +3,8 @@ export * from './SegmentedControl/SegmentedControl';
 export * from './Tabs/Tabs';
 export * from './Accordion/Accordion';
 export * from './Modal/Modal';
+export * from './Drawer/Drawer';
+export * from './Stepper/Stepper';
 export * from './CommandPalette/CommandPalette';
 export * from './DataTable/DataTable';
 export * from './StatCard/StatCard';
