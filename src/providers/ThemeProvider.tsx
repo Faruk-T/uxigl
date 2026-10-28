@@ -129,7 +129,21 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
   const setSeedPalette = useCallback(
     (seedPalette: SeedPaletteId) => {
-      updatePrefs((prev) => ({ ...prev, seedPalette }));
+      updatePrefs((prev) => ({
+        ...prev,
+        seedPalette,
+        customPrimaryHex: undefined,
+      }));
+    },
+    [updatePrefs]
+  );
+
+  const setCustomPrimaryHex = useCallback(
+    (customPrimaryHex?: string) => {
+      updatePrefs((prev) => ({
+        ...prev,
+        customPrimaryHex,
+      }));
     },
     [updatePrefs]
   );
@@ -289,6 +303,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       setMode,
       toggleMode,
       setSeedPalette,
+      setCustomPrimaryHex,
       setRadiusScale,
       setCustomRadiusPx,
       setDensity,
@@ -314,6 +329,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       setMode,
       toggleMode,
       setSeedPalette,
+      setCustomPrimaryHex,
       setRadiusScale,
       setCustomRadiusPx,
       setDensity,

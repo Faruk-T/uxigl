@@ -34,5 +34,7 @@ export { CodeGeneratorService } from './core/services/CodeGeneratorService';
 export {
   CssVariableThemeEngine,
   buildInheritedSheetGLTheme,
+  resolveEffectiveModeTokens,
+  generateThemeCssExport,
 } from './core/services/ThemeEngineService';
 export { defaultThemeStorageAdapter } from './core/services/StorageService';

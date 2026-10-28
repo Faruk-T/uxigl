@@ -45,6 +45,113 @@ export function blendHexColors(baseHex: string, tintHex: string, tintWeight: num
 }
 
 /**
+ * Resolves the effective mode tokens for a given `ThemePreferences` and `ResolvedThemeMode`.
+ * If `prefs.customPrimaryHex` is provided (e.g. `#6366F1`), dynamically synthesizes a complete
+ * Material You × Liquid Glass tonal surface & accent palette around that brand color.
+ */
+export function resolveEffectiveModeTokens(
+  prefs: ThemePreferences,
+  resolvedMode: ResolvedThemeMode,
+): SeedPaletteModeTokens {
+  const palette = SEED_PALETTES[prefs.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
+  const baseTokens: SeedPaletteModeTokens =
+    resolvedMode === 'dark' ? palette.dark : palette.light;
+
+  const customHex = prefs.customPrimaryHex?.trim();
+  if (!customHex || !/^#[0-9A-Fa-f]{6}$/.test(customHex)) {
+    return baseTokens;
+  }
+
+  const isDark = resolvedMode === 'dark';
+  const primary = customHex.toUpperCase();
+  const primaryHover = blendHexColors(primary, isDark ? '#FFFFFF' : '#000000', 0.16);
+  const secondary = blendHexColors(primary, '#38BDF8', 0.32);
+
+  if (isDark) {
+    const bgCanvas = blendHexColors('#070A12', primary, 0.08);
+    const bgElevated = blendHexColors('#0D1220', primary, 0.12);
+    const surfaceTonal = blendHexColors('#131A2E', primary, 0.16);
+    const surfaceTonalHigh = blendHexColors('#1B243D', primary, 0.22);
+    return {
+      ...baseTokens,
+      primary,
+      primaryHover,
+      primaryContainer: hexToRgba(primary, 0.22),
+      onPrimaryContainer: blendHexColors(primary, '#FFFFFF', 0.68),
+      secondary,
+      accentGlow: hexToRgba(primary, 0.42),
+      bgCanvas,
+      bgElevated,
+      surfaceGlass: hexToRgba(bgElevated, 0.72),
+      surfaceGlassHover: hexToRgba(surfaceTonal, 0.82),
+      surfaceTonal,
+      surfaceTonalHigh,
+      surfaceElevated: bgElevated,
+      borderSubtle: hexToRgba(primary, 0.18),
+      borderStrong: hexToRgba(primary, 0.34),
+    };
+  }
+
+  const bgCanvas = blendHexColors('#F8FAFC', primary, 0.05);
+  const bgElevated = blendHexColors('#FFFFFF', primary, 0.02);
+  const surfaceTonal = blendHexColors('#F1F5F9', primary, 0.10);
+  const surfaceTonalHigh = blendHexColors('#E2E8F0', primary, 0.16);
+  return {
+    ...baseTokens,
+    primary,
+    primaryHover,
+    primaryContainer: hexToRgba(primary, 0.14),
+    onPrimaryContainer: blendHexColors(primary, '#0F172A', 0.55),
+    secondary,
+    accentGlow: hexToRgba(primary, 0.25),
+    bgCanvas,
+    bgElevated,
+    surfaceGlass: hexToRgba(bgElevated, 0.82),
+    surfaceGlassHover: hexToRgba(surfaceTonal, 0.90),
+    surfaceTonal,
+    surfaceTonalHigh,
+    surfaceElevated: bgElevated,
+    borderSubtle: hexToRgba(primary, 0.15),
+    borderStrong: hexToRgba(primary, 0.28),
+  };
+}
+
+/**
+ * Generates a copy-ready CSS Custom Properties export snippet for the active theme.
+ */
+export function generateThemeCssExport(
+  prefs: ThemePreferences,
+  resolvedMode: ResolvedThemeMode,
+): string {
+  const t = resolveEffectiveModeTokens(prefs, resolvedMode);
+  const px =
+    typeof prefs.customRadiusPx === 'number'
+      ? prefs.customRadiusPx
+      : prefs.radiusScale === 'sharp'
+      ? 4
+      : prefs.radiusScale === 'pill'
+      ? 22
+      : 12;
+
+  return `:root[data-theme="${resolvedMode}"] {
+  --uxu-primary: ${t.primary};
+  --uxu-primary-hover: ${t.primaryHover};
+  --uxu-primary-container: ${t.primaryContainer};
+  --uxu-on-primary-container: ${t.onPrimaryContainer};
+  --uxu-secondary: ${t.secondary};
+  --uxu-bg-canvas: ${t.bgCanvas};
+  --uxu-bg-elevated: ${t.bgElevated};
+  --uxu-surface-glass: ${t.surfaceGlass};
+  --uxu-surface-tonal: ${t.surfaceTonal};
+  --uxu-surface-tonal-high: ${t.surfaceTonalHigh};
+  --uxu-border-subtle: ${t.borderSubtle};
+  --uxu-border-strong: ${t.borderStrong};
+  --uxu-radius-md: ${px}px;
+  --uxu-font-scale: ${((prefs.fontScale ?? 100) / 100).toFixed(2)};
+}`;
+}
+
+/**
  * Builds a 100% theme-inherited `IGridThemeTokens` configuration for SheetGL
  * so that Canvas 2D surfaces (`bg`, `headerBg`, `rowNumberBg`, `groupRowBg`, `gridLine`)
  * and DOM overlays (`toolbarBg`, `popoverBg`, `inputBg`, `badgeBg`) match uxiGL's active palette.
@@ -54,9 +161,10 @@ export function buildInheritedSheetGLTheme(
   resolvedMode: ResolvedThemeMode,
   styleVariant: 'apple' | 'google' = 'apple',
 ): IGridThemeTokens {
-  const palette = SEED_PALETTES[prefs.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
-  const modeTokens: SeedPaletteModeTokens =
-    resolvedMode === 'dark' ? palette.dark : palette.light;
+  const modeTokens: SeedPaletteModeTokens = resolveEffectiveModeTokens(
+    prefs,
+    resolvedMode,
+  );
   const isDark = resolvedMode === 'dark';
 
   const fontPreset =
@@ -169,8 +277,7 @@ export class CssVariableThemeEngine implements IThemeEngine {
     if (typeof document === 'undefined') return;
 
     const root = document.documentElement;
-    const palette = SEED_PALETTES[prefs.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
-    const modeTokens = resolvedMode === 'dark' ? palette.dark : palette.light;
+    const modeTokens = resolveEffectiveModeTokens(prefs, resolvedMode);
     const radiusTokens = RADIUS_SCALE_TOKENS[prefs.radiusScale] ?? RADIUS_SCALE_TOKENS.squircle;
     const densityTokens = DENSITY_SCALE_TOKENS[prefs.density] ?? DENSITY_SCALE_TOKENS.comfortable;
 

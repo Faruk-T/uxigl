@@ -82,6 +82,8 @@ export interface SeedPaletteDefinition {
 export interface ThemePreferences {
   mode: ThemeMode;
   seedPalette: SeedPaletteId;
+  /** Optional custom brand primary HEX color (e.g. '#6366F1') that dynamically overrides the seed palette */
+  customPrimaryHex?: string;
   radiusScale: RadiusScale;
   /** Exact base border-radius in pixels (0 to 32, default 12) */
   customRadiusPx?: number;
@@ -126,6 +128,7 @@ export interface ThemeContextContract {
   setMode: (mode: ThemeMode) => void;
   toggleMode: () => void;
   setSeedPalette: (paletteId: SeedPaletteId) => void;
+  setCustomPrimaryHex: (hex?: string) => void;
   setRadiusScale: (scale: RadiusScale) => void;
   setCustomRadiusPx: (px: number) => void;
   setDensity: (density: UIDensity) => void;
