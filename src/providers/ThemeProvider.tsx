@@ -26,7 +26,10 @@ import {
   SEED_PALETTES,
 } from '../core/tokens/designTokens';
 import { defaultThemeStorageAdapter } from '../core/services/StorageService';
-import { defaultThemeEngine } from '../core/services/ThemeEngineService';
+import {
+  defaultThemeEngine,
+  resolveEffectiveModeTokens,
+} from '../core/services/ThemeEngineService';
 
 /**
  * ============================================================================
@@ -290,8 +293,18 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     () => Object.values(FONT_FAMILY_PRESETS),
     []
   );
-  const activePalette =
-    SEED_PALETTES[preferences.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
+  const activePalette = useMemo(() => {
+    const basePalette =
+      SEED_PALETTES[preferences.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
+    if (!preferences.customPrimaryHex) {
+      return basePalette;
+    }
+    return {
+      ...basePalette,
+      light: resolveEffectiveModeTokens(preferences, 'light'),
+      dark: resolveEffectiveModeTokens(preferences, 'dark'),
+    };
+  }, [preferences]);
 
   const value = useMemo<ThemeContextContract>(
     () => ({

@@ -35,6 +35,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   onClose,
   title,
   subtitle,
+  badge,
   icon,
   placement = 'right',
   size = 'md',
@@ -78,9 +79,12 @@ export const Drawer: React.FC<DrawerProps> = ({
         <div className="uxu-drawer-panel__header">
           <div className="uxu-drawer-panel__header-left">
             {icon && <div className="uxu-modal__icon">{icon}</div>}
-            <div>
-              <h3 className="uxu-modal__title">{title}</h3>
-              {subtitle && <p className="uxu-modal__subtitle">{subtitle}</p>}
+            <div className="uxu-drawer-panel__title-group">
+              {badge && <span className="uxu-drawer-panel__badge">{badge}</span>}
+              <h3 className="uxu-drawer-panel__title">{title}</h3>
+              {subtitle && (
+                <p className="uxu-drawer-panel__subtitle">{subtitle}</p>
+              )}
             </div>
           </div>
 
