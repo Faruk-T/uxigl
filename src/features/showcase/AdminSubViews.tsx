@@ -39,14 +39,20 @@ import {
   Input,
   MultiSelectTagInput,
   Progress,
+  Select,
   Slider,
   Switch,
+  Textarea,
 } from '../../components/primitives';
 import {
   Card,
   DataTable,
+  Modal,
+  Pagination,
   SegmentedControl,
   SheetGLGridAdapter,
+  Stepper,
+  Timeline,
 } from '../../components/composites';
 import { useTheme } from '../../providers/ThemeProvider';
 import { useToast } from '../../providers/ToastProvider';
@@ -214,12 +220,24 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
   } = useTheme();
 
   // Users view state
+  const [usersList, setUsersList] = useState<UserDirectoryRow[]>(INITIAL_USERS);
   const [roleFilter, setRoleFilter] = useState<string>('all');
   const [userEngineMode, setUserEngineMode] = useState<'native' | 'sheetgl'>(
     'native'
   );
+  const [addUserModalOpen, setAddUserModalOpen] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserRole, setNewUserRole] = useState('Senior Frontend Architect');
+  const [newUserDept, setNewUserDept] = useState('Platform Mühendisliği');
+  const [userPage, setUserPage] = useState(1);
 
   // Forms view state (Enterprise B2B / Muhasebe / E-Ticaret Form Studio)
+  const [formStep, setFormStep] = useState<number>(1);
+  const [formBank, setFormBank] = useState<string>('garanti-bbva');
+  const [formNotes, setFormNotes] = useState<string>(
+    'İrsaliye yerine geçer. 30 gün vadeli kurumsal B2B cari mutabakat faturasıdır.'
+  );
   const [formProjectName, setFormProjectName] = useState(
     'Anadolu Bulut Teknoloji A.Ş.'
   );
@@ -268,6 +286,12 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
   const [selectedMsgId, setSelectedMsgId] = useState<string>('msg-1');
   const [replyText, setReplyText] = useState<string>('');
 
+  // Calendar view state
+  const [calendarEvents, setCalendarEvents] = useState(CALENDAR_EVENTS);
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState<number>(22);
+  const [newEventTitle, setNewEventTitle] = useState<string>('');
+  const [newEventTime, setNewEventTime] = useState<string>('14:00');
+
   // Security view state
   const [mfaEnforced, setMfaEnforced] = useState<boolean>(true);
   const [ipAllowlist, setIpAllowlist] = useState<boolean>(true);
@@ -277,8 +301,30 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
   if (viewId === 'users') {
     const filteredUsers =
       roleFilter === 'all'
-        ? INITIAL_USERS
-        : INITIAL_USERS.filter((u) => u.status.toLowerCase() === roleFilter);
+        ? usersList
+        : usersList.filter((u) => u.status.toLowerCase() === roleFilter);
+
+    const handleAddUser = () => {
+      if (!newUserName.trim() || !newUserEmail.trim()) return;
+      const created: UserDirectoryRow = {
+        id: `usr-${Date.now()}`,
+        name: newUserName.trim(),
+        email: newUserEmail.trim(),
+        role: newUserRole,
+        department: newUserDept,
+        status: 'Active',
+        lastLogin: 'Şimdi',
+      };
+      setUsersList((prev) => [created, ...prev]);
+      setAddUserModalOpen(false);
+      setNewUserName('');
+      setNewUserEmail('');
+      notify({
+        title: 'Yeni Kullanıcı Eklendi',
+        description: `${created.name} (${created.department}) dizine kaydedildi.`,
+        tone: 'success',
+      });
+    };
 
     return (
       <div className="uxu-stack-md">
@@ -304,13 +350,7 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
                 variant="filled"
                 size="sm"
                 leadingIcon={<Plus size={14} />}
-                onClick={() =>
-                  notify({
-                    title: 'Yeni Kullanıcı Daveti',
-                    description: 'Davet bağlantısı oluşturuldu.',
-                    tone: 'success',
-                  })
-                }
+                onClick={() => setAddUserModalOpen(true)}
               >
                 Kullanıcı Ekle
               </Button>
@@ -321,9 +361,19 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
             <div className="uxu-stack-md">
               <div className="uxu-stage-row">
                 {[
-                  { id: 'all', label: 'Tümü (5)' },
-                  { id: 'active', label: 'Aktif (4)' },
-                  { id: 'invited', label: 'Davetli (1)' },
+                  { id: 'all', label: `Tümü (${usersList.length})` },
+                  {
+                    id: 'active',
+                    label: `Aktif (${
+                      usersList.filter((u) => u.status === 'Active').length
+                    })`,
+                  },
+                  {
+                    id: 'invited',
+                    label: `Davetli (${
+                      usersList.filter((u) => u.status === 'Invited').length
+                    })`,
+                  },
                 ].map((f) => (
                   <Chip
                     key={f.id}
@@ -392,6 +442,13 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
                   },
                 ]}
               />
+
+              <Pagination
+                page={userPage}
+                totalPages={3}
+                totalItems={usersList.length}
+                onPageChange={setUserPage}
+              />
             </div>
           ) : (
             <SheetGLGridAdapter
@@ -401,6 +458,96 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
             />
           )}
         </Card>
+
+        <Modal
+          open={addUserModalOpen}
+          onClose={() => setAddUserModalOpen(false)}
+          variant="confirm"
+          tone="primary"
+          title="Yeni Ekip Üyesi & Kullanıcı Ekle"
+          subtitle="Kurumsal SSO dizinine anında yeni kullanıcı tanımlayın"
+          footer={
+            <div className="uxu-modal-footer-actions">
+              <Button variant="ghost" onClick={() => setAddUserModalOpen(false)}>
+                Vazgeç
+              </Button>
+              <Button
+                variant="filled"
+                leadingIcon={<Plus size={14} />}
+                onClick={handleAddUser}
+              >
+                Kullanıcıyı Dizine Ekle
+              </Button>
+            </div>
+          }
+        >
+          <div className="uxu-stack-md">
+            <Input
+              label="Ad Soyad"
+              placeholder="Örn: Kaan Arslan"
+              value={newUserName}
+              onChange={setNewUserName}
+              required
+            />
+            <Input
+              label="Kurumsal E-Posta"
+              placeholder="kaan.arslan@uxigl.dev"
+              value={newUserEmail}
+              onChange={setNewUserEmail}
+              required
+            />
+            <Select
+              label="Departman"
+              value={newUserDept}
+              onChange={setNewUserDept}
+              options={[
+                {
+                  value: 'Platform Mühendisliği',
+                  label: 'Platform Mühendisliği',
+                  badge: 'Core',
+                },
+                {
+                  value: 'UI / UX Tasarım',
+                  label: 'UI / UX Tasarım',
+                  badge: 'Design',
+                },
+                {
+                  value: 'Siber Güvenlik',
+                  label: 'Siber Güvenlik (SecOps)',
+                  badge: 'Zero-Trust',
+                },
+                {
+                  value: 'Grafik & Shader',
+                  label: 'Grafik & WebGL2 Shader',
+                  badge: 'GPU',
+                },
+              ]}
+            />
+            <Select
+              label="Rol / Unvan"
+              value={newUserRole}
+              onChange={setNewUserRole}
+              options={[
+                {
+                  value: 'Senior Frontend Architect',
+                  label: 'Senior Frontend Architect',
+                },
+                {
+                  value: 'Staff WebGL Engineer',
+                  label: 'Staff WebGL Engineer',
+                },
+                {
+                  value: 'Design Systems Lead',
+                  label: 'Design Systems Lead',
+                },
+                {
+                  value: 'SecOps Compliance Auditor',
+                  label: 'SecOps Compliance Auditor',
+                },
+              ]}
+            />
+          </div>
+        </Modal>
       </div>
     );
   }
@@ -542,6 +689,28 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
             }
           >
             <div className="uxu-stack-md">
+              <Stepper
+                activeStep={formStep}
+                onStepClick={setFormStep}
+                steps={[
+                  {
+                    id: 'st-1',
+                    title: 'Cari & VKN',
+                    subtitle: 'Mükellef Kaydı',
+                  },
+                  {
+                    id: 'st-2',
+                    title: 'Banka & Tutar',
+                    subtitle: 'IBAN ve KDV (%20)',
+                  },
+                  {
+                    id: 'st-3',
+                    title: 'GİB e-Fatura Onayı',
+                    subtitle: 'Mali Mühür & SLA',
+                  },
+                ]}
+              />
+
               <div className="uxu-stage-grid-2">
                 <Input
                   label="Kurumsal Cari Unvanı"
@@ -625,6 +794,46 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
                   timeValue={formInvoiceTime}
                   onDateChange={setFormInvoiceDate}
                   onTimeChange={setFormInvoiceTime}
+                />
+              </div>
+
+              <div className="uxu-stage-grid-2">
+                <Select
+                  label="Tahsilat Bankası Seçimi (<Select />)"
+                  value={formBank}
+                  onChange={setFormBank}
+                  options={[
+                    {
+                      value: 'garanti-bbva',
+                      label: 'Garanti BBVA Ticari',
+                      description: 'FAST & Otomatik DBS Aktif',
+                      badge: 'Varsayılan',
+                    },
+                    {
+                      value: 'is-bankasi',
+                      label: 'Türkiye İş Bankası Kurumsal',
+                      description: 'Kurumsal Çek & Havale Hesabı',
+                      badge: 'Kurumsal',
+                    },
+                    {
+                      value: 'ziraat',
+                      label: 'Ziraat Bankası Kamu / GİB',
+                      description: 'Vergi & SGK Otomatik Ödeme',
+                      badge: 'GİB',
+                    },
+                  ]}
+                />
+                <Textarea
+                  label="e-Fatura Açıklama Notu (<Textarea />)"
+                  value={formNotes}
+                  onChange={setFormNotes}
+                  rows={2}
+                  maxLength={200}
+                  showCount
+                  quickTemplates={[
+                    'İrsaliye yerine geçer.',
+                    'Tevkifatlı Fatura',
+                  ]}
                 />
               </div>
 
@@ -1067,14 +1276,39 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
   // 7. CALENDAR VIEW
   if (viewId === 'calendar') {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const handleAddCalendarEvent = () => {
+      if (!newEventTitle.trim()) return;
+      setCalendarEvents((prev) => [
+        ...prev,
+        {
+          day: selectedCalendarDay,
+          title: newEventTitle.trim(),
+          tag: 'Yeni Plan',
+          tone: 'primary' as const,
+          time: newEventTime,
+        },
+      ]);
+      setNewEventTitle('');
+      notify({
+        title: 'Takvim Etkinliği Eklendi',
+        description: `${selectedCalendarDay} Ekim 2026 (${newEventTime}) için kaydedildi.`,
+        tone: 'success',
+      });
+    };
+
     return (
       <div className="uxu-dash-chart-and-feed">
         <Card
           variant="glass"
           eyebrow="CALENDAR • EKİM 2026 SÜRÜM TAKVİMİ"
           title="Release & Operations Calendar"
-          subtitle="Aylık dağıtım planı, bakım pencereleri ve ekip etkinlikleri"
+          subtitle="Bir güne tıklayarak seçin ve sağ panelden o güne yeni etkinlik ekleyin"
           headerIcon={<CalendarIcon size={18} />}
+          headerAction={
+            <Badge tone="primary" size="xs">
+              Seçili Gün: {selectedCalendarDay} Ekim
+            </Badge>
+          }
         >
           <div
             style={{
@@ -1098,34 +1332,39 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
               </div>
             ))}
             {days.map((day) => {
-              const ev = CALENDAR_EVENTS.find((e) => e.day === day);
+              const ev = calendarEvents.find((e) => e.day === day);
+              const isSelected = day === selectedCalendarDay;
               return (
-                <div
+                <button
                   key={day}
+                  type="button"
+                  onClick={() => setSelectedCalendarDay(day)}
                   style={{
                     minHeight: 62,
                     padding: '6px 8px',
                     borderRadius: 'var(--uxu-radius-sm)',
-                    background: ev
+                    background: isSelected
+                      ? 'var(--uxu-primary-container)'
+                      : ev
                       ? 'var(--uxu-surface-elevated)'
                       : 'var(--uxu-surface-tonal)',
-                    border:
-                      day === 22
-                        ? '1px solid var(--uxu-primary)'
-                        : '1px solid var(--uxu-border-subtle)',
+                    border: isSelected
+                      ? '1.5px solid var(--uxu-primary)'
+                      : '1px solid var(--uxu-border-subtle)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
+                    textAlign: 'left',
+                    cursor: 'pointer',
                   }}
                 >
                   <span
                     style={{
                       fontSize: '0.76rem',
-                      fontWeight: day === 22 ? 800 : 600,
-                      color:
-                        day === 22
-                          ? 'var(--uxu-primary)'
-                          : 'var(--uxu-text-secondary)',
+                      fontWeight: isSelected ? 800 : 600,
+                      color: isSelected
+                        ? 'var(--uxu-primary)'
+                        : 'var(--uxu-text-secondary)',
                     }}
                   >
                     {day}
@@ -1135,7 +1374,7 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
                       {ev.tag}
                     </Badge>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -1143,41 +1382,48 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
 
         <Card
           variant="tonal"
-          eyebrow="UPCOMING MILESTONES"
-          title="Yaklaşan Etkinlikler"
+          eyebrow={`SEÇİLİ GÜN: ${selectedCalendarDay} EKİM 2026`}
+          title="Etkinlik Ekle & Yaklaşan Takvim"
           subtitle="Planlanan sürüm ve denetim takvimi"
         >
-          <div className="uxu-stack-sm">
-            {CALENDAR_EVENTS.map((ev) => (
-              <div
-                key={ev.day}
-                style={{
-                  padding: '10px 12px',
-                  borderRadius: 'var(--uxu-radius-md)',
-                  background: 'var(--uxu-surface-elevated)',
-                  border: '1px solid var(--uxu-border-subtle)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 10,
-                }}
-              >
-                <div>
-                  <strong style={{ fontSize: '0.83rem' }}>{ev.title}</strong>
-                  <div
-                    style={{
-                      fontSize: '0.74rem',
-                      color: 'var(--uxu-text-secondary)',
-                    }}
-                  >
-                    {ev.day} Ekim 2026 • Saat {ev.time}
-                  </div>
-                </div>
-                <Badge tone={ev.tone} size="xs">
-                  {ev.tag}
-                </Badge>
+          <div className="uxu-stack-md">
+            <div className="uxu-stack-xs">
+              <Input
+                label={`${selectedCalendarDay} Ekim İçin Yeni Etkinlik Başlığı`}
+                placeholder="Örn: Prod Kümesi Bakım Penceresi"
+                value={newEventTitle}
+                onChange={setNewEventTitle}
+                size="sm"
+              />
+              <div className="uxu-stage-row" style={{ justifyContent: 'space-between' }}>
+                <Input
+                  type="text"
+                  placeholder="Saat (Örn: 14:00)"
+                  value={newEventTime}
+                  onChange={setNewEventTime}
+                  size="sm"
+                />
+                <Button
+                  variant="filled"
+                  size="sm"
+                  leadingIcon={<Plus size={14} />}
+                  onClick={handleAddCalendarEvent}
+                >
+                  Takvime Ekle
+                </Button>
               </div>
-            ))}
+            </div>
+
+            <Timeline
+              items={calendarEvents.map((ev, idx) => ({
+                id: `cal-${ev.day}-${idx}`,
+                title: ev.title,
+                description: `${ev.day} Ekim 2026 • Saat ${ev.time}`,
+                timestamp: `${ev.day} Eki`,
+                tone: ev.tone,
+                badge: ev.tag,
+              }))}
+            />
           </div>
         </Card>
       </div>

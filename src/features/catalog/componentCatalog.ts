@@ -162,14 +162,14 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
   },
   {
     id: 'input',
-    name: 'Input & Enterprise Forms',
-    turkishTitle: 'Maskeli Giriş, Döviz, Tarih/Saat, Etiket & Dosya Yükleme',
+    name: 'Input, Select, Textarea & Enterprise Forms',
+    turkishTitle: 'Maskeli Giriş, Combobox Select, Textarea, Döviz & Dosya Yükleme',
     category: 'inputs',
     summary:
-      'Maskeli giriş (Telefon, TR IBAN, VKN/TCKN, Kredi Kartı), CurrencyInput (KDV hesaplamalı döviz), DateTimePickerInput, MultiSelectTagInput ve FileUploadDropzone içeren kurumsal form ailesi.',
+      'Maskeli giriş (Telefon, TR IBAN, VKN/TCKN, Kredi Kartı), aranabilir Select Combobox, şablonlu Textarea, CurrencyInput (KDV hesaplamalı döviz), DateTimePickerInput, MultiSelectTagInput ve FileUploadDropzone içeren kurumsal form ailesi.',
     importPath: '@/components/primitives',
     importStatement:
-      "import { Input, CurrencyInput, DateTimePickerInput, MultiSelectTagInput, FileUploadDropzone } from '@/components/primitives';",
+      "import { Input, Select, Textarea, CurrencyInput, DateTimePickerInput, MultiSelectTagInput, FileUploadDropzone } from '@/components/primitives';",
     dos: [
       'Finans ve muhasebe formlarında mask="iban" | "tax-id" | "phone" | "credit-card" kullanın.',
       'Dövizli tutarlarda CurrencyInput ile otomatik KDV hesaplamasını aktif edin.',
@@ -626,13 +626,13 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
   },
   {
     id: 'tabs-accordion',
-    name: 'Tabs & Accordion',
-    turkishTitle: 'Sekme & Akordeon',
+    name: 'Tabs, Accordion, Stepper & Timeline',
+    turkishTitle: 'Sekme, Akordeon, Süreç Sihirbazı & Denetim Akışı',
     category: 'surfaces',
     summary:
-      'Ekran içeriklerini yatay sekmelere (Tabs) veya açılır-kapanır panellere (Accordion) böler.',
+      'Ekran içeriklerini yatay sekmelere (Tabs), açılır-kapanır panellere (Accordion), çok adımlı süreç sihirbazına (Stepper) veya dikey işlem geçmişine (Timeline) böler.',
     importPath: '@/components/composites',
-    importStatement: "import { Tabs, Accordion } from '@/components/composites';",
+    importStatement: "import { Tabs, Accordion, Stepper, Timeline } from '@/components/composites';",
     dos: [
       'Sekmelerde kayıt sayısı için count prop’unu kullanın.',
       'İlk paneli açık başlatmak için defaultExpandedIds verin.',
@@ -696,14 +696,14 @@ export const COMPONENT_CATALOG: ComponentCatalogEntry[] = [
   },
   {
     id: 'modal-command',
-    name: 'Modal, Alert, Toast & CommandPalette',
-    turkishTitle: 'Diyalog, 5 Yönlü Toast, Uyarı Bandı & Komut Paleti',
+    name: 'Modal, Drawer, Alert, Toast & CommandPalette',
+    turkishTitle: 'Diyalog, Yan Çekmece (Drawer), 5 Yönlü Toast, Uyarı Bandı & Komut Paleti',
     category: 'surfaces',
     summary:
-      '6 varyantlı Modal diyalog (default, confirm, danger, alert, sheet, glass), 5 ekran yönünde (top-right, top-left, bottom-right, bottom-left, top-center) ve 6 semantik/glass tonda çalışan Toast bildirim motoru, satır içi Alert bandı ve CommandPalette (⌘K).',
+      '6 varyantlı Modal diyalog, 3 yönlü (right, left, bottom) kayar Drawer çekmece paneli, 5 ekran yönünde çalışan Toast bildirim motoru, satır içi Alert bandı ve CommandPalette (⌘K).',
     importPath: '@/components/composites',
     importStatement:
-      "import { Modal, CommandPalette } from '@/components/composites';\nimport { Alert } from '@/components/primitives';\nimport { useToast } from '@/providers/ToastProvider';",
+      "import { Modal, Drawer, CommandPalette } from '@/components/composites';\nimport { Alert } from '@/components/primitives';\nimport { useToast } from '@/providers/ToastProvider';",
     dos: [
       'macOS görünümü için showMacTrafficLights aktif edin; yıkıcı işlemlerde variant="danger" Modal kullanın.',
       'Toast bildirimlerinde ekran yönünü placement="top-right | top-left | bottom-right | bottom-left | top-center" ile belirleyin.',
