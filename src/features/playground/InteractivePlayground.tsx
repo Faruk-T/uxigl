@@ -50,6 +50,8 @@ import {
   MultiSelectTagInput,
   FileUploadDropzone,
   type UploadedFileItem,
+  Select,
+  Textarea,
   Alert,
   Switch,
   Slider,
@@ -69,6 +71,11 @@ import {
   Accordion,
   Modal,
   type ModalVariant,
+  Drawer,
+  type DrawerPlacement,
+  Stepper,
+  Timeline,
+  Pagination,
   StatCard,
   DataTable,
   SheetGLGridAdapter,
@@ -200,6 +207,16 @@ export const InteractivePlayground: React.FC<InteractivePlaygroundProps> = ({
     'Material Design 3',
   ]);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [demoDrawerOpen, setDemoDrawerOpen] = useState(false);
+  const [drawerPlacement, setDrawerPlacement] =
+    useState<DrawerPlacement>('right');
+  const [selectedBankCode, setSelectedBankCode] = useState('garanti-bbva');
+  const [invoiceNotes, setInvoiceNotes] = useState(
+    'Kurumsal B2B mutabakat kapsamında %20 KDV dahil e-Fatura düzenlenmiştir.'
+  );
+  const [activeWorkflowStep, setActiveWorkflowStep] = useState(1);
+  const [tablePage, setTablePage] = useState(1);
+  const [tablePageSize, setTablePageSize] = useState(10);
   const [playgroundTableVariant, setPlaygroundTableVariant] =
     useState<NativeTableVariant>('default');
   const [animDurationSec, setAnimDurationSec] = useState<number>(3.2);
@@ -1153,6 +1170,88 @@ export function CloudFileManagerExample() {
                 />
               </Card>
             </div>
+
+            {/* 5. Searchable Select Combobox & Rich Textarea */}
+            <div className="uxu-stage-grid-2">
+              <Card
+                variant="tonal"
+                padding="md"
+                title="Aranabilir Açılır Seçici (<Select /> Combobox)"
+                subtitle="Grup başlıkları, klavye navigasyonu, canlı arama filtresi ve rozet desteği"
+              >
+                <Select
+                  label="Tahsilat & Havale Bankası Seçimi"
+                  value={selectedBankCode}
+                  onChange={setSelectedBankCode}
+                  surface={inputSurface}
+                  size={controlSize}
+                  disabled={isDisabled}
+                  searchable
+                  clearable
+                  helperText="Klavye ok tuşları veya canlı arama kutusu ile filtreleyebilirsiniz."
+                  options={[
+                    {
+                      value: 'garanti-bbva',
+                      label: 'Garanti BBVA Kurumsal',
+                      description: 'TR33 0006 2000 • FAST & SWIFT Aktif',
+                      badge: 'Varsayılan',
+                      group: 'Özel Sektör Bankaları',
+                      icon: <Building2 size={15} />,
+                    },
+                    {
+                      value: 'is-bankasi',
+                      label: 'Türkiye İş Bankası Ticari',
+                      description: 'TR12 0006 4000 • Otomatik DBS Entegrasyonu',
+                      badge: 'DBS',
+                      group: 'Özel Sektör Bankaları',
+                      icon: <Building2 size={15} />,
+                    },
+                    {
+                      value: 'ziraat-katilim',
+                      label: 'Ziraat Bankası Kurumsal',
+                      description: 'TR89 0001 0000 • Kamu & GİB Vergi Ödemeleri',
+                      badge: 'GİB',
+                      group: 'Kamu Bankaları',
+                      icon: <CreditCard size={15} />,
+                    },
+                    {
+                      value: 'wise-eu',
+                      label: 'Wise Europe (SEPA / IBAN)',
+                      description: 'BE68 9670 1234 • EUR & GBP Tahsilat Hesabı',
+                      badge: 'SEPA',
+                      group: 'Küresel Ödeme Ağ Geçitleri',
+                      icon: <Globe size={15} />,
+                    },
+                  ]}
+                />
+              </Card>
+
+              <Card
+                variant="tonal"
+                padding="md"
+                title="Çok Satırlı Zengin Metin Alanı (<Textarea />)"
+                subtitle="Hızlı şablon ekleme çipleri, karakter/kelime sayacı ve doğrulama durumu"
+              >
+                <Textarea
+                  label="e-Fatura & Muhasebe Açıklama Notu"
+                  value={invoiceNotes}
+                  onChange={setInvoiceNotes}
+                  surface={inputSurface}
+                  size={controlSize}
+                  disabled={isDisabled}
+                  rows={3}
+                  maxLength={280}
+                  showCount
+                  clearable
+                  quickTemplates={[
+                    'İrsaliye yerine geçer.',
+                    'Tevkifatlı fatura (%9/10 KDV)',
+                    '30 gün vadeli B2B cari mutabakat.',
+                  ]}
+                  helperText="Üstteki hazır şablonlara tıklayarak metne hızlıca ekleme yapabilirsiniz."
+                />
+              </Card>
+            </div>
           </div>
         );
 
@@ -1949,6 +2048,104 @@ export function CloudFileManagerExample() {
               </div>
             </Card>
 
+            {/* 5. Slide-Over Drawer Component */}
+            <Card
+              variant="tonal"
+              padding="md"
+              title="Kayar Yan & Alt Çekmece Paneli (<Drawer />)"
+              subtitle="Sağ (right), Sol (left) ve Alt (bottom) yönlerden açılan Liquid Glass denetim ve filtre çekmecesi"
+            >
+              <div className="uxu-stage-row">
+                {(
+                  [
+                    { pos: 'right', label: 'Sağdan Aç (Right Drawer)' },
+                    { pos: 'left', label: 'Soldan Aç (Left Drawer)' },
+                    { pos: 'bottom', label: 'Alttan Aç (Bottom Sheet Drawer)' },
+                  ] as Array<{ pos: DrawerPlacement; label: string }>
+                ).map((d) => (
+                  <Button
+                    key={d.pos}
+                    variant={drawerPlacement === d.pos ? 'filled' : 'glass'}
+                    size="sm"
+                    pill={isPill}
+                    onClick={() => {
+                      setDrawerPlacement(d.pos);
+                      setDemoDrawerOpen(true);
+                    }}
+                  >
+                    {d.label}
+                  </Button>
+                ))}
+              </div>
+            </Card>
+
+            <Drawer
+              open={demoDrawerOpen}
+              onClose={() => setDemoDrawerOpen(false)}
+              placement={drawerPlacement}
+              size="md"
+              badge="DRAWER COMPOSITE"
+              title="Canlı Denetim & Filtre Çekmecesi"
+              subtitle={`Yön: ${drawerPlacement.toUpperCase()} • ESC veya arka plan tıklaması ile kapanır`}
+              footer={
+                <div className="uxu-modal-footer-actions">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDemoDrawerOpen(false)}
+                  >
+                    Kapat
+                  </Button>
+                  <Button
+                    variant="filled"
+                    size="sm"
+                    onClick={() => {
+                      setDemoDrawerOpen(false);
+                      notify({
+                        title: 'Çekmece Ayarları Uygulandı',
+                        description: `${drawerPlacement.toUpperCase()} çekmece filtreleri kaydedildi.`,
+                        tone: 'success',
+                      });
+                    }}
+                  >
+                    Filtreleri Uygula
+                  </Button>
+                </div>
+              }
+            >
+              <div className="uxu-stack-md">
+                <Alert
+                  tone="info"
+                  variant="tonal"
+                  title="Uzamsal Yan Panel (<Drawer />)"
+                  description="Tablo satır detaylarını, gelişmiş filtre formlarını veya işlem geçmişini sayfadan ayrılmadan yan panelde göstermek için kullanılır."
+                />
+                <Select
+                  label="Denetim Bölgesi"
+                  value={selectedBankCode}
+                  onChange={setSelectedBankCode}
+                  options={[
+                    {
+                      value: 'garanti-bbva',
+                      label: 'Avrupa-Merkez (Frankfurt M4)',
+                      badge: 'Aktif',
+                    },
+                    {
+                      value: 'is-bankasi',
+                      label: 'Türkiye-Batı (İstanbul Edge)',
+                      badge: '11ms',
+                    },
+                  ]}
+                />
+                <Textarea
+                  label="Operasyonel Denetim Notu"
+                  value={invoiceNotes}
+                  onChange={setInvoiceNotes}
+                  rows={3}
+                />
+              </div>
+            </Drawer>
+
             <Modal
               open={demoModalOpen}
               onClose={() => setDemoModalOpen(false)}
@@ -2085,6 +2282,99 @@ export function CloudFileManagerExample() {
                 },
               ]}
             />
+
+            <div className="uxu-stage-grid-2">
+              <Card
+                variant="tonal"
+                padding="md"
+                title="Çok Adımlı Süreç Sihirbazı (<Stepper />)"
+                subtitle="Adımlara tıklayarak ilerlemeyi canlı değiştirebilirsiniz"
+              >
+                <div className="uxu-stack-md">
+                  <Stepper
+                    activeStep={activeWorkflowStep}
+                    onStepClick={setActiveWorkflowStep}
+                    steps={[
+                      {
+                        id: 's1',
+                        title: 'Cari Doğrulama',
+                        subtitle: 'VKN & MERSİS Kontrolü',
+                        meta: 'Adım 1',
+                      },
+                      {
+                        id: 's2',
+                        title: 'Sözleşme & Limit',
+                        subtitle: 'Teminat Onayı',
+                        meta: 'Adım 2',
+                      },
+                      {
+                        id: 's3',
+                        title: 'Canlı Aktivasyon',
+                        subtitle: 'ERP & GİB Bağlantısı',
+                        meta: 'Adım 3',
+                      },
+                    ]}
+                  />
+                  <div className="uxu-stage-row">
+                    <Button
+                      variant="outlined"
+                      size="xs"
+                      disabled={activeWorkflowStep <= 0}
+                      onClick={() =>
+                        setActiveWorkflowStep((s) => Math.max(0, s - 1))
+                      }
+                    >
+                      ← Önceki Adım
+                    </Button>
+                    <Button
+                      variant="filled"
+                      size="xs"
+                      disabled={activeWorkflowStep >= 2}
+                      onClick={() =>
+                        setActiveWorkflowStep((s) => Math.min(2, s + 1))
+                      }
+                    >
+                      Sonraki Adım →
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+
+              <Card
+                variant="tonal"
+                padding="md"
+                title="Kurumsal Denetim & Aktivite Akışı (<Timeline />)"
+                subtitle="Zaman damgalı işlem geçmişi ve durum izleme bileşeni"
+              >
+                <Timeline
+                  items={[
+                    {
+                      id: 't1',
+                      title: 'GİB e-Fatura Zarfı Onaylandı',
+                      description: 'ETTN: 9482-4810-AB21 • Otomatik muhasebeleşti.',
+                      timestamp: '10:42',
+                      tone: 'success',
+                      badge: 'GİB #200',
+                    },
+                    {
+                      id: 't2',
+                      title: 'Hazine Onayı Bekleniyor',
+                      description: '₺148.500,00 ödeme emri çift imza kuyruğunda.',
+                      timestamp: '09:15',
+                      tone: 'warning',
+                      badge: 'Onayda',
+                    },
+                    {
+                      id: 't3',
+                      title: 'SheetGL Veri Kümesi Güncellendi',
+                      description: '10.000 satırlık stok hareketi içe aktarıldı.',
+                      timestamp: 'Dün',
+                      tone: 'primary',
+                    },
+                  ]}
+                />
+              </Card>
+            </div>
           </div>
         );
 
@@ -2214,6 +2504,16 @@ export function CloudFileManagerExample() {
                   },
                 ]}
               />
+              <div style={{ marginTop: 14 }}>
+                <Pagination
+                  page={tablePage}
+                  totalPages={8}
+                  totalItems={76}
+                  pageSize={tablePageSize}
+                  onPageChange={setTablePage}
+                  onPageSizeChange={setTablePageSize}
+                />
+              </div>
             </Card>
           </div>
         );

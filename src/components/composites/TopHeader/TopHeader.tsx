@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Menu,
   Sun,
@@ -10,13 +10,51 @@ import {
   Home,
   Sparkles,
   Link2,
+  CheckCheck,
+  Plus,
 } from 'lucide-react';
 import type { BreadcrumbItem } from '../../../core/contracts/NavigationContract';
 import { RouteService } from '../../../core/services/RouteService';
 import { useTheme } from '../../../providers/ThemeProvider';
 import { useToast } from '../../../providers/ToastProvider';
-import { Button, Tooltip } from '../../primitives';
+import { Button, Badge, Tooltip } from '../../primitives';
 import { GithubIcon } from '../../brand/GithubIcon';
+
+interface HeaderNotificationItem {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  category: 'sistem' | 'finans';
+  unread: boolean;
+}
+
+const INITIAL_NOTIFICATIONS: HeaderNotificationItem[] = [
+  {
+    id: 'n-1',
+    title: 'SheetGL v1.0.21 Tema Senkronu',
+    description: 'Tüm aktif grid hücreleri yeni Material You paletine bağlandı.',
+    time: '2 dk önce',
+    category: 'sistem',
+    unread: true,
+  },
+  {
+    id: 'n-2',
+    title: 'e-Fatura #GIB-2026-8841 Onaylandı',
+    description: 'Anadolu Bulut A.Ş. için ₺148.500,00 tahsilat kaydı işlendi.',
+    time: '14 dk önce',
+    category: 'finans',
+    unread: true,
+  },
+  {
+    id: 'n-3',
+    title: 'FileManGL S3 Yedekleme Tamamlandı',
+    description: '42 kurumsal dizin ve 1.280 belge başarıyla arşivlendi.',
+    time: '1 saat önce',
+    category: 'sistem',
+    unread: false,
+  },
+];
 
 /**
  * ============================================================================
@@ -50,6 +88,53 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     setWebglEnabled,
   } = useTheme();
   const { notify } = useToast();
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifFilter, setNotifFilter] = useState<'all' | 'sistem' | 'finans'>('all');
+  const [notifications, setNotifications] = useState<HeaderNotificationItem[]>(
+    INITIAL_NOTIFICATIONS
+  );
+  const notifWrapperRef = useRef<HTMLDivElement | null>(null);
+
+  const unreadCount = notifications.filter((n) => n.unread).length;
+  const filteredNotifications = notifications.filter((n) =>
+    notifFilter === 'all' ? true : n.category === notifFilter
+  );
+
+  useEffect(() => {
+    if (!notifOpen) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (
+        notifWrapperRef.current &&
+        !notifWrapperRef.current.contains(e.target as Node)
+      ) {
+        setNotifOpen(false);
+      }
+    };
+    window.addEventListener('mousedown', handleOutside);
+    return () => window.removeEventListener('mousedown', handleOutside);
+  }, [notifOpen]);
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+  };
+
+  const pushDemoNotification = () => {
+    const newItem: HeaderNotificationItem = {
+      id: `n-${Date.now()}`,
+      title: 'Yeni Kurumsal İşlem Kaydı',
+      description: 'B2B onay akışı #TR-9042 otomatik olarak tamamlandı.',
+      time: 'Şimdi',
+      category: 'finans',
+      unread: true,
+    };
+    setNotifications((prev) => [newItem, ...prev]);
+    notify({
+      title: newItem.title,
+      description: newItem.description,
+      tone: 'primary',
+      placement: 'top-right',
+    });
+  };
 
   const handleToggleWebgl = () => {
     const next = !preferences.webglEnabled;
@@ -331,24 +416,107 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           </Button>
         </Tooltip>
 
-        <Tooltip content="Bildirim Testi">
-          <Button
-            variant="tonal"
-            size="sm"
-            iconOnly
-            pill
-            aria-label="Bildirimler"
-            onClick={() =>
-              notify({
-                title: 'Sistem Bildirimi',
-                description: 'Tema ve bileşenler senkronize.',
-                tone: 'primary',
-              })
-            }
-          >
-            <Bell size={14} />
-          </Button>
-        </Tooltip>
+        <div className="uxu-notif-anchor" ref={notifWrapperRef}>
+          <Tooltip content="Canlı Bildirim Merkezi">
+            <button
+              type="button"
+              className="uxu-btn uxu-btn--tonal uxu-btn--sm uxu-btn--icon-only uxu-btn--pill uxu-notif-trigger"
+              aria-label="Bildirim Merkezi"
+              aria-expanded={notifOpen}
+              onClick={() => setNotifOpen((prev) => !prev)}
+            >
+              <Bell size={14} />
+              {unreadCount > 0 && (
+                <span className="uxu-notif-trigger__badge">{unreadCount}</span>
+              )}
+            </button>
+          </Tooltip>
+
+          {notifOpen && (
+            <div
+              className="uxu-notif-popover"
+              role="dialog"
+              aria-label="Canlı Bildirim Merkezi"
+            >
+              <div className="uxu-notif-popover__header">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <strong>Bildirim Merkezi</strong>
+                  {unreadCount > 0 && (
+                    <Badge tone="primary" size="xs">
+                      {unreadCount} Yeni
+                    </Badge>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <button
+                    type="button"
+                    className="uxu-notif-popover__action"
+                    onClick={markAllRead}
+                    title="Tümünü okundu işaretle"
+                  >
+                    <CheckCheck size={13} />
+                    <span>Okundu</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="uxu-notif-popover__action"
+                    onClick={pushDemoNotification}
+                    title="Canlı test bildirimi ekle"
+                  >
+                    <Plus size={13} />
+                    <span>Test</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="uxu-notif-popover__tabs">
+                {(
+                  [
+                    { id: 'all', label: 'Tümü' },
+                    { id: 'sistem', label: 'Sistem' },
+                    { id: 'finans', label: 'Finans' },
+                  ] as const
+                ).map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    className={`uxu-notif-popover__tab ${
+                      notifFilter === tab.id ? 'uxu-notif-popover__tab--active' : ''
+                    }`}
+                    onClick={() => setNotifFilter(tab.id)}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="uxu-notif-popover__list">
+                {filteredNotifications.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={`uxu-notif-item ${
+                      item.unread ? 'uxu-notif-item--unread' : ''
+                    }`}
+                    onClick={() =>
+                      setNotifications((prev) =>
+                        prev.map((n) =>
+                          n.id === item.id ? { ...n, unread: false } : n
+                        )
+                      )
+                    }
+                  >
+                    <div className="uxu-notif-item__top">
+                      <strong>{item.title}</strong>
+                      <small>{item.time}</small>
+                    </div>
+                    <p>{item.description}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         <Tooltip
           content={resolvedMode === 'dark' ? 'Aydınlık Mod' : 'Karanlık Mod'}

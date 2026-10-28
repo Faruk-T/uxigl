@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sun,
   Moon,
@@ -7,8 +7,14 @@ import {
   RotateCcw,
   Sparkles,
   X,
+  Copy,
+  Check,
+  Code2,
+  Pipette,
 } from 'lucide-react';
 import { useTheme } from '../../providers/ThemeProvider';
+import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
+import { generateThemeCssExport } from '../../core/services/ThemeEngineService';
 import {
   Button,
   Slider,
@@ -31,6 +37,17 @@ export interface ThemeStudioDrawerProps {
   onClose: () => void;
 }
 
+const BRAND_HEX_SWATCHES = [
+  { hex: '#6366F1', label: 'Indigo' },
+  { hex: '#0EA5E9', label: 'Sky' },
+  { hex: '#10B981', label: 'Emerald' },
+  { hex: '#F59E0B', label: 'Amber' },
+  { hex: '#EC4899', label: 'Pink' },
+  { hex: '#8B5CF6', label: 'Violet' },
+  { hex: '#EF4444', label: 'Crimson' },
+  { hex: '#14B8A6', label: 'Teal' },
+];
+
 export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
   open,
   onClose,
@@ -42,6 +59,7 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
     availableFontPresets,
     setMode,
     setSeedPalette,
+    setCustomPrimaryHex,
     setRadiusScale,
     setCustomRadiusPx,
     setDensity,
@@ -58,7 +76,15 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
     resetPreferences,
   } = useTheme();
 
+  const [exportFormat, setExportFormat] = useState<'css' | 'json'>('css');
+  const { copied, copy } = useCopyToClipboard();
+
   if (!open) return null;
+
+  const exportCodeString =
+    exportFormat === 'css'
+      ? generateThemeCssExport(preferences, resolvedMode)
+      : JSON.stringify(preferences, null, 2);
 
   return (
     <div
@@ -123,21 +149,31 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
             />
           </div>
 
-          {/* 2. Seed Palettes */}
+          {/* 2. Seed Palettes & Custom Brand HEX Color Picker */}
           <div className="uxu-studio-section">
             <div className="uxu-studio-section__header">
               <span>Tohum Renk Paleti (Seed Color Harmony)</span>
+              {preferences.customPrimaryHex && (
+                <Badge tone="warning" size="xs">
+                  Özel HEX: {preferences.customPrimaryHex.toUpperCase()}
+                </Badge>
+              )}
             </div>
             <div className="uxu-palette-grid">
               {availablePalettes.map((palette) => {
-                const isSelected = preferences.seedPalette === palette.id;
+                const isSelected =
+                  preferences.seedPalette === palette.id &&
+                  !preferences.customPrimaryHex;
                 const colors =
                   resolvedMode === 'dark' ? palette.dark : palette.light;
                 return (
                   <button
                     key={palette.id}
                     type="button"
-                    onClick={() => setSeedPalette(palette.id)}
+                    onClick={() => {
+                      setCustomPrimaryHex(undefined);
+                      setSeedPalette(palette.id);
+                    }}
                     className={`uxu-palette-card ${
                       isSelected ? 'uxu-palette-card--active' : ''
                     }`}
@@ -154,6 +190,62 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
                   </button>
                 );
               })}
+            </div>
+
+            {/* Custom Brand Color Synthesizer */}
+            <div className="uxu-custom-hex-box">
+              <div className="uxu-custom-hex-box__top">
+                <div className="uxu-custom-hex-box__label">
+                  <Pipette size={14} className="uxu-text-primary" />
+                  <div>
+                    <strong>Özel Marka Rengi Sentezleyici (HEX)</strong>
+                    <small>
+                      Tek bir marka renginden tüm uxiGL, SheetGL &amp; FileManGL
+                      tonlarını otomatik üretir
+                    </small>
+                  </div>
+                </div>
+                <div className="uxu-custom-hex-box__picker-wrap">
+                  <input
+                    type="color"
+                    aria-label="Özel marka rengi seçin"
+                    className="uxu-custom-hex-box__color-input"
+                    value={preferences.customPrimaryHex ?? '#6366F1'}
+                    onChange={(e) => setCustomPrimaryHex(e.target.value)}
+                  />
+                  <code className="uxu-custom-hex-box__code">
+                    {(preferences.customPrimaryHex ?? 'Palet').toUpperCase()}
+                  </code>
+                  {preferences.customPrimaryHex && (
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => setCustomPrimaryHex(undefined)}
+                    >
+                      Temizle
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div className="uxu-custom-hex-box__swatches">
+                {BRAND_HEX_SWATCHES.map((sw) => {
+                  const active =
+                    preferences.customPrimaryHex?.toUpperCase() ===
+                    sw.hex.toUpperCase();
+                  return (
+                    <button
+                      key={sw.hex}
+                      type="button"
+                      title={`${sw.label} (${sw.hex})`}
+                      className={`uxu-custom-hex-swatch ${
+                        active ? 'uxu-custom-hex-swatch--active' : ''
+                      }`}
+                      style={{ background: sw.hex }}
+                      onClick={() => setCustomPrimaryHex(sw.hex)}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -403,7 +495,7 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
             )}
           </div>
 
-          {/* 6. Accessibility Motion Toggle */}
+          {/* 7. Accessibility Motion Toggle */}
           <div className="uxu-studio-section">
             <Switch
               label="Hareketi Azalt (Reduced Motion)"
@@ -412,6 +504,45 @@ export const ThemeStudioDrawer: React.FC<ThemeStudioDrawerProps> = ({
               onChange={setReducedMotion}
               size="sm"
             />
+          </div>
+
+          {/* 8. Theme Export Studio (CSS Variables & JSON Config) */}
+          <div className="uxu-studio-section">
+            <div className="uxu-studio-section__header">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <Code2 size={14} className="uxu-text-primary" />
+                Tema Dışa Aktarım Stüdyosu (CSS / JSON)
+              </span>
+              <Badge tone="success" size="xs">
+                Canlı Token Çıktısı
+              </Badge>
+            </div>
+            <SegmentedControl<'css' | 'json'>
+              value={exportFormat}
+              onChange={setExportFormat}
+              fullWidth
+              size="sm"
+              options={[
+                { value: 'css', label: 'CSS Variables (:root)' },
+                { value: 'json', label: 'ThemeProvider JSON' },
+              ]}
+            />
+            <pre className="uxu-theme-export-pre">
+              <code>{exportCodeString}</code>
+            </pre>
+            <Button
+              variant={copied ? 'success' : 'tonal'}
+              size="sm"
+              fullWidth
+              leadingIcon={copied ? <Check size={15} /> : <Copy size={15} />}
+              onClick={() => copy(exportCodeString)}
+            >
+              {copied
+                ? 'Tema Kodu Panoya Kopyalandı!'
+                : exportFormat === 'css'
+                ? 'CSS Token Değişkenlerini Kopyala'
+                : 'ThemeProvider JSON Yapılandırmasını Kopyala'}
+            </Button>
           </div>
         </div>
 
