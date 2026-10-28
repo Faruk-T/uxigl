@@ -1,5 +1,7 @@
 export * from './Button/Button';
 export * from './Input/Input';
+export * from './Select/Select';
+export * from './Textarea/Textarea';
 export * from './EnterpriseInputs/EnterpriseInputs';
 export * from './Alert/Alert';
 export * from './Switch/Switch';
