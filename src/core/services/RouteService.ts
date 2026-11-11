@@ -62,6 +62,8 @@ const DOCS_TOPIC_IDS = new Set([
 export const DASHBOARD_VIEW_IDS = new Set([
   'overview',
   'analytics',
+  'analytics-telemetry',
+  'dashboard/analytics-telemetry',
   'users',
   'products',
   'crm-orders',
@@ -113,9 +115,10 @@ export class RouteService {
         return `/docs/${sub}`;
       }
       case 'dashboard': {
+        const normalized = subItemId?.replace(/^dashboard\//, '');
         const sub =
-          subItemId && DASHBOARD_VIEW_IDS.has(subItemId)
-            ? subItemId
+          normalized && DASHBOARD_VIEW_IDS.has(normalized)
+            ? normalized
             : 'overview';
         return `/dashboard/${sub}`;
       }
