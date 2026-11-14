@@ -21,6 +21,7 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { Avatar, Badge, Button, Checkbox, Input, Switch } from '../../components/primitives';
+import { DemoLoginView } from './DemoLoginView';
 
 export interface FlowPalette {
   shellBg: string;
@@ -447,7 +448,7 @@ export const FlowWorkspaceInnerPages: React.FC<FlowInnerPagesProps> = ({
               <button
                 type="button"
                 onClick={() => onSelectNav('vendors')}
-                style={{ border: 'none', background: 'transparent', color: '#3B82F6', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                style={{ border: 'none', background: 'transparent', color: 'var(--uxu-primary)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
               >
                 Manage all →
               </button>
@@ -794,7 +795,7 @@ export const FlowWorkspaceInnerPages: React.FC<FlowInnerPagesProps> = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#3B82F6',
+                    color: 'var(--uxu-primary)',
                   }}
                 >
                   <FileCheck2 size={19} />
@@ -839,7 +840,7 @@ export const FlowWorkspaceInnerPages: React.FC<FlowInnerPagesProps> = ({
                   style={{
                     border: 'none',
                     background: 'transparent',
-                    color: '#3B82F6',
+                    color: 'var(--uxu-primary)',
                     fontWeight: 600,
                     cursor: 'pointer',
                     display: 'inline-flex',
@@ -863,7 +864,7 @@ export const FlowWorkspaceInnerPages: React.FC<FlowInnerPagesProps> = ({
   // =========================================================================
   if (activeNav === 'reports') {
     const categories = [
-      { name: 'Software & SaaS', spend: '$185,000', pct: 74, color: '#3B82F6' },
+      { name: 'Software & SaaS', spend: '$185,000', pct: 74, color: 'var(--uxu-primary)' },
       { name: 'AI & Analytics', spend: '$128,000', pct: 52, color: '#8B5CF6' },
       { name: 'Cloud Infrastructure', spend: '$84,000', pct: 36, color: '#06B6D4' },
       { name: 'Security & Legal', spend: '$57,000', pct: 24, color: '#10B981' },
@@ -1143,7 +1144,22 @@ export const FlowWorkspaceInnerPages: React.FC<FlowInnerPagesProps> = ({
   }
 
   // =========================================================================
-  // 8. ACCOUNT
+  // 8. LOGIN VARIETIES
+  // =========================================================================
+  if (activeNav === 'login') {
+    return (
+      <DemoLoginView
+        brandName="FlowGL"
+        brandSubtitle="Clean Vendor Onboarding"
+        brandInitial="F"
+        defaultEmail="daniel.kim@flowgl.io"
+        onSuccess={() => onSelectNav('vendors')}
+      />
+    );
+  }
+
+  // =========================================================================
+  // 9. ACCOUNT
   // =========================================================================
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>

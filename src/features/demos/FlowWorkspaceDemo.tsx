@@ -26,6 +26,8 @@ import {
   UploadCloud,
   CheckCircle2,
   Layers,
+  LogIn,
+  Palette,
 } from 'lucide-react';
 import { useTheme } from '../../providers/ThemeProvider';
 import { useToast } from '../../providers/ToastProvider';
@@ -42,6 +44,7 @@ import { FlowWorkspaceInnerPages } from './FlowWorkspaceInnerPages';
 
 export interface FlowWorkspaceDemoProps {
   onNavigate: (sectionId: string, subItemId?: string) => void;
+  onOpenThemeStudio?: () => void;
 }
 
 type VendorStatus = 'Active' | 'Pending' | 'Blocked';
@@ -186,6 +189,7 @@ const NAV_ITEMS = [
   { id: 'notifications', label: 'Notifications', icon: Bell, badge: '3', badgeTone: 'danger' as const },
   { id: 'settings', label: 'Settings', icon: Settings },
   { id: 'account', label: 'Account', icon: User },
+  { id: 'login', label: 'Login', icon: LogIn },
 ];
 
 function statusTone(status: VendorStatus): 'success' | 'warning' | 'danger' {
@@ -196,8 +200,15 @@ function statusTone(status: VendorStatus): 'success' | 'warning' | 'danger' {
 
 export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
   onNavigate,
+  onOpenThemeStudio,
 }) => {
-  const { resolvedMode, toggleMode } = useTheme();
+  const {
+    resolvedMode,
+    toggleMode,
+    availablePalettes,
+    preferences,
+    setSeedPalette,
+  } = useTheme();
   const { notify } = useToast();
   const isDark = resolvedMode === 'dark';
 
@@ -243,40 +254,24 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
     [vendors, selectedVendorId]
   );
 
-  // Clean surface palette derived from theme mode for maximum breathing room
-  const palette = isDark
-    ? {
-        shellBg: '#0B0F17',
-        sidebarBg: '#0F141F',
-        listBg: '#101622',
-        mainBg: '#0D121C',
-        cardBg: '#161C2A',
-        cardElevated: '#1B2233',
-        border: 'rgba(148, 163, 184, 0.12)',
-        borderStrong: 'rgba(59, 130, 246, 0.75)',
-        text: '#F8FAFC',
-        muted: '#94A3B8',
-        subtle: '#64748B',
-        pillBg: 'rgba(255, 255, 255, 0.05)',
-        activeNavBg: 'linear-gradient(90deg, rgba(37, 99, 235, 0.28) 0%, rgba(37, 99, 235, 0.06) 100%)',
-        primary: '#2563EB',
-      }
-    : {
-        shellBg: '#F4F6FA',
-        sidebarBg: '#FFFFFF',
-        listBg: '#F8FAFC',
-        mainBg: '#F4F6FA',
-        cardBg: '#FFFFFF',
-        cardElevated: '#F1F5F9',
-        border: 'rgba(15, 23, 42, 0.09)',
-        borderStrong: 'rgba(37, 99, 235, 0.8)',
-        text: '#0F172A',
-        muted: '#475569',
-        subtle: '#64748B',
-        pillBg: 'rgba(15, 23, 42, 0.05)',
-        activeNavBg: 'linear-gradient(90deg, rgba(37, 99, 235, 0.14) 0%, rgba(37, 99, 235, 0.03) 100%)',
-        primary: '#2563EB',
-      };
+  // Dynamic surface palette powered by uxiGL Theme Studio CSS tokens
+  const palette = {
+    shellBg: 'var(--uxu-bg-canvas)',
+    sidebarBg: 'var(--uxu-bg-elevated)',
+    listBg: isDark ? 'rgba(16, 22, 34, 0.72)' : 'var(--uxu-surface-tonal)',
+    mainBg: 'var(--uxu-bg-canvas)',
+    cardBg: 'var(--uxu-surface-tonal)',
+    cardElevated: 'var(--uxu-surface-tonal-high)',
+    border: 'var(--uxu-border-subtle)',
+    borderStrong: 'var(--uxu-primary)',
+    text: 'var(--uxu-text-primary)',
+    muted: 'var(--uxu-text-secondary)',
+    subtle: 'var(--uxu-text-muted)',
+    pillBg: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.05)',
+    activeNavBg:
+      'linear-gradient(90deg, var(--uxu-primary-container) 0%, transparent 100%)',
+    primary: 'var(--uxu-primary)',
+  };
 
   const progressPercent = activeStep === 1 ? selectedVendor.progress : activeStep === 2 ? 84 : 100;
   const ringRadius = 52;
@@ -448,21 +443,21 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
                     width: 34,
                     height: 34,
                     borderRadius: 10,
-                    background: 'linear-gradient(135deg, #38BDF8 0%, #2563EB 100%)',
+                    background: 'linear-gradient(135deg, var(--uxu-secondary) 0%, var(--uxu-primary) 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#fff',
                     fontWeight: 800,
                     fontSize: 16,
-                    boxShadow: '0 6px 18px rgba(37, 99, 235, 0.35)',
+                    boxShadow: '0 6px 18px var(--uxu-accent-glow)',
                   }}
                 >
                   F
                 </div>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.02em' }}>
-                    Flow Workspace
+                    FlowGL
                   </div>
                   <div style={{ fontSize: 11, color: palette.subtle }}>uxiGL Clean Demo</div>
                 </div>
@@ -593,7 +588,7 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
                 onClick={() => onNavigate('dashboard', 'overview')}
                 style={{ width: '100%', borderRadius: 10 }}
               >
-                Enterprise Cockpit →
+                EnterpriseGL →
               </Button>
             </div>
 
@@ -825,7 +820,71 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
               )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              {/* Quick Seed Palette Color Swatches */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '5px 10px',
+                  borderRadius: 999,
+                  border: `1px solid ${palette.border}`,
+                  backgroundColor: palette.cardBg,
+                }}
+                title="Hızlı Renk Paleti"
+              >
+                {availablePalettes.slice(0, 6).map((p) => {
+                  const isActiveSeed = preferences.seedPalette === p.id;
+                  const swatchColor = isDark ? p.dark.primary : p.light.primary;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setSeedPalette(p.id)}
+                      aria-label={p.name}
+                      title={p.name}
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        border: isActiveSeed
+                          ? `2px solid ${palette.text}`
+                          : '1px solid rgba(255,255,255,0.2)',
+                        backgroundColor: swatchColor,
+                        cursor: 'pointer',
+                        padding: 0,
+                        transform: isActiveSeed ? 'scale(1.18)' : 'scale(1)',
+                        transition: 'transform 0.15s ease',
+                      }}
+                    />
+                  );
+                })}
+              </div>
+
+              {onOpenThemeStudio && (
+                <button
+                  type="button"
+                  onClick={onOpenThemeStudio}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '7px 13px',
+                    borderRadius: 10,
+                    border: `1px solid ${palette.borderStrong}`,
+                    backgroundColor: 'var(--uxu-primary-container)',
+                    color: 'var(--uxu-on-primary-container)',
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Palette size={14} />
+                  <span>Tema Stüdyosu</span>
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => onNavigate('dashboard', 'overview')}
@@ -844,7 +903,7 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
                 }}
               >
                 <Layers size={14} />
-                <span>Enterprise Cockpit</span>
+                <span>EnterpriseGL</span>
               </button>
 
               <div
@@ -885,21 +944,63 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
             />
           ) : (
             <>
-          {/* Title Block */}
-          <div>
-            <h1
+          {/* Hero Onboarding Banner */}
+          <div
+            style={{
+              borderRadius: 20,
+              border: `1px solid ${palette.border}`,
+              padding: '26px 28px',
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: 142,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              backgroundColor: palette.cardBg,
+            }}
+          >
+            <img
+              src="/demos/flowgl-hero.jpg"
+              alt="FlowGL Vendor Onboarding Hub"
               style={{
-                margin: '0 0 6px',
-                fontSize: 30,
-                fontWeight: 700,
-                letterSpacing: '-0.025em',
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'right center',
+                filter: isDark ? 'brightness(0.75) contrast(1.06)' : 'none',
+                pointerEvents: 'none',
               }}
-            >
-              Start onboarding
-            </h1>
-            <p style={{ margin: 0, fontSize: 15, color: palette.muted }}>
-              Add vendor details and complete the verification process.
-            </p>
+            />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: isDark
+                  ? 'linear-gradient(90deg, rgba(11, 15, 23, 0.94) 0%, rgba(11, 15, 23, 0.78) 46%, rgba(11, 15, 23, 0.14) 100%)'
+                  : 'linear-gradient(90deg, rgba(248, 250, 252, 0.96) 0%, rgba(248, 250, 252, 0.84) 44%, rgba(248, 250, 252, 0.08) 100%)',
+                pointerEvents: 'none',
+              }}
+            />
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: 460 }}>
+              <Badge size="sm" variant="tonal" tone="primary" style={{ marginBottom: 10 }}>
+                FlowGL Partner Hub
+              </Badge>
+              <h1
+                style={{
+                  margin: '0 0 6px',
+                  fontSize: 30,
+                  fontWeight: 800,
+                  letterSpacing: '-0.025em',
+                }}
+              >
+                Start onboarding
+              </h1>
+              <p style={{ margin: 0, fontSize: 14.5, color: palette.muted }}>
+                Add vendor details and complete the verification process.
+              </p>
+            </div>
           </div>
 
           {/* Clean 3-Step Horizontal Stepper */}
@@ -1270,8 +1371,8 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
                     <svg width="128" height="128" viewBox="0 0 128 128">
                       <defs>
                         <linearGradient id="flowProgressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#3B82F6" />
-                          <stop offset="50%" stopColor="#6366F1" />
+                          <stop offset="0%" stopColor="var(--uxu-primary)" />
+                          <stop offset="50%" stopColor="var(--uxu-secondary)" />
                           <stop offset="100%" stopColor="#34D399" />
                         </linearGradient>
                       </defs>
@@ -1315,7 +1416,7 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[
-                    { label: 'Vendor details', done: true, dotColor: '#3B82F6' },
+                    { label: 'Vendor details', done: true, dotColor: 'var(--uxu-primary)' },
                     { label: 'Documents', done: activeStep >= 2, dotColor: '#8B5CF6' },
                     { label: 'Review', done: activeStep >= 3, dotColor: '#64748B' },
                   ].map((item) => (
