@@ -1309,7 +1309,11 @@ export default function App() {
                 }}
               >
                 <img
-                  src="/demos/enterprise-cockpit.jpg"
+                  src={
+                    isDark
+                      ? '/demos/enterprise-cockpit-dark.jpg'
+                      : '/demos/enterprise-cockpit-light.jpg'
+                  }
                   alt="Enterprise Cockpit — uxiGL Demo"
                   style={{
                     width: '100%',
@@ -1378,7 +1382,11 @@ export default function App() {
                 }}
               >
                 <img
-                  src="/demos/flow-workspace.jpg"
+                  src={
+                    isDark
+                      ? '/demos/flow-workspace-dark.jpg'
+                      : '/demos/flow-workspace-light.jpg'
+                  }
                   alt="Flow Workspace — uxiGL Clean UI Demo"
                   style={{
                     width: '100%',

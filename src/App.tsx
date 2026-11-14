@@ -152,10 +152,7 @@ export const App: React.FC = () => {
     });
 
     if (window.location.pathname !== activeRoutePath) {
-      if (
-        window.location.pathname === '/' ||
-        window.location.pathname === ''
-      ) {
+      if (window.location.pathname === '' && activeRoutePath === '/') {
         window.history.replaceState(
           { sectionId: activeSectionId, subItemId: activeSubItemId },
           '',

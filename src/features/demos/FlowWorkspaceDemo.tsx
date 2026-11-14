@@ -38,6 +38,7 @@ import {
   Switch,
 } from '../../components/primitives';
 import { Modal } from '../../components/composites';
+import { FlowWorkspaceInnerPages } from './FlowWorkspaceInnerPages';
 
 export interface FlowWorkspaceDemoProps {
   onNavigate: (sectionId: string, subItemId?: string) => void;
@@ -203,6 +204,7 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
   const [vendors, setVendors] = useState<VendorRecord[]>(INITIAL_VENDORS);
   const [selectedVendorId, setSelectedVendorId] = useState<string>('lanternfish');
   const [activeNav, setActiveNav] = useState<string>('vendors');
+  const [unreadNotifications, setUnreadNotifications] = useState<number>(3);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<'All' | VendorStatus>('All');
   const [activeStep, setActiveStep] = useState<1 | 2 | 3>(1);
@@ -384,6 +386,9 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
           min-height: 100vh;
           width: 100%;
         }
+        .flow-demo-layout--two-col {
+          grid-template-columns: 236px minmax(0, 1fr);
+        }
         .flow-demo-detail-grid {
           display: grid;
           grid-template-columns: minmax(0, 1.55fr) minmax(270px, 0.95fr);
@@ -411,7 +416,7 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
         }
       `}</style>
 
-      <div className="flow-demo-layout">
+      <div className={`flow-demo-layout${activeNav !== 'vendors' ? ' flow-demo-layout--two-col' : ''}`}>
         {/* ================================================================
             COLUMN 1: CLEAN LEFT NAVIGATION SIDEBAR
         ================================================================ */}
@@ -495,15 +500,23 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
                       <Icon size={17} style={{ opacity: isActive ? 1 : 0.78 }} />
                       <span>{item.label}</span>
                     </span>
-                    {item.badge && (
-                      <Badge
-                        size="sm"
-                        variant="filled"
-                        tone={item.badgeTone}
-                      >
-                        {item.badge}
-                      </Badge>
-                    )}
+                    {(() => {
+                      const badgeText =
+                        item.id === 'notifications'
+                          ? unreadNotifications > 0
+                            ? String(unreadNotifications)
+                            : undefined
+                          : item.badge;
+                      return badgeText ? (
+                        <Badge
+                          size="sm"
+                          variant="filled"
+                          tone={item.badgeTone}
+                        >
+                          {badgeText}
+                        </Badge>
+                      ) : null;
+                    })()}
                   </button>
                 );
               })}
@@ -605,6 +618,7 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
         {/* ================================================================
             COLUMN 2: VENDORS MASTER LIST (FEWER, LARGER ITEMS)
         ================================================================ */}
+        {activeNav === 'vendors' && (
         <section
           className="flow-demo-list-col"
           style={{
@@ -750,6 +764,7 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
             })}
           </div>
         </section>
+        )}
 
         {/* ================================================================
             COLUMN 3: SPACIOUS MAIN ONBOARDING WORKSPACE
@@ -795,11 +810,19 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
                 <ArrowLeft size={13} />
                 <span>uxiGL Landing</span>
               </button>
-              <span>Vendors</span>
-              <span style={{ opacity: 0.45 }}>&gt;</span>
-              <span style={{ color: palette.text, fontWeight: 600 }}>
-                {selectedVendor.name}
+              <span>
+                {activeNav === 'vendors'
+                  ? 'Vendors'
+                  : NAV_ITEMS.find((n) => n.id === activeNav)?.label ?? 'Workspace'}
               </span>
+              {activeNav === 'vendors' && (
+                <>
+                  <span style={{ opacity: 0.45 }}>&gt;</span>
+                  <span style={{ color: palette.text, fontWeight: 600 }}>
+                    {selectedVendor.name}
+                  </span>
+                </>
+              )}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -844,6 +867,24 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
             </div>
           </div>
 
+          {activeNav !== 'vendors' ? (
+            <FlowWorkspaceInnerPages
+              activeNav={activeNav}
+              palette={palette}
+              isDark={isDark}
+              vendors={vendors}
+              onSelectVendor={(vendorId) => {
+                setSelectedVendorId(vendorId);
+                setActiveNav('vendors');
+              }}
+              onSelectNav={(navId) => setActiveNav(navId)}
+              onToggleTheme={toggleMode}
+              notify={notify}
+              unreadNotifications={unreadNotifications}
+              onUpdateUnreadNotifications={setUnreadNotifications}
+            />
+          ) : (
+            <>
           {/* Title Block */}
           <div>
             <h1
@@ -1424,6 +1465,8 @@ export const FlowWorkspaceDemo: React.FC<FlowWorkspaceDemoProps> = ({
               </div>
             </div>
           </div>
+            </>
+          )}
         </main>
       </div>
 
