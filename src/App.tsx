@@ -68,10 +68,14 @@ import {
 import { ThemeStudioDrawer } from './features/theme-studio/ThemeStudioDrawer';
 import { UXILandingPage } from './features/landing/UXILandingPage';
 import { FlowWorkspaceDemo } from './features/demos/FlowWorkspaceDemo';
+import { CargoGLDemo } from './features/demos/CargoGLDemo';
+import { SynthGLDemo } from './features/demos/SynthGLDemo';
 
 export type MainSectionId =
   | 'landing'
   | 'demo-flow'
+  | 'demo-cargo'
+  | 'demo-synth'
   | 'docs-guide'
   | 'dashboard'
   | 'components-inputs'
@@ -948,7 +952,40 @@ export const App: React.FC = () => {
             overflowY: 'auto',
           }}
         >
-          <FlowWorkspaceDemo onNavigate={handleSidebarSelect} />
+          <FlowWorkspaceDemo
+            onNavigate={handleSidebarSelect}
+            onOpenThemeStudio={() => setThemeDrawerOpen(true)}
+          />
+        </div>
+      ) : activeSectionId === 'demo-cargo' ? (
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100vh',
+            overflowY: 'auto',
+          }}
+        >
+          <CargoGLDemo
+            onNavigate={handleSidebarSelect}
+            onOpenThemeStudio={() => setThemeDrawerOpen(true)}
+          />
+        </div>
+      ) : activeSectionId === 'demo-synth' ? (
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100vh',
+            overflowY: 'auto',
+          }}
+        >
+          <SynthGLDemo
+            onNavigate={handleSidebarSelect}
+            onOpenThemeStudio={() => setThemeDrawerOpen(true)}
+          />
         </div>
       ) : (
         <>

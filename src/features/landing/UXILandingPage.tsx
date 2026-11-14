@@ -159,10 +159,10 @@ export default function App() {
     typeof preferences.customRadiusPx === 'number'
       ? preferences.customRadiusPx
       : preferences.radiusScale === 'sharp'
-      ? 4
-      : preferences.radiusScale === 'pill'
-      ? 22
-      : 12;
+        ? 4
+        : preferences.radiusScale === 'pill'
+          ? 22
+          : 12;
 
   const colors = {
     bg: isDark ? '#06080F' : '#F8FAFC',
@@ -185,99 +185,99 @@ export default function App() {
 
   const features = isTR
     ? [
-        {
-          icon: '✨',
-          title: 'Liquid Glass & Katmanlı Yüzey Malzemeleri',
-          desc: 'Gezinme ve kontrol katmanında yüzen Liquid Glass (Regular & Clear), içerik katmanında ise 4 kademeli Standart Yüzey Malzemeleri (UltraThin, Thin, Regular, Thick) ve Vibrancy hiyerarşisi.',
-        },
-        {
-          icon: '🎨',
-          title: 'Dinamik Tonlama (Dynamic Tonal) & 0–32px Border Radius',
-          desc: '6 hazır tohum renk paleti (Sapphire Blue, Royal Iris, Emerald Mint, Solar Coral, Amber Gold, Titanium Mono) ve 0px ile 32px arasında anlık ayarlanabilir köşe geometrisi.',
-        },
-        {
-          icon: '📊',
-          title: 'SheetGL WebGL Tablo + Native DataTable',
-          desc: '100.000+ satır için 4 kurumsal senaryolu (Finans, Telemetri, İK, Stok) SheetGL kanvas tablosu ve sıfır GPU yüküyle çalışan 4 varyantlı semantik HTML <DataTable />.',
-        },
-        {
-          icon: '🗂️',
-          title: 'FileManGL WebGL2 Sanal Dosya Sistemi (VFS)',
-          desc: 'Sekmeli Windows 11 gezgin deneyimi, 3D uzamsal sahne (webgl_spatial), disk ısı haritası (webgl_diskmap) ve 5 katmanlı NTFS ACL + POSIX (0755) izin motoru.',
-        },
-        {
-          icon: '🔗',
-          title: 'Gerçek URL Route & localStorage Kalıcılığı',
-          desc: 'Her sayfa, alt menü ve bileşen kendi URL adresine (/dashboard/*, /components/*, /docs/*) sahiptir. Tema, font ölçeği ve border-radius tercihleri F5 sonrasında korunur.',
-        },
-        {
-          icon: '⚡',
-          title: 'Sıfır Kaynak Tüketimli Eko-Mimari & SOLID',
-          desc: 'Opsiyonel düşük çözünürlüklü WebGL ambiyansı, tek-aktif-motor (Single-Active-Engine) politikası ve Bağımlılıkların Tersine Çevrilmesi (DIP) prensipleriyle %0 boşta CPU/GPU yükü.',
-        },
-      ]
+      {
+        icon: '✨',
+        title: 'Liquid Glass & Katmanlı Yüzey Malzemeleri',
+        desc: 'Gezinme ve kontrol katmanında yüzen Liquid Glass (Regular & Clear), içerik katmanında ise 4 kademeli Standart Yüzey Malzemeleri (UltraThin, Thin, Regular, Thick) ve Vibrancy hiyerarşisi.',
+      },
+      {
+        icon: '🎨',
+        title: 'Dinamik Tonlama (Dynamic Tonal) & 0–32px Border Radius',
+        desc: '6 hazır tohum renk paleti (Sapphire Blue, Royal Iris, Emerald Mint, Solar Coral, Amber Gold, Titanium Mono) ve 0px ile 32px arasında anlık ayarlanabilir köşe geometrisi.',
+      },
+      {
+        icon: '📊',
+        title: 'SheetGL WebGL Tablo + Native DataTable',
+        desc: '100.000+ satır için 4 kurumsal senaryolu (Finans, Telemetri, İK, Stok) SheetGL kanvas tablosu ve sıfır GPU yüküyle çalışan 4 varyantlı semantik HTML <DataTable />.',
+      },
+      {
+        icon: '🗂️',
+        title: 'FileManGL WebGL2 Sanal Dosya Sistemi (VFS)',
+        desc: 'Sekmeli Windows 11 gezgin deneyimi, 3D uzamsal sahne (webgl_spatial), disk ısı haritası (webgl_diskmap) ve 5 katmanlı NTFS ACL + POSIX (0755) izin motoru.',
+      },
+      {
+        icon: '🔗',
+        title: 'Gerçek URL Route & localStorage Kalıcılığı',
+        desc: 'Her sayfa, alt menü ve bileşen kendi URL adresine (/dashboard/*, /components/*, /docs/*) sahiptir. Tema, font ölçeği ve border-radius tercihleri F5 sonrasında korunur.',
+      },
+      {
+        icon: '⚡',
+        title: 'Sıfır Kaynak Tüketimli Eko-Mimari & SOLID',
+        desc: 'Opsiyonel düşük çözünürlüklü WebGL ambiyansı, tek-aktif-motor (Single-Active-Engine) politikası ve Bağımlılıkların Tersine Çevrilmesi (DIP) prensipleriyle %0 boşta CPU/GPU yükü.',
+      },
+    ]
     : [
-        {
-          icon: '✨',
-          title: 'Liquid Glass & Standard Materials',
-          desc: 'Floating Liquid Glass (Regular & Clear) for navigation and transient controls, paired with 4-tier Standard Materials and Vibrancy for the content layer.',
-        },
-        {
-          icon: '🎨',
-          title: 'Dynamic Tonal Engine & 0–32px Border Radius',
-          desc: '6 seed color palettes with automatic dark/light tonal adaptation and a live 0px–32px border-radius engine persisted in localStorage.',
-        },
-        {
-          icon: '📊',
-          title: 'SheetGL WebGL Grid + Native DataTable',
-          desc: 'Includes 4 enterprise SheetGL presets (Finance, Telemetry, HR, Inventory) plus a lightweight 4-variant semantic HTML <DataTable />.',
-        },
-        {
-          icon: '🗂️',
-          title: 'FileManGL WebGL2 Virtual File System (VFS)',
-          desc: 'Tabbed Windows 11 explorer UX, 3D spatial view, interactive disk treemap, and 5-layer NTFS ACL + POSIX (0755) permission engine.',
-        },
-        {
-          icon: '🔗',
-          title: 'Clean URL Routing & Persistent State',
-          desc: 'Every page, sub-menu, and component has a dedicated URL route (/dashboard/*, /components/*, /docs/*) with HTML5 History API support.',
-        },
-        {
-          icon: '⚡',
-          title: 'Zero Idle Resource Architecture & SOLID',
-          desc: 'Single-active-engine lifecycle and strict backdrop-filter discipline keep idle CPU & GPU usage near 0%.',
-        },
-      ];
+      {
+        icon: '✨',
+        title: 'Liquid Glass & Standard Materials',
+        desc: 'Floating Liquid Glass (Regular & Clear) for navigation and transient controls, paired with 4-tier Standard Materials and Vibrancy for the content layer.',
+      },
+      {
+        icon: '🎨',
+        title: 'Dynamic Tonal Engine & 0–32px Border Radius',
+        desc: '6 seed color palettes with automatic dark/light tonal adaptation and a live 0px–32px border-radius engine persisted in localStorage.',
+      },
+      {
+        icon: '📊',
+        title: 'SheetGL WebGL Grid + Native DataTable',
+        desc: 'Includes 4 enterprise SheetGL presets (Finance, Telemetry, HR, Inventory) plus a lightweight 4-variant semantic HTML <DataTable />.',
+      },
+      {
+        icon: '🗂️',
+        title: 'FileManGL WebGL2 Virtual File System (VFS)',
+        desc: 'Tabbed Windows 11 explorer UX, 3D spatial view, interactive disk treemap, and 5-layer NTFS ACL + POSIX (0755) permission engine.',
+      },
+      {
+        icon: '🔗',
+        title: 'Clean URL Routing & Persistent State',
+        desc: 'Every page, sub-menu, and component has a dedicated URL route (/dashboard/*, /components/*, /docs/*) with HTML5 History API support.',
+      },
+      {
+        icon: '⚡',
+        title: 'Zero Idle Resource Architecture & SOLID',
+        desc: 'Single-active-engine lifecycle and strict backdrop-filter discipline keep idle CPU & GPU usage near 0%.',
+      },
+    ];
 
   const faqs = isTR
     ? [
-        {
-          q: 'Neden proje adı uxiGL olarak seçildi?',
-          a: 'uxiGL; User Experience (UX), User Interface (UI) ve donanım hızlandırmalı GL (SheetGL & FileManGL) ekosisteminin tek bir çatı altında birleşimini simgeler.',
-        },
-        {
-          q: 'uxiGL içinde hem SheetGL hem de FileManGL hazır geliyor mu?',
-          a: 'Evet! SheetGL (WebGL veri tablosu + 4 kurumsal senaryo) ve FileManGL (WebGL2 sanal dosya yöneticisi) uxiGL mimarisine tam entegredir. Ayrıca hafif tablolar için sıfır GPU yüküyle çalışan native <DataTable /> bileşeni de mevcuttur.',
-        },
-        {
-          q: 'Border Radius, Font Ölçeği ve Tema seçimleri sayfa yenilenince (F5) korunuyor mu?',
-          a: 'Evet. Tüm görünüm tercihleri (Dark/Light mod, 6 tohum renk paleti, 0px–32px Border Radius, %80–%125 yazı boyutu ve aktif URL route) localStorage üzerinde anında saklanır.',
-        },
-      ]
+      {
+        q: 'Neden proje adı uxiGL olarak seçildi?',
+        a: 'uxiGL; User Experience (UX), User Interface (UI) ve donanım hızlandırmalı GL (SheetGL & FileManGL) ekosisteminin tek bir çatı altında birleşimini simgeler.',
+      },
+      {
+        q: 'uxiGL içinde hem SheetGL hem de FileManGL hazır geliyor mu?',
+        a: 'Evet! SheetGL (WebGL veri tablosu + 4 kurumsal senaryo) ve FileManGL (WebGL2 sanal dosya yöneticisi) uxiGL mimarisine tam entegredir. Ayrıca hafif tablolar için sıfır GPU yüküyle çalışan native <DataTable /> bileşeni de mevcuttur.',
+      },
+      {
+        q: 'Border Radius, Font Ölçeği ve Tema seçimleri sayfa yenilenince (F5) korunuyor mu?',
+        a: 'Evet. Tüm görünüm tercihleri (Dark/Light mod, 6 tohum renk paleti, 0px–32px Border Radius, %80–%125 yazı boyutu ve aktif URL route) localStorage üzerinde anında saklanır.',
+      },
+    ]
     : [
-        {
-          q: 'Why is the project named uxiGL?',
-          a: 'uxiGL represents the convergence of User Experience (UX), User Interface (UI), and our GL engine family (SheetGL & FileManGL) into a unified design system.',
-        },
-        {
-          q: 'Are SheetGL and FileManGL built directly into uxiGL?',
-          a: 'Yes! Both SheetGL (Canvas/WebGL DataGrid) and FileManGL (WebGL2 Virtual File System) are natively integrated alongside uxiGL’s lightweight semantic <DataTable />.',
-        },
-        {
-          q: 'Do Border Radius, Font Scale, and Theme preferences persist across F5 reloads?',
-          a: 'Yes. All theme tokens (Dark/Light mode, 6 seed palettes, 0px–32px Border Radius, 80%–125% font scale) and URL routes persist automatically.',
-        },
-      ];
+      {
+        q: 'Why is the project named uxiGL?',
+        a: 'uxiGL represents the convergence of User Experience (UX), User Interface (UI), and our GL engine family (SheetGL & FileManGL) into a unified design system.',
+      },
+      {
+        q: 'Are SheetGL and FileManGL built directly into uxiGL?',
+        a: 'Yes! Both SheetGL (Canvas/WebGL DataGrid) and FileManGL (WebGL2 Virtual File System) are natively integrated alongside uxiGL’s lightweight semantic <DataTable />.',
+      },
+      {
+        q: 'Do Border Radius, Font Scale, and Theme preferences persist across F5 reloads?',
+        a: 'Yes. All theme tokens (Dark/Light mode, 6 seed palettes, 0px–32px Border Radius, 80%–125% font scale) and URL routes persist automatically.',
+      },
+    ];
 
   return (
     <div
@@ -616,8 +616,8 @@ export default function App() {
                     ? 'Stüdyo'
                     : 'Studio'
                   : isTR
-                  ? 'Uygulamaya Git'
-                  : 'Launch uxiGL'}
+                    ? 'Uygulamaya Git'
+                    : 'Launch uxiGL'}
               </span>
               <span style={{ fontSize: isMobile ? 13 : 15 }}>→</span>
             </a>
@@ -1020,8 +1020,8 @@ export default function App() {
                 backgroundColor: showQuickUsage
                   ? 'rgba(16, 185, 129, 0.18)'
                   : isDark
-                  ? 'rgba(255, 255, 255, 0.04)'
-                  : '#FFFFFF',
+                    ? 'rgba(255, 255, 255, 0.04)'
+                    : '#FFFFFF',
                 color: showQuickUsage ? '#10B981' : colors.text,
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: 11.5,
@@ -1034,8 +1034,8 @@ export default function App() {
                   ? 'Örnek Kodu Gizle'
                   : 'Hide Code'
                 : isTR
-                ? 'Örnek Kullanım (TSX)'
-                : 'Code Usage (TSX)'}
+                  ? 'Örnek Kullanım (TSX)'
+                  : 'Code Usage (TSX)'}
             </button>
           </div>
 
@@ -1314,7 +1314,7 @@ export default function App() {
                       ? '/demos/enterprise-cockpit-dark.jpg'
                       : '/demos/enterprise-cockpit-light.jpg'
                   }
-                  alt="Enterprise Cockpit — uxiGL Demo"
+                  alt="EnterpriseGL — uxiGL Demo"
                   style={{
                     width: '100%',
                     height: '100%',
@@ -1327,7 +1327,7 @@ export default function App() {
               <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                   <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
-                    Enterprise Cockpit
+                    EnterpriseGL
                   </h3>
                   <Badge size="sm" variant="tonal" tone="info">
                     {isTR ? 'Veri Yoğun' : 'Data Dense'}
@@ -1387,7 +1387,7 @@ export default function App() {
                       ? '/demos/flow-workspace-dark.jpg'
                       : '/demos/flow-workspace-light.jpg'
                   }
-                  alt="Flow Workspace — uxiGL Clean UI Demo"
+                  alt="FlowGL — uxiGL Clean UI Demo"
                   style={{
                     width: '100%',
                     height: '100%',
@@ -1400,7 +1400,7 @@ export default function App() {
               <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                   <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
-                    Flow Workspace
+                    FlowGL
                   </h3>
                   <Badge size="sm" variant="tonal" tone="success">
                     {isTR ? 'Clean & Ferah UI' : 'Clean & Spacious UI'}
@@ -1417,6 +1417,152 @@ export default function App() {
                     variant="filled"
                     size="sm"
                     onClick={() => onNavigate('demo-flow', 'flow-workspace')}
+                  >
+                    {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* DEMO 3: CARGOGL (LOGISTICS & FLEET SUITE) */}
+            <div
+              style={{
+                borderRadius: currentRadiusPx + 4,
+                backgroundColor: colors.card,
+                border: `1px solid ${colors.cardBorder}`,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: isDark
+                  ? '0 20px 50px rgba(0, 0, 0, 0.5)'
+                  : '0 16px 40px rgba(15, 23, 42, 0.08)',
+              }}
+            >
+              <a
+                href="/demos/cargogl"
+                onClick={(e) => {
+                  if (RouteService.isModifiedClick(e)) return;
+                  e.preventDefault();
+                  onNavigate('demo-cargo', 'cargogl');
+                }}
+                style={{
+                  display: 'block',
+                  position: 'relative',
+                  aspectRatio: '16 / 10',
+                  overflow: 'hidden',
+                  borderBottom: `1px solid ${colors.cardBorder}`,
+                  backgroundColor: isDark ? '#0B0F17' : '#F8FAFC',
+                }}
+              >
+                <img
+                  src={
+                    isDark
+                      ? '/demos/cargogl-dark.jpg'
+                      : '/demos/cargogl-light.jpg'
+                  }
+                  alt="CargoGL — uxiGL Smart Logistics Demo"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top left',
+                    display: 'block',
+                  }}
+                />
+              </a>
+              <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
+                    CargoGL
+                  </h3>
+                  <Badge size="sm" variant="tonal" tone="primary">
+                    {isTR ? 'Lojistik & Filo' : 'Logistics & Fleet'}
+                  </Badge>
+                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: colors.muted, lineHeight: 1.6, flex: 1 }}>
+                  {isTR
+                    ? 'Sparkline KPI kartları, canlı sevkiyat zaman çizelgesi, rota grafikleri ve Tema Stüdyosu uyumlu akıllı lojistik yönetim paneli.'
+                    : 'Smart logistics command center featuring sparkline KPIs, live shipment timeline, route progress charts, and Theme Studio sync.'}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 6 }}>
+                  <code style={{ fontSize: 12, color: colors.muted }}>/demos/cargogl</code>
+                  <Button
+                    variant="filled"
+                    size="sm"
+                    onClick={() => onNavigate('demo-cargo', 'cargogl')}
+                  >
+                    {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* DEMO 4: SYNTHGL (AI WORKFLOW & AGENT ORCHESTRATION) */}
+            <div
+              style={{
+                borderRadius: currentRadiusPx + 4,
+                backgroundColor: colors.card,
+                border: `1px solid ${colors.cardBorder}`,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: isDark
+                  ? '0 20px 50px rgba(0, 0, 0, 0.5)'
+                  : '0 16px 40px rgba(15, 23, 42, 0.08)',
+              }}
+            >
+              <a
+                href="/demos/synthgl"
+                onClick={(e) => {
+                  if (RouteService.isModifiedClick(e)) return;
+                  e.preventDefault();
+                  onNavigate('demo-synth', 'synthgl');
+                }}
+                style={{
+                  display: 'block',
+                  position: 'relative',
+                  aspectRatio: '16 / 10',
+                  overflow: 'hidden',
+                  borderBottom: `1px solid ${colors.cardBorder}`,
+                  backgroundColor: isDark ? '#0B0F17' : '#F8FAFC',
+                }}
+              >
+                <img
+                  src={
+                    isDark
+                      ? '/demos/synthgl-dark.jpg'
+                      : '/demos/synthgl-light.jpg'
+                  }
+                  alt="SynthGL — uxiGL AI Workflow Demo"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top left',
+                    display: 'block',
+                  }}
+                />
+              </a>
+              <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
+                    SynthGL
+                  </h3>
+                  <Badge size="sm" variant="tonal" tone="info">
+                    {isTR ? 'AI İş Akışı' : 'AI Orchestration'}
+                  </Badge>
+                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: colors.muted, lineHeight: 1.6, flex: 1 }}>
+                  {isTR
+                    ? 'Ajan orkestrasyonu, gruplanmış performans grafikleri, canlı bildirim akışı ve Tema Stüdyosu uyumlu yapay zeka stüdyosu.'
+                    : 'AI workflow orchestration studio featuring grouped performance charts, live notification feed, agent roster, and Theme Studio sync.'}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 6 }}>
+                  <code style={{ fontSize: 12, color: colors.muted }}>/demos/synthgl</code>
+                  <Button
+                    variant="filled"
+                    size="sm"
+                    onClick={() => onNavigate('demo-synth', 'synthgl')}
                   >
                     {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
                   </Button>

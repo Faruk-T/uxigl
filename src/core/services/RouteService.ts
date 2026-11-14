@@ -10,6 +10,8 @@
 export type RouteMainSectionId =
   | 'landing'
   | 'demo-flow'
+  | 'demo-cargo'
+  | 'demo-synth'
   | 'docs-guide'
   | 'dashboard'
   | 'components-inputs'
@@ -99,6 +101,10 @@ export class RouteService {
         return '/';
       case 'demo-flow':
         return '/demos/flow-workspace';
+      case 'demo-cargo':
+        return '/demos/cargogl';
+      case 'demo-synth':
+        return '/demos/synthgl';
       case 'docs-guide': {
         const sub =
           subItemId && DOCS_TOPIC_IDS.has(subItemId)
@@ -193,6 +199,20 @@ export class RouteService {
     }
 
     if (first === 'demos' || first === 'demo') {
+      if (second === 'cargogl' || second === 'cargo' || second === 'shipflow') {
+        return {
+          sectionId: 'demo-cargo',
+          subItemId: 'cargogl',
+          path: '/demos/cargogl',
+        };
+      }
+      if (second === 'synthgl' || second === 'synth' || second === 'flowai') {
+        return {
+          sectionId: 'demo-synth',
+          subItemId: 'synthgl',
+          path: '/demos/synthgl',
+        };
+      }
       return {
         sectionId: 'demo-flow',
         subItemId: 'flow-workspace',
