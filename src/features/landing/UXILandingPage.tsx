@@ -14,6 +14,8 @@ import {
 import { UXILogo } from '../../components/brand/UXILogo';
 import { GithubIcon } from '../../components/brand/GithubIcon';
 import {
+  Badge,
+  Button,
   Switch,
   Slider,
   Progress,
@@ -1213,6 +1215,207 @@ export default function App() {
               </span>
             </a>
           ))}
+        </div>
+
+        {/* ====================================================================
+            ALTERNATIVE UXIGL DEMOS SHOWCASE (#demos)
+        ==================================================================== */}
+        <div
+          id="demos"
+          style={{
+            maxWidth: 1220,
+            margin: isMobile ? '28px auto 34px' : '42px auto 48px',
+            textAlign: 'left',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              gap: 12,
+              marginBottom: 18,
+              padding: '0 4px',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: '#38BDF8',
+                  marginBottom: 6,
+                }}
+              >
+                {isTR ? 'İKİ FARKLI ARAYÜZ YAKLAŞIMI' : 'TWO DISTINCT UI PARADIGMS'}
+              </div>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: isMobile ? 22 : 28,
+                  fontWeight: 800,
+                  letterSpacing: '-0.025em',
+                  color: colors.text,
+                }}
+              >
+                {isTR ? 'uxiGL Canlı Demo Koleksiyonu' : 'uxiGL Live Demo Collection'}
+              </h2>
+            </div>
+            <div style={{ fontSize: 13.5, color: colors.muted }}>
+              {isTR
+                ? 'Aynı uxiGL çekirdeği ile üretilmiş yoğun kurumsal ve ferah clean UI demoları'
+                : 'Dense enterprise cockpit & spacious clean UI demos built with the same uxiGL core'}
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, minmax(0, 1fr))',
+              gap: 20,
+            }}
+          >
+            {/* DEMO 1: ENTERPRISE COCKPIT (EXISTING) */}
+            <div
+              style={{
+                borderRadius: currentRadiusPx + 4,
+                backgroundColor: colors.card,
+                border: `1px solid ${colors.cardBorder}`,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: isDark
+                  ? '0 20px 50px rgba(0, 0, 0, 0.5)'
+                  : '0 16px 40px rgba(15, 23, 42, 0.08)',
+              }}
+            >
+              <a
+                href="/dashboard/overview"
+                onClick={(e) => {
+                  if (RouteService.isModifiedClick(e)) return;
+                  e.preventDefault();
+                  onNavigate('dashboard', 'overview');
+                }}
+                style={{
+                  display: 'block',
+                  position: 'relative',
+                  aspectRatio: '16 / 10',
+                  overflow: 'hidden',
+                  borderBottom: `1px solid ${colors.cardBorder}`,
+                  backgroundColor: '#0F172A',
+                }}
+              >
+                <img
+                  src="/demos/enterprise-cockpit.jpg"
+                  alt="Enterprise Cockpit — uxiGL Demo"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top left',
+                    display: 'block',
+                  }}
+                />
+              </a>
+              <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
+                    Enterprise Cockpit
+                  </h3>
+                  <Badge size="sm" variant="tonal" tone="info">
+                    {isTR ? 'Veri Yoğun' : 'Data Dense'}
+                  </Badge>
+                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: colors.muted, lineHeight: 1.6, flex: 1 }}>
+                  {isTR
+                    ? 'KPI metrik kartları, etkileşimli grafikler, SheetGL WebGL tablo ve FileManGL VFS dosya yöneticisini tek ekranda birleştiren kapsamlı kurumsal yönetim paneli.'
+                    : 'Comprehensive enterprise command center combining KPI cards, interactive charts, SheetGL WebGL DataGrid, and FileManGL VFS.'}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 6 }}>
+                  <code style={{ fontSize: 12, color: colors.muted }}>/dashboard/overview</code>
+                  <Button
+                    variant="outlined"
+                    size="sm"
+                    onClick={() => onNavigate('dashboard', 'overview')}
+                  >
+                    {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* DEMO 2: FLOW WORKSPACE (NEW CLEAN UI) */}
+            <div
+              style={{
+                borderRadius: currentRadiusPx + 4,
+                backgroundColor: colors.card,
+                border: `1px solid ${colors.cardBorder}`,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: isDark
+                  ? '0 20px 50px rgba(0, 0, 0, 0.5)'
+                  : '0 16px 40px rgba(15, 23, 42, 0.08)',
+              }}
+            >
+              <a
+                href="/demos/flow-workspace"
+                onClick={(e) => {
+                  if (RouteService.isModifiedClick(e)) return;
+                  e.preventDefault();
+                  onNavigate('demo-flow', 'flow-workspace');
+                }}
+                style={{
+                  display: 'block',
+                  position: 'relative',
+                  aspectRatio: '16 / 10',
+                  overflow: 'hidden',
+                  borderBottom: `1px solid ${colors.cardBorder}`,
+                  backgroundColor: '#0B0F17',
+                }}
+              >
+                <img
+                  src="/demos/flow-workspace.jpg"
+                  alt="Flow Workspace — uxiGL Clean UI Demo"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'top left',
+                    display: 'block',
+                  }}
+                />
+              </a>
+              <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
+                    Flow Workspace
+                  </h3>
+                  <Badge size="sm" variant="tonal" tone="success">
+                    {isTR ? 'Clean & Ferah UI' : 'Clean & Spacious UI'}
+                  </Badge>
+                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: colors.muted, lineHeight: 1.6, flex: 1 }}>
+                  {isTR
+                    ? 'Daha az obje, daha büyük kartlar ve yüksek boşluk oranıyla tasarlanmış 3 kolonlu master-detail vendor onboarding ve doğrulama arayüzü.'
+                    : '3-column master-detail vendor onboarding & verification UI designed with fewer objects, larger cards, and generous whitespace.'}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 6 }}>
+                  <code style={{ fontSize: 12, color: colors.muted }}>/demos/flow-workspace</code>
+                  <Button
+                    variant="filled"
+                    size="sm"
+                    onClick={() => onNavigate('demo-flow', 'flow-workspace')}
+                  >
+                    {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ====================================================================

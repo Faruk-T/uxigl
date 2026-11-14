@@ -9,6 +9,7 @@
 
 export type RouteMainSectionId =
   | 'landing'
+  | 'demo-flow'
   | 'docs-guide'
   | 'dashboard'
   | 'components-inputs'
@@ -96,6 +97,8 @@ export class RouteService {
     switch (sectionId) {
       case 'landing':
         return '/';
+      case 'demo-flow':
+        return '/demos/flow-workspace';
       case 'docs-guide': {
         const sub =
           subItemId && DOCS_TOPIC_IDS.has(subItemId)
@@ -186,6 +189,14 @@ export class RouteService {
         sectionId: 'landing',
         subItemId: 'home',
         path: '/',
+      };
+    }
+
+    if (first === 'demos' || first === 'demo') {
+      return {
+        sectionId: 'demo-flow',
+        subItemId: 'flow-workspace',
+        path: '/demos/flow-workspace',
       };
     }
 

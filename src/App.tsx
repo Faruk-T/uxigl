@@ -67,9 +67,11 @@ import {
 } from './features/docs/ArchitectureDocsView';
 import { ThemeStudioDrawer } from './features/theme-studio/ThemeStudioDrawer';
 import { UXILandingPage } from './features/landing/UXILandingPage';
+import { FlowWorkspaceDemo } from './features/demos/FlowWorkspaceDemo';
 
 export type MainSectionId =
   | 'landing'
+  | 'demo-flow'
   | 'docs-guide'
   | 'dashboard'
   | 'components-inputs'
@@ -938,6 +940,18 @@ export const App: React.FC = () => {
             onNavigate={handleSidebarSelect}
             onOpenCommandPalette={() => setCmdPaletteOpen(true)}
           />
+        </div>
+      ) : activeSectionId === 'demo-flow' ? (
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100vh',
+            overflowY: 'auto',
+          }}
+        >
+          <FlowWorkspaceDemo onNavigate={handleSidebarSelect} />
         </div>
       ) : (
         <>
