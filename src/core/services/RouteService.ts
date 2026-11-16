@@ -63,7 +63,6 @@ export const DASHBOARD_VIEW_IDS = new Set([
   'overview',
   'analytics',
   'analytics-telemetry',
-  'dashboard/analytics-telemetry',
   'users',
   'products',
   'crm-orders',

@@ -164,7 +164,6 @@ describe('DASHBOARD_VIEW_IDS', () => {
     expect(DASHBOARD_VIEW_IDS.has('overview')).toBe(true);
     expect(DASHBOARD_VIEW_IDS.has('analytics')).toBe(true);
     expect(DASHBOARD_VIEW_IDS.has('analytics-telemetry')).toBe(true);
-    expect(DASHBOARD_VIEW_IDS.has('dashboard/analytics-telemetry')).toBe(true);
     expect(DASHBOARD_VIEW_IDS.has('settings')).toBe(true);
     expect(DASHBOARD_VIEW_IDS.has('file-manager')).toBe(true);
   });

@@ -1058,8 +1058,7 @@ export const App: React.FC = () => {
               )}
 
               {activeSectionId === 'dashboard' &&
-                (activeSubItemId === 'analytics-telemetry' ||
-                activeSubItemId === 'dashboard/analytics-telemetry' ? (
+                (activeSubItemId === 'analytics-telemetry' ? (
                   <AnalyticsDashboardView />
                 ) : (
                   <AppleGoogleAppShowcase

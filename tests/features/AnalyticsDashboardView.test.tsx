@@ -1,7 +1,9 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import React, { act } from 'react';
-import { createRoot, type Root } from 'react-dom/client';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import React from 'react';
+import { render, screen, cleanup } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
 
 // Stub out SheetGLGridAdapter's WebGL/Canvas rendering in jsdom while keeping
 // SHEETGL_PRESET_META intact and surfacing datasetPreset / initialRowCount props.
@@ -35,124 +37,83 @@ vi.mock(
 
 import { AnalyticsDashboardView } from '../../src/features/showcase/AnalyticsDashboardView';
 
-(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;
-
 describe('AnalyticsDashboardView', () => {
-  let container: HTMLDivElement;
-  let root: Root;
-
-  beforeEach(() => {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-    root = createRoot(container);
-  });
-
   afterEach(() => {
-    act(() => {
-      root.unmount();
-    });
-    container.remove();
+    cleanup();
   });
 
   it('renders default finance-erp scenario KPI metrics and compliance badges', () => {
-    act(() => {
-      root.render(React.createElement(AnalyticsDashboardView));
-    });
+    render(<AnalyticsDashboardView />);
 
-    const text = container.textContent ?? '';
-    expect(text).toContain('Analytics & Financial Telemetry');
-    expect(text).toContain('Live Ledger · 150 Rows');
-    expect(text).toContain('SOC2 · GDPR · ISO27001');
+    expect(
+      screen.getByRole('heading', { name: /Analytics & Financial Telemetry/i })
+    ).toBeInTheDocument();
+    expect(screen.getByText('Live Ledger · 150 Rows')).toBeInTheDocument();
+    expect(screen.getByText('SOC2 · GDPR · ISO27001')).toBeInTheDocument();
 
     // Finance & ERP KPI metrics
-    expect(text).toContain('Total Revenue');
-    expect(text).toContain('$4,820,450');
-    expect(text).toContain('Active Enterprise Accounts');
-    expect(text).toContain('28,490');
-    expect(text).toContain('Audit & SLA Compliance');
-    expect(text).toContain('99.99%');
+    expect(screen.getByText('Total Revenue')).toBeInTheDocument();
+    expect(screen.getByText('$4,820,450')).toBeInTheDocument();
+    expect(screen.getByText('Active Enterprise Accounts')).toBeInTheDocument();
+    expect(screen.getByText('28,490')).toBeInTheDocument();
+    expect(screen.getByText('Audit & SLA Compliance')).toBeInTheDocument();
+    expect(screen.getByText('99.99%')).toBeInTheDocument();
 
-    const gridStub = container.querySelector(
-      '[data-testid="sheetgl-grid-adapter-stub"]'
-    );
-    expect(gridStub?.getAttribute('data-preset')).toBe('finance-erp');
+    const gridStub = screen.getByTestId('sheetgl-grid-adapter-stub');
+    expect(gridStub).toHaveAttribute('data-preset', 'finance-erp');
+    expect(gridStub).toHaveAttribute('data-rows', '150');
   });
 
-  it('switches interactively across cloud-telemetry, hr-payroll, and inventory-supply scenarios', () => {
-    act(() => {
-      root.render(React.createElement(AnalyticsDashboardView));
-    });
-
-    const getTabByLabel = (label: string): HTMLButtonElement => {
-      const tabs = Array.from(
-        container.querySelectorAll<HTMLButtonElement>('[role="tab"]')
-      );
-      const match = tabs.find((tab) => tab.textContent?.includes(label));
-      if (!match) {
-        throw new Error(`Could not find tab with label "${label}"`);
-      }
-      return match;
-    };
+  it('switches interactively across cloud-telemetry, hr-payroll, and inventory-supply scenarios', async () => {
+    const user = userEvent.setup();
+    render(<AnalyticsDashboardView />);
 
     // 1. Switch to Cloud Telemetry ('cloud-telemetry')
-    act(() => {
-      getTabByLabel('Cloud Telemetry').click();
-    });
+    await user.click(screen.getByRole('tab', { name: /Cloud Telemetry/i }));
 
-    let text = container.textContent ?? '';
-    expect(text).toContain('K8s Cluster Stream · 150 Nodes');
-    expect(text).toContain('HPA Active · Zero-Trust Mesh');
-    expect(text).toContain('Cluster Throughput (RPS)');
-    expect(text).toContain('1.42M req/s');
-    expect(text).toContain('Global P99 Latency');
-    expect(text).toContain('8.4 ms');
-    expect(text).toContain('System Uptime SLA');
-    expect(text).toContain('99.99%');
-    expect(
-      container
-        .querySelector('[data-testid="sheetgl-grid-adapter-stub"]')
-        ?.getAttribute('data-preset')
-    ).toBe('cloud-telemetry');
+    expect(screen.getByText('K8s Cluster Stream · 150 Nodes')).toBeInTheDocument();
+    expect(screen.getByText('HPA Active · Zero-Trust Mesh')).toBeInTheDocument();
+    expect(screen.getByText('Cluster Throughput (RPS)')).toBeInTheDocument();
+    expect(screen.getByText('1.42M req/s')).toBeInTheDocument();
+    expect(screen.getByText('Global P99 Latency')).toBeInTheDocument();
+    expect(screen.getByText('8.4 ms')).toBeInTheDocument();
+    expect(screen.getByText('System Uptime SLA')).toBeInTheDocument();
+    expect(screen.getByText('99.99%')).toBeInTheDocument();
+    expect(screen.getByTestId('sheetgl-grid-adapter-stub')).toHaveAttribute(
+      'data-preset',
+      'cloud-telemetry'
+    );
 
     // 2. Switch to HR & Payroll ('hr-payroll')
-    act(() => {
-      getTabByLabel('HR & Payroll').click();
-    });
+    await user.click(screen.getByRole('tab', { name: /HR & Payroll/i }));
 
-    text = container.textContent ?? '';
-    expect(text).toContain('Workforce Matrix · 150 Staff');
-    expect(text).toContain('OKR Q4 · Global Payroll');
-    expect(text).toContain('Monthly Payroll & RSU');
-    expect(text).toContain('$2,140,800');
-    expect(text).toContain('Active Engineering & R&D');
-    expect(text).toContain('1,284');
-    expect(text).toContain('Mean OKR Attainment');
-    expect(text).toContain('91.4%');
-    expect(
-      container
-        .querySelector('[data-testid="sheetgl-grid-adapter-stub"]')
-        ?.getAttribute('data-preset')
-    ).toBe('hr-payroll');
+    expect(screen.getByText('Workforce Matrix · 150 Staff')).toBeInTheDocument();
+    expect(screen.getByText('OKR Q4 · Global Payroll')).toBeInTheDocument();
+    expect(screen.getByText('Monthly Payroll & RSU')).toBeInTheDocument();
+    expect(screen.getByText('$2,140,800')).toBeInTheDocument();
+    expect(screen.getByText('Active Engineering & R&D')).toBeInTheDocument();
+    expect(screen.getByText('1,284')).toBeInTheDocument();
+    expect(screen.getByText('Mean OKR Attainment')).toBeInTheDocument();
+    expect(screen.getByText('91.4%')).toBeInTheDocument();
+    expect(screen.getByTestId('sheetgl-grid-adapter-stub')).toHaveAttribute(
+      'data-preset',
+      'hr-payroll'
+    );
 
     // 3. Switch to Supply Chain ('inventory-supply')
-    act(() => {
-      getTabByLabel('Supply Chain').click();
-    });
+    await user.click(screen.getByRole('tab', { name: /Supply Chain/i }));
 
-    text = container.textContent ?? '';
-    expect(text).toContain('Live SKU Telemetry · 150 SKUs');
-    expect(text).toContain('Insured · 7 Global Hubs');
-    expect(text).toContain('Total Inventory Valuation');
-    expect(text).toContain('$18,940,200');
-    expect(text).toContain('Warehouse Capacity');
-    expect(text).toContain('84.6%');
-    expect(text).toContain('On-Time Dispatch SLA');
-    expect(text).toContain('98.7%');
-    expect(
-      container
-        .querySelector('[data-testid="sheetgl-grid-adapter-stub"]')
-        ?.getAttribute('data-preset')
-    ).toBe('inventory-supply');
+    expect(screen.getByText('Live SKU Telemetry · 150 SKUs')).toBeInTheDocument();
+    expect(screen.getByText('Insured · 7 Global Hubs')).toBeInTheDocument();
+    expect(screen.getByText('Total Inventory Valuation')).toBeInTheDocument();
+    expect(screen.getByText('$18,940,200')).toBeInTheDocument();
+    expect(screen.getByText('Warehouse Capacity')).toBeInTheDocument();
+    expect(screen.getByText('84.6%')).toBeInTheDocument();
+    expect(screen.getByText('On-Time Dispatch SLA')).toBeInTheDocument();
+    expect(screen.getByText('98.7%')).toBeInTheDocument();
+    expect(screen.getByTestId('sheetgl-grid-adapter-stub')).toHaveAttribute(
+      'data-preset',
+      'inventory-supply'
+    );
   });
 });
-
