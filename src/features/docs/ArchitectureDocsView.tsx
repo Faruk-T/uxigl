@@ -454,49 +454,49 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
         icon: <FileCode2 size={15} />,
         subItems: [
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-login',
             labelTr: 'Login & Auth (Split-Screen + Yüzen Cam)',
             labelEn: 'Login & Auth (Split-Screen + Floating Glass)',
             onSelect: () => setDocsPageTemplate('page-login'),
           },
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-register',
             labelTr: 'Register, Onboarding & 6 Haneli 2FA OTP',
             labelEn: 'Register, Onboarding & 6-Digit 2FA OTP',
             onSelect: () => setDocsPageTemplate('page-register'),
           },
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-pricing',
             labelTr: 'SaaS Pricing & Koltuk Hesaplayıcı',
             labelEn: 'SaaS Pricing & Seat Calculator',
             onSelect: () => setDocsPageTemplate('page-pricing'),
           },
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-profile',
             labelTr: 'User Profile & Geliştirici Portfolyosu',
             labelEn: 'User Profile & Developer Portfolio',
             onSelect: () => setDocsPageTemplate('page-profile'),
           },
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-invoice',
             labelTr: 'B2B e-Fatura & Kredi Kartı Checkout',
             labelEn: 'B2B e-Invoice & Credit Card Checkout',
             onSelect: () => setDocsPageTemplate('page-invoice'),
           },
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-kanban',
             labelTr: 'Kanban Sprint & Görev Panosu',
             labelEn: 'Kanban Sprint & Task Board',
             onSelect: () => setDocsPageTemplate('page-kanban'),
           },
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-status',
             labelTr: '404, 500 Bakım & Canlı SLA Monitörü',
             labelEn: '404, 500 Maintenance & Live SLA Monitor',
             onSelect: () => setDocsPageTemplate('page-status'),
           },
           {
-            id: 'doc-tpl-Stage',
+            id: 'doc-tpl-settings',
             labelTr: 'Enterprise Settings & Tercihler (Appearance, Account, Notifications)',
             labelEn: 'Enterprise Settings & Preferences (Appearance, Account, Notifications)',
             onSelect: () => setDocsPageTemplate('page-settings'),
@@ -582,7 +582,11 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
     setExpandedChapters((prev) => ({ ...prev, [chapterId]: true }));
     sub.onSelect?.();
     window.setTimeout(() => {
-      const el = document.getElementById(sub.id);
+      const el =
+        document.getElementById(sub.id) ??
+        (chapterId === 'page-templates'
+          ? document.getElementById('doc-tpl-stage')
+          : null);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -1426,7 +1430,7 @@ export function EnterprisePagesRouter() {
                 </Card>
               </div>
 
-              <div id="doc-tpl-Stage">
+              <div id="doc-tpl-stage">
                 <PageTemplatesShowcaseView
                   activePageId={docsPageTemplate}
                   onPageChange={setDocsPageTemplate}
