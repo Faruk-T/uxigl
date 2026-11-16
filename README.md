@@ -2,7 +2,7 @@
 
 > **Uniting User Experience (UX), User Interface (UI), and Hardware-Accelerated WebGL (`SheetGL` + `FileManGL`) into a Single Enterprise Architecture.**
 
-[![Version](https://img.shields.io/badge/version-2.7.0-0284c7.svg)](https://github.com/umitunc/uxigl)
+[![Version](https://img.shields.io/badge/version-2.8.4-0284c7.svg)](https://github.com/umitunc/uxigl)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg)](https://opensource.org/licenses/MIT)
 
@@ -38,7 +38,7 @@ The [`UXILogo`](src/components/brand/UXILogo.tsx) emblem reduces the three lette
 6. **Zero Idle CPU/GPU Resource Footprint & SOLID Principles:**
    - Single-Active-Engine policy ensures only one heavy canvas (`SheetGL` or `FileManGL`) is mounted per view.
    - Strict Dependency Inversion (`ThemeEngineService`, `StorageService`, `RouteService`) and Open/Closed component contracts.
-7. **7 Ready-Made Enterprise Page Templates (`PageTemplatesShowcaseView`):**
+7. **8 Ready-Made Enterprise Page Templates (`PageTemplatesShowcaseView` & `EnterpriseSettingsPage`):**
    - **Login & Auth (`page-login`):** Split-Screen Enterprise SSO + Centered Floating Liquid Glass card, Passkey/WebAuthn & password visibility toggle.
    - **Register & 2FA (`page-register`):** 3-step onboarding (Account -> Workspace Role -> 6-digit OTP verification) with live password strength meter.
    - **SaaS Pricing (`page-pricing`):** Annual/Monthly billing toggle, interactive Team Seat Calculator (`Slider`), 3-tier pricing cards & FAQ `Accordion`.
@@ -46,6 +46,7 @@ The [`UXILogo`](src/components/brand/UXILogo.tsx) emblem reduces the three lette
    - **B2B e-Fatura & Checkout (`page-invoice`):** Printable Turkish GİB e-Invoice line-item table with VAT (%20 KDV) breakdown + live interactive Credit Card preview.
    - **Kanban Sprint Board (`page-kanban`):** 4-column agile board (`Backlog`, `In Progress`, `Code Review`, `Completed`) with instant search filter, task creation & column movement.
    - **404, 500 & Live SLA Status (`page-status`):** 404 Not Found, 500 Planned Cluster Maintenance with Trace ID, and 90-day Uptime SLA Telemetry monitor.
+   - **Enterprise Settings & Preferences (`page-settings`):** Tabbed workspace configuration (`Appearance`, `Account`, `Notifications`) directly wired to `ThemeEngineService`, `StorageService` (`uxigl.workspace.settings.v1`), and persistent workspace preferences.
 
 ---
 
@@ -66,6 +67,7 @@ The [`UXILogo`](src/components/brand/UXILogo.tsx) emblem reduces the three lette
 | `/dashboard/page-invoice` | `PageTemplatesShowcaseView` | Printable B2B e-Fatura Table & Live Credit Card Checkout Preview |
 | `/dashboard/page-kanban` | `PageTemplatesShowcaseView` | 4-Column Agile Sprint & Task Management Board Demo |
 | `/dashboard/page-status` | `PageTemplatesShowcaseView` | 404 Not Found, 500 Cluster Maintenance & 90-Day Live Uptime SLA Monitor |
+| `/dashboard/page-settings` | `EnterpriseSettingsPage` | Enterprise Workspace Settings, Live Theme/Appearance Sync, Account Profile & Notification Preferences |
 | `/dashboard/smart-cluster` | `AppleGoogleAppShowcase` | AI Neural Engine Compilation & Hardware Cluster Controls |
 | `/components/inputs/:id` | `InteractivePlayground` | Form Controls (`button`, `input`, `switch`, `checkbox`, `slider`) |
 | `/components/surfaces/:id` | `InteractivePlayground` | Surfaces, Navigation & Page Templates (`card`, `segmented-control`, `tabs-accordion`, `sidebar`, `page-templates`, `modal-command`) |
