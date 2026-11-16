@@ -56,6 +56,7 @@ The [`UXILogo`](src/components/brand/UXILogo.tsx) emblem reduces the three lette
 | `/` | `UXILandingPage` | Full-screen `uxiGL` product landing page with live interactive preview & phonetic guide |
 | `/dashboard/overview` | `AppleGoogleAppShowcase` | Command Center Overview (KPIs, neural telemetry, native table & SheetGL summary) |
 | `/dashboard/analytics` | `AppleGoogleAppShowcase` | Live Analytics & Regional Performance Matrix |
+| `/dashboard/analytics-telemetry` | `AnalyticsDashboardView` | Interactive Multi-Scenario KPI Telemetry Dashboard (`SheetGL` Finance ERP, Cloud Telemetry, HR Payroll & Supply Chain) |
 | `/dashboard/crm-orders` | `SheetGLGridAdapter` | Full-page SheetGL (4 enterprise presets) + Native `<DataTable />` comparison |
 | `/dashboard/file-manager` | `FileManGLExplorerAdapter` | Full-page FileManGL WebGL2 Virtual File System Explorer |
 | `/dashboard/page-login` | `PageTemplatesShowcaseView` | Enterprise Split-Screen SSO & Centered Floating Glass Login Demo |
@@ -109,7 +110,7 @@ export default function App() {
     <ThemeProvider defaultTheme="system" defaultRadius={12}>
       <ToastProvider>
         <Card variant="glass" title="uxiGL Enterprise Dashboard">
-          <SheetGLGridAdapter scenario="saas_finance" />
+          <SheetGLGridAdapter datasetPreset="finance-erp" />
         </Card>
       </ToastProvider>
     </ThemeProvider>
@@ -122,6 +123,9 @@ export default function App() {
 ```bash
 # Start Vite development server
 npm run dev
+
+# Run Vitest unit & component test suite
+npm test
 
 # Build both demo SPA (dist/index.html) and npm library bundle (dist/lib)
 npm run build
