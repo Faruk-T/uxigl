@@ -13,37 +13,73 @@ import type { IdentifiableProps } from '../../../core/contracts/ComponentContrac
  * - 4 visual variants: `'default'` | `'striped'` | `'bordered'` | `'minimal'`
  * - 3 row densities: `'sm'` | `'md'` | `'lg'`
  * - Optional column sorting, instant search filter, and row selection checkboxes
+ * - Full WAI-ARIA semantics (`aria-sort`, `role="checkbox"`, `aria-checked`, keyboard navigation)
  */
 
+/** Visual variant options for {@link DataTable}. */
 export type NativeTableVariant = 'default' | 'striped' | 'bordered' | 'minimal';
+
+/** Row density scale options for {@link DataTable}. */
 export type NativeTableSize = 'sm' | 'md' | 'lg';
 
+/**
+ * Column schema definition for {@link DataTable}.
+ */
 export interface DataTableColumn<TRow> {
+  /** Property key on `TRow` bound to this column. */
   key: keyof TRow & string;
+  /** Visible column header label. */
   header: string;
+  /** Whether clicking or pressing Enter/Space on the column header sorts by this column. */
   sortable?: boolean;
+  /** Horizontal text alignment for cells in this column (defaults to `'left'`). */
   align?: 'left' | 'center' | 'right';
+  /** Optional explicit CSS width for the column header. */
   width?: string | number;
+  /** Optional custom cell renderer function. */
   render?: (row: TRow) => React.ReactNode;
 }
 
+/**
+ * Props contract for {@link DataTable}.
+ */
 export interface DataTableProps<TRow extends Record<string, unknown>>
   extends IdentifiableProps {
+  /** Array of column definitions. */
   columns: DataTableColumn<TRow>[];
+  /** Array of row records to display. */
   data: TRow[];
+  /** Unique identifier property key on each `TRow` record. */
   rowKey: keyof TRow & string;
+  /** Visual table surface variant (defaults to `'default'`). */
   variant?: NativeTableVariant;
+  /** Row padding density scale (defaults to `'md'`). */
   size?: NativeTableSize;
+  /** Enables the instant toolbar search filter input (defaults to `true`). */
   searchable?: boolean;
+  /** Enables per-row and select-all checkboxes (defaults to `false`). */
   selectable?: boolean;
+  /** Pins the `<thead>` during vertical scroll (defaults to `false`). */
   stickyHeader?: boolean;
+  /** Placeholder and accessible label for the search input. */
   searchPlaceholder?: string;
+  /** Message rendered when no rows match the current filter. */
   emptyMessage?: string;
+  /** Optional custom actions node rendered on the right side of the toolbar. */
   toolbarRight?: React.ReactNode;
+  /** Optional summary node rendered inside the table footer. */
   footerSummary?: React.ReactNode;
+  /** Optional callback fired when a body row is clicked. */
   onRowClick?: (row: TRow) => void;
 }
 
+/**
+ * Lightweight, zero-WebGL semantic HTML `<DataTable />` composite with built-in
+ * search filtering, WAI-ARIA sortable columns, and accessible row selection.
+ *
+ * @param props - {@link DataTableProps} configuration options.
+ * @returns Rendered semantic HTML table container.
+ */
 export function DataTable<TRow extends Record<string, unknown>>({
   id,
   className = '',
@@ -67,7 +103,8 @@ export function DataTable<TRow extends Record<string, unknown>>({
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
-  const handleSort = (key: keyof TRow & string) => {
+  const handleSort = (key: keyof TRow & string, sortable?: boolean) => {
+    if (!sortable) return;
     if (sortKey === key) {
       setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -114,8 +151,8 @@ export function DataTable<TRow extends Record<string, unknown>>({
     }
   };
 
-  const toggleRow = (keyStr: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const toggleRow = (keyStr: string, e?: React.SyntheticEvent) => {
+    e?.stopPropagation();
     setSelectedKeys((prev) => {
       const next = new Set(prev);
       if (next.has(keyStr)) {
@@ -149,6 +186,7 @@ export function DataTable<TRow extends Record<string, unknown>>({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={searchPlaceholder}
+                  aria-label={searchPlaceholder}
                   className="uxu-table-search__input"
                 />
               </div>
@@ -169,15 +207,24 @@ export function DataTable<TRow extends Record<string, unknown>>({
         </div>
       )}
 
-      <div
-        className={`uxu-table-scroll uxu-table-scroll--${variant}`}
-      >
+      <div className={`uxu-table-scroll uxu-table-scroll--${variant}`}>
         <table className={tableClasses}>
           <thead>
             <tr>
               {selectable && (
                 <th className="uxu-table__th-check" onClick={toggleAll}>
                   <span
+                    role="checkbox"
+                    aria-checked={allSelected}
+                    aria-label="Tüm satırları seç"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleAll();
+                      }
+                    }}
                     className={`uxu-table-check ${
                       allSelected ? 'uxu-table-check--checked' : ''
                     }`}
@@ -188,6 +235,14 @@ export function DataTable<TRow extends Record<string, unknown>>({
               )}
               {columns.map((col) => {
                 const isSorted = sortKey === col.key;
+                const ariaSort = col.sortable
+                  ? isSorted
+                    ? sortDir === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : 'none'
+                  : undefined;
+
                 return (
                   <th
                     key={col.key}
@@ -195,8 +250,20 @@ export function DataTable<TRow extends Record<string, unknown>>({
                       textAlign: col.align ?? 'left',
                       width: col.width,
                     }}
+                    aria-sort={ariaSort}
+                    tabIndex={col.sortable ? 0 : undefined}
                     className={col.sortable ? 'uxu-table__th--sortable' : ''}
-                    onClick={() => col.sortable && handleSort(col.key)}
+                    onClick={() => handleSort(col.key, col.sortable)}
+                    onKeyDown={
+                      col.sortable
+                        ? (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleSort(col.key, col.sortable);
+                            }
+                          }
+                        : undefined
+                    }
                   >
                     <span className="uxu-table__th-inner">
                       {col.header}
@@ -252,6 +319,16 @@ export function DataTable<TRow extends Record<string, unknown>>({
                         onClick={(e) => toggleRow(keyStr, e)}
                       >
                         <span
+                          role="checkbox"
+                          aria-checked={isSelected}
+                          aria-label={`Satır seç ${keyStr}`}
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              toggleRow(keyStr, e);
+                            }
+                          }}
                           className={`uxu-table-check ${
                             isSelected ? 'uxu-table-check--checked' : ''
                           }`}
