@@ -2,7 +2,7 @@
 
 > **Uniting User Experience (UX), User Interface (UI), and Hardware-Accelerated WebGL (`SheetGL` + `FileManGL`) into a Single Enterprise Architecture.**
 
-[![Version](https://img.shields.io/badge/version-2.8.4-0284c7.svg)](https://github.com/umitunc/uxigl)
+[![Version](https://img.shields.io/badge/version-2.8.5-0284c7.svg)](https://github.com/umitunc/uxigl)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6.svg)](https://www.typescriptlang.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg)](https://opensource.org/licenses/MIT)
 
@@ -55,6 +55,9 @@ The [`UXILogo`](src/components/brand/UXILogo.tsx) emblem reduces the three lette
 | URL Route | View / Module | Description |
 | :--- | :--- | :--- |
 | `/` | `UXILandingPage` | Full-screen `uxiGL` product landing page with live interactive preview & phonetic guide |
+| `/demos/flow-workspace` | `FlowWorkspaceDemo` | FlowGL Workspace — Full-screen enterprise productivity & inner pages showcase |
+| `/demos/cargogl` | `CargoGLDemo` | CargoGL — Global logistics, fleet telemetry & supply chain showcase |
+| `/demos/synthgl` | `SynthGLDemo` | SynthGL — AI orchestration, neural pipelines & model studio showcase |
 | `/dashboard/overview` | `AppleGoogleAppShowcase` | Command Center Overview (KPIs, neural telemetry, native table & SheetGL summary) |
 | `/dashboard/analytics` | `AppleGoogleAppShowcase` | Live Analytics & Regional Performance Matrix |
 | `/dashboard/analytics-telemetry` | `AnalyticsDashboardView` | Interactive Multi-Scenario KPI Telemetry Dashboard (`SheetGL` Finance ERP, Cloud Telemetry, HR Payroll & Supply Chain) |
