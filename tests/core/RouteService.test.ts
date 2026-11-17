@@ -9,6 +9,12 @@ describe('RouteService.buildPath', () => {
     expect(RouteService.buildPath('landing')).toBe('/');
   });
 
+  it('returns /demos/* paths for demo-flow, demo-cargo, and demo-synth sections', () => {
+    expect(RouteService.buildPath('demo-flow')).toBe('/demos/flow-workspace');
+    expect(RouteService.buildPath('demo-cargo')).toBe('/demos/cargogl');
+    expect(RouteService.buildPath('demo-synth')).toBe('/demos/synthgl');
+  });
+
   it('returns /docs/getting-started for docs-guide with no subItem', () => {
     expect(RouteService.buildPath('docs-guide')).toBe('/docs/getting-started');
   });
@@ -129,6 +135,40 @@ describe('RouteService.parsePath', () => {
     const result = RouteService.parsePath('/home');
     expect(result?.sectionId).toBe('landing');
   });
+
+  it('parses /demos/* and /demo/* routes and aliases accurately', () => {
+    expect(RouteService.parsePath('/demos/flow-workspace')).toEqual({
+      sectionId: 'demo-flow',
+      subItemId: 'flow-workspace',
+      path: '/demos/flow-workspace',
+    });
+    expect(RouteService.parsePath('/demo/flow')).toEqual({
+      sectionId: 'demo-flow',
+      subItemId: 'flow-workspace',
+      path: '/demos/flow-workspace',
+    });
+    expect(RouteService.parsePath('/demos/unknown-demo')).toEqual({
+      sectionId: 'demo-flow',
+      subItemId: 'flow-workspace',
+      path: '/demos/flow-workspace',
+    });
+
+    for (const cargoPath of ['/demos/cargogl', '/demo/cargo', '/demos/shipflow']) {
+      expect(RouteService.parsePath(cargoPath)).toEqual({
+        sectionId: 'demo-cargo',
+        subItemId: 'cargogl',
+        path: '/demos/cargogl',
+      });
+    }
+
+    for (const synthPath of ['/demos/synthgl', '/demo/synth', '/demos/flowai']) {
+      expect(RouteService.parsePath(synthPath)).toEqual({
+        sectionId: 'demo-synth',
+        subItemId: 'synthgl',
+        path: '/demos/synthgl',
+      });
+    }
+  });
 });
 
 describe('RouteService.getSectionForComponent', () => {
@@ -170,5 +210,37 @@ describe('DASHBOARD_VIEW_IDS', () => {
 
   it('does not contain bogus views', () => {
     expect(DASHBOARD_VIEW_IDS.has('bogus')).toBe(false);
+  });
+});
+
+describe('RouteService.isModifiedClick', () => {
+  const createClickEvent = (
+    overrides: Partial<{
+      metaKey: boolean;
+      ctrlKey: boolean;
+      shiftKey: boolean;
+      altKey: boolean;
+      button: number;
+    }> = {}
+  ) =>
+    ({
+      metaKey: false,
+      ctrlKey: false,
+      shiftKey: false,
+      altKey: false,
+      button: 0,
+      ...overrides,
+    }) as any;
+
+  it('returns false for a standard unmodified left-click (button 0)', () => {
+    expect(RouteService.isModifiedClick(createClickEvent())).toBe(false);
+  });
+
+  it('returns true when modifier keys are pressed or button is not 0', () => {
+    expect(RouteService.isModifiedClick(createClickEvent({ metaKey: true }))).toBe(true);
+    expect(RouteService.isModifiedClick(createClickEvent({ ctrlKey: true }))).toBe(true);
+    expect(RouteService.isModifiedClick(createClickEvent({ shiftKey: true }))).toBe(true);
+    expect(RouteService.isModifiedClick(createClickEvent({ altKey: true }))).toBe(true);
+    expect(RouteService.isModifiedClick(createClickEvent({ button: 1 }))).toBe(true);
   });
 });
