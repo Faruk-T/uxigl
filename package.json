@@ -1,6 +1,6 @@
 {
   "name": "truncgil-uxigl",
-  "version": "2.8.6",
+  "version": "2.8.7",
   "description": "uxiGL — Liquid Glass & Dynamic Tonal Modular Design System with SheetGL DataGrid, FileManGL VFS & Interactive Analytics Charts",
   "license": "MIT",
   "author": "Trunçgil Teknoloji (https://www.truncgil.com)",
@@ -72,7 +72,7 @@
   "dependencies": {
     "filemangl": "^1.0.5",
     "lucide-react": "^1.16.0",
-    "sheetgl": "^2.0.0"
+    "sheetgl": "^2.2.7"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",
