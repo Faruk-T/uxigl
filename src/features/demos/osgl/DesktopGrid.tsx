@@ -1,12 +1,12 @@
-﻿import React, { useMemo, useRef, useState } from 'react';
-import { GoogleIcon } from '../../../components/primitives';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   ENTERPRISE_APPS,
-  resolveIconSurface,
   type EnterpriseOSApp,
   type FloatingWindowState,
   type IconBgStyle,
 } from './types';
+import { DesktopIconTile } from './DesktopIconTile';
+import { reorderIconSlotsOnDrop } from './desktopGridUtils';
 
 export function DesktopGrid({
   isDark,
@@ -94,57 +94,7 @@ export function DesktopGrid({
       setDragOverSlot(null);
       return;
     }
-    const movingIds =
-      selectedAppIds.length > 1 && selectedAppIds.includes(draggedAppId)
-        ? [...selectedAppIds].sort((a, b) => (iconSlots[a] ?? 0) - (iconSlots[b] ?? 0))
-        : [draggedAppId];
-
-    setIconSlots((prev) => {
-      if (movingIds.length > 1) {
-        const next: Record<string, number> = { ...prev };
-        const movingSet = new Set(movingIds);
-        const remaining = Object.entries(prev)
-          .filter(([id]) => !movingSet.has(id))
-          .sort((a, b) => a[1] - b[1]);
-
-        movingIds.forEach((id, offset) => {
-          next[id] = targetSlot + offset;
-        });
-
-        const occupiedByMoving = new Set(movingIds.map((id) => next[id]));
-        let cursor = 0;
-        remaining.forEach(([id, oldSlot]) => {
-          if (!occupiedByMoving.has(oldSlot)) {
-            next[id] = oldSlot;
-          } else {
-            while (occupiedByMoving.has(cursor) || Object.values(next).includes(cursor)) cursor += 1;
-            next[id] = cursor;
-          }
-        });
-        return next;
-      }
-
-      const sourceSlot = prev[draggedAppId];
-      if (sourceSlot === targetSlot) return prev;
-      const occupantId = Object.keys(prev).find((id) => prev[id] === targetSlot);
-      if (!occupantId) return { ...prev, [draggedAppId]: targetSlot };
-
-      const slotMap = new Map<number, string>();
-      for (const [id, s] of Object.entries(prev)) {
-        if (id !== draggedAppId) slotMap.set(s, id);
-      }
-      const chain: string[] = [];
-      let scan = targetSlot;
-      while (slotMap.has(scan)) {
-        chain.push(slotMap.get(scan)!);
-        scan += 1;
-      }
-      const result: Record<string, number> = { ...prev, [draggedAppId]: targetSlot };
-      chain.forEach((id, i) => {
-        result[id] = targetSlot + i + 1;
-      });
-      return result;
-    });
+    setIconSlots((prev) => reorderIconSlotsOnDrop(prev, draggedAppId, targetSlot, selectedAppIds));
     setDraggedAppId(null);
     setDragOverSlot(null);
   };
@@ -251,17 +201,29 @@ export function DesktopGrid({
             );
           }
 
-          const isOpen = windows.some((w) => w.appId === app.id);
-          const isSelected = selectedAppIds.includes(app.id);
-          const isNumericBadge = app.badge && /^\d+$/.test(app.badge);
-          const iconSurf = resolveIconSurface(app, iconBgStyle, primaryColor, isDark, iconColor, iconBgColor, iconGradColor1, iconGradColor2);
-
           return (
-            <button
+            <DesktopIconTile
               key={app.id}
-              ref={(el) => { desktopIconRefs.current[app.id] = el; }}
-              type="button"
-              draggable
+              app={app}
+              slotIdx={slotIdx}
+              buttonRef={(el) => {
+                desktopIconRefs.current[app.id] = el;
+              }}
+              isOpen={windows.some((w) => w.appId === app.id)}
+              isSelected={selectedAppIds.includes(app.id)}
+              isDragged={draggedAppId === app.id}
+              isDropHighlight={isDropHighlight && draggedAppId !== app.id}
+              iconBoxSize={iconBoxSize}
+              iconGlyphSize={iconGlyphSize}
+              barTextColor={barTextColor}
+              effectiveIsLightBg={effectiveIsLightBg}
+              isDark={isDark}
+              primaryColor={primaryColor}
+              iconBgStyle={iconBgStyle}
+              iconBgColor={iconBgColor}
+              iconGradColor1={iconGradColor1}
+              iconGradColor2={iconGradColor2}
+              iconColor={iconColor}
               onDragStart={() => {
                 if (!selectedAppIds.includes(app.id)) setSelectedAppIds([app.id]);
                 setDraggedAppId(app.id);
@@ -270,10 +232,17 @@ export function DesktopGrid({
                 e.preventDefault();
                 if (dragOverSlot !== slotIdx) setDragOverSlot(slotIdx);
               }}
-              onDragLeave={() => { if (dragOverSlot === slotIdx) setDragOverSlot(null); }}
-              onDrop={(e) => { e.preventDefault(); handleDropOnSlot(slotIdx); }}
-              onDragEnd={() => { setDraggedAppId(null); setDragOverSlot(null); }}
-              className="macosgl-app-btn"
+              onDragLeave={() => {
+                if (dragOverSlot === slotIdx) setDragOverSlot(null);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleDropOnSlot(slotIdx);
+              }}
+              onDragEnd={() => {
+                setDraggedAppId(null);
+                setDragOverSlot(null);
+              }}
               onClick={(e) => {
                 if (e.ctrlKey || e.metaKey || e.shiftKey) {
                   e.stopPropagation();
@@ -285,58 +254,7 @@ export function DesktopGrid({
                 setSelectedAppIds([app.id]);
                 onOpenApp(app.id);
               }}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                gap: 6,
-                border: isDropHighlight && draggedAppId !== app.id
-                  ? '1.5px dashed rgba(255,255,255,0.75)'
-                  : isSelected
-                  ? '1.5px solid rgba(96, 165, 250, 0.85)'
-                  : '1.5px solid transparent',
-                background: isDropHighlight && draggedAppId !== app.id
-                  ? 'rgba(255,255,255,0.14)'
-                  : isSelected
-                  ? 'rgba(59, 130, 246, 0.24)'
-                  : 'transparent',
-                borderRadius: 16,
-                padding: '6px 4px',
-                cursor: 'pointer',
-                opacity: draggedAppId === app.id ? 0.45 : 1,
-              }}
-            >
-              <div
-                style={{
-                  position: 'relative',
-                  width: iconBoxSize,
-                  height: iconBoxSize,
-                  borderRadius: Math.round(iconBoxSize * 0.26),
-                  background: iconSurf.background,
-                  border: iconSurf.border,
-                  backdropFilter: iconSurf.backdropFilter,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 12px 26px rgba(0, 0, 0, 0.32), 0 2px 6px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.42)',
-                  color: iconSurf.color,
-                }}
-              >
-                <GoogleIcon name={app.googleIcon} size={iconGlyphSize} />
-                {isNumericBadge && (
-                  <span style={{ position: 'absolute', top: -5, right: -5, minWidth: 19, height: 19, padding: '0 5px', borderRadius: 999, backgroundColor: '#ef4444', color: '#ffffff', fontSize: 10.5, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(239, 68, 68, 0.45)', border: '2px solid rgba(255,255,255,0.92)' }}>
-                    {app.badge}
-                  </span>
-                )}
-              </div>
-              <span style={{ fontSize: 11.5, fontWeight: 600, color: barTextColor, textShadow: effectiveIsLightBg ? 'none' : '0 1px 6px rgba(0, 0, 0, 0.65)', textAlign: 'center', lineHeight: 1.2 }}>
-                {app.label}
-              </span>
-              {isOpen && (
-                <span style={{ width: 4, height: 4, borderRadius: 999, marginTop: -3, backgroundColor: barTextColor, opacity: 0.85 }} />
-              )}
-            </button>
+            />
           );
         })}
       </div>
