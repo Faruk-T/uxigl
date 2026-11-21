@@ -1601,7 +1601,11 @@ export default function App() {
                 }}
               >
                 <img
-                  src="/demos/macosgl.jpg"
+                  src={
+                    isDark
+                      ? '/demos/osgl-dark.jpg'
+                      : '/demos/osgl-light.jpg'
+                  }
                   alt="OSGL — uxiGL OS Workspace Demo"
                   style={{
                     width: '100%',
