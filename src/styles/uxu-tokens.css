@@ -4649,6 +4649,7 @@ pre {
   max-width: 640px;
   border-radius: var(--uxu-radius-xl);
   background: var(--uxu-bg-elevated);
+  color: var(--uxu-text-primary);
   border: 1px solid var(--uxu-border-strong);
   box-shadow: var(--uxu-shadow-elevated);
   overflow: hidden;
@@ -4664,6 +4665,7 @@ pre {
 
 .uxu-cmd-palette__search-icon {
   color: var(--uxu-primary);
+  flex-shrink: 0;
 }
 
 .uxu-cmd-palette__input {
@@ -4671,14 +4673,22 @@ pre {
   border: none;
   outline: none;
   background: transparent;
+  color: var(--uxu-text-primary);
   font-size: 1rem;
+}
+
+.uxu-cmd-palette__input::placeholder {
+  color: var(--uxu-text-tertiary, #94a3b8);
 }
 
 .uxu-cmd-palette__esc {
   font-size: 0.72rem;
+  font-weight: 600;
   padding: 3px 7px;
   border-radius: 6px;
   background: var(--uxu-surface-tonal);
+  color: var(--uxu-text-secondary);
+  border: 1px solid var(--uxu-border-subtle);
   cursor: pointer;
 }
 
@@ -4698,8 +4708,14 @@ pre {
   border-radius: var(--uxu-radius-md);
   border: none;
   background: transparent;
+  color: var(--uxu-text-primary);
   text-align: left;
   cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.uxu-cmd-palette__item:hover:not(.uxu-cmd-palette__item--selected) {
+  background: var(--uxu-surface-tonal);
 }
 
 .uxu-cmd-palette__item--selected {
@@ -4713,6 +4729,14 @@ pre {
   gap: 12px;
 }
 
+.uxu-cmd-palette__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--uxu-primary);
+  flex-shrink: 0;
+}
+
 .uxu-cmd-palette__item-title {
   font-weight: 600;
   font-size: 0.88rem;
@@ -4720,7 +4744,13 @@ pre {
 
 .uxu-cmd-palette__item-sub {
   font-size: 0.75rem;
-  opacity: 0.78;
+  color: var(--uxu-text-secondary);
+  opacity: 0.88;
+}
+
+.uxu-cmd-palette__item--selected .uxu-cmd-palette__item-sub {
+  color: inherit;
+  opacity: 0.82;
 }
 
 .uxu-cmd-palette__item-right {
@@ -4731,9 +4761,11 @@ pre {
 
 .uxu-cmd-palette__category {
   font-size: 0.7rem;
+  font-weight: 600;
   padding: 2px 8px;
   border-radius: 9999px;
   background: var(--uxu-surface-tonal-high);
+  color: var(--uxu-text-secondary);
 }
 
 .uxu-cmd-palette__footer {

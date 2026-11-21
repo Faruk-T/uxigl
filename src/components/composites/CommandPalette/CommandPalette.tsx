@@ -35,6 +35,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const handleClose = () => {
     setQuery('');
@@ -72,6 +73,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     setSelectedIndex(0);
   }, [query]);
 
+  useEffect(() => {
+    if (!open || !listRef.current) return;
+    const item = listRef.current.children[selectedIndex] as HTMLElement | undefined;
+    item?.scrollIntoView?.({ block: 'nearest' });
+  }, [open, selectedIndex]);
+
   if (!open) return null;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -87,6 +94,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           ? (prev - 1 + filteredActions.length) % filteredActions.length
           : 0
       );
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      setSelectedIndex(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      setSelectedIndex(Math.max(0, filteredActions.length - 1));
     } else if (e.key === 'Enter' && filteredActions[selectedIndex]) {
       e.preventDefault();
       filteredActions[selectedIndex].onSelect();
@@ -153,7 +166,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           </kbd>
         </div>
 
-        <div className="uxu-cmd-palette__list">
+        <div ref={listRef} className="uxu-cmd-palette__list">
           {filteredActions.length === 0 ? (
             <div className="uxu-cmd-palette__empty">
               <Sparkles size={22} />
