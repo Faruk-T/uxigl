@@ -747,7 +747,7 @@ const SegmentedTabsAccordionLiveMiniDemo: React.FC = () => {
     <div className="uxu-stack-md">
       <SegmentedControl<'glass' | 'tonal' | 'hybrid'>
         value={seg}
-        onChange={setSeg}
+        onChange={(v) => setSeg(v as 'glass' | 'tonal' | 'hybrid')}
         fullWidth
         options={[
           { value: 'glass', label: 'Liquid Glass', badge: '8pt' },
