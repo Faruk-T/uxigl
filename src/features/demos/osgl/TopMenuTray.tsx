@@ -22,6 +22,7 @@ const WIDGET_LABELS: { id: DesktopWidgetId; tr: string; en: string }[] = [
   { id: 'todo', tr: 'Yapılacaklar', en: 'To-Do List' },
   { id: 'notes', tr: 'Hızlı Notlar', en: 'Quick Notes' },
   { id: 'system', tr: 'Sistem Özeti', en: 'System Status' },
+  { id: 'timeline', tr: 'Günlük Zaman Akışı', en: 'Daily Time Flow' },
 ];
 
 export function TopMenuTray({

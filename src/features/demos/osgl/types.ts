@@ -9,7 +9,8 @@ export type DesktopWidgetId =
   | 'timer'
   | 'todo'
   | 'notes'
-  | 'system';
+  | 'system'
+  | 'timeline';
 
 export const DEFAULT_ENABLED_WIDGETS: Record<DesktopWidgetId, boolean> = {
   clock: true,
@@ -18,6 +19,7 @@ export const DEFAULT_ENABLED_WIDGETS: Record<DesktopWidgetId, boolean> = {
   todo: true,
   notes: true,
   system: true,
+  timeline: true,
 };
 
 export interface WidgetPosition {
@@ -44,6 +46,7 @@ export const DEFAULT_WIDGET_SIZES: Record<DesktopWidgetId, WidgetSize> = {
   todo: { width: 280, height: 200 },
   notes: { width: 280, height: 140 },
   system: { width: 280, height: 120 },
+  timeline: { width: 280, height: 180 },
 };
 
 export function getDefaultWidgetPositions(
@@ -59,6 +62,7 @@ export function getDefaultWidgetPositions(
       timer: { x: colLeft, y: 20 },
       todo: { x: colLeft, y: 160 },
       notes: { x: colLeft, y: 380 },
+      timeline: { x: colLeft, y: 540 },
     };
   }
   return {
@@ -68,6 +72,7 @@ export function getDefaultWidgetPositions(
     todo: { x: colRight, y: 540 },
     notes: { x: colRight, y: 760 },
     system: { x: colRight, y: 920 },
+    timeline: { x: colRight, y: 1060 },
   };
 }
 

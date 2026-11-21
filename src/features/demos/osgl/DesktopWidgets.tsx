@@ -23,6 +23,7 @@ import {
   QuickNotesWidgetCard,
 } from './widgets/widgetProductivityCards';
 import { TodoWidgetCard } from './widgets/TodoWidgetCard';
+import { TimeFlowWidgetCard } from './widgets/TimeFlowWidgetCard';
 
 function snapToGrid(val: number): number {
   return Math.round(val / WIDGET_GRID_STEP) * WIDGET_GRID_STEP;
@@ -250,10 +251,12 @@ export function DesktopWidgets({
             glassBlur={glassBlur}
           />
         );
+      case 'timeline':
+        return <TimeFlowWidgetCard theme={theme} />;
     }
   };
 
-  const widgetIds: DesktopWidgetId[] = ['clock', 'kpi', 'timer', 'todo', 'notes', 'system'];
+  const widgetIds: DesktopWidgetId[] = ['clock', 'kpi', 'timer', 'todo', 'notes', 'system', 'timeline'];
 
   return (
     <div
