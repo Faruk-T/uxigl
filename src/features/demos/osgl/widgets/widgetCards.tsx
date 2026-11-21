@@ -72,16 +72,14 @@ export function ClockWidgetCard({
   }, []);
 
   const persistEvents = (updater: (prev: CalendarTaskEvent[]) => CalendarTaskEvent[]) => {
-    setEvents((prev) => {
-      const next = updater(prev);
-      try {
-        window.localStorage.setItem(OSGL_CALENDAR_STORAGE_KEY, JSON.stringify(next));
-        window.dispatchEvent(new Event(OSGL_CALENDAR_SYNC_EVENT));
-      } catch {
-        // ignore storage errors
-      }
-      return next;
-    });
+    const next = updater(loadCalendarEvents());
+    setEvents(next);
+    try {
+      window.localStorage.setItem(OSGL_CALENDAR_STORAGE_KEY, JSON.stringify(next));
+      window.dispatchEvent(new Event(OSGL_CALENDAR_SYNC_EVENT));
+    } catch {
+      // ignore storage errors
+    }
   };
 
   const openCreateModal = (dateIso: string = selectedIso) => {
