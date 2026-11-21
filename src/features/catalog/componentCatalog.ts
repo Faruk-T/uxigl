@@ -1451,4 +1451,69 @@ export function ControlledScheduler() {
       },
     ],
   },
+  {
+    id: 'messenger',
+    name: 'Messenger (WhatsApp-like)',
+    turkishTitle: 'Kurumsal Mesajlaşma Modülü (WhatsApp Benzeri · SOLID)',
+    category: 'surfaces',
+    summary:
+      'SOLID mimarili tam teşekküllü WhatsApp tarzı mesajlaşma modülü: stok profil görselleri veya otomatik baş harf Avatar, sohbet arama/filtreleme, okundu tikleri, yanıt alıntısı, emoji tepkileri ve mobil tek-panel duyarlılığı.',
+    importPath: 'truncgil-uxigl',
+    importStatement:
+      "import { Messenger, type MessengerConversation, type MessengerMessage } from 'truncgil-uxigl';",
+    dos: [
+      'Kontrolsüz kullanımda storageKey vererek mesaj geçmişini localStorage üzerinde kalıcı hale getirin.',
+      'Avatar bileşeninde avatarUrl verilmediğinde kullanıcı baş harflerinin otomatik üretilmesini sağlayın.',
+    ],
+    donts: [
+      'Mobilde liste ve sohbet panelini aynı anda dar ekrana sıkıştırmayın; otomatik tek-panel modunu kullanın.',
+    ],
+    accessibilityNotes: [
+      'Sohbet listesi aside[aria-label], aktif sohbet ise region[aria-label] ile işaretlenir; geri ve gönder butonları aria-label taşır.',
+    ],
+    examples: [
+      {
+        id: 'messenger-persistent-example',
+        title: '1. Kalıcı Kurumsal Mesajlaşma (<Messenger />)',
+        description: 'Kontrolsüz kullanımda storageKey ile mesajları localStorage üzerinde saklar.',
+        code: `import { Messenger } from 'truncgil-uxigl';
+
+export function TeamChat() {
+  return (
+    <Messenger
+      locale="tr"
+      height={560}
+      storageKey="my-app.messenger.v1"
+    />
+  );
+}`,
+      },
+    ],
+    propsTable: [
+      {
+        name: 'conversations / onConversationsChange',
+        type: 'MessengerConversation[] / (next: MessengerConversation[]) => void',
+        defaultValue: 'undefined',
+        description: 'Kontrollü sohbet ve mesaj listesi yönetimi.',
+      },
+      {
+        name: 'storageKey',
+        type: 'string',
+        defaultValue: 'undefined',
+        description: 'Mesaj geçmişi ve sabitleme/susturma durumunu localStorage üzerine yazar.',
+      },
+      {
+        name: 'compact',
+        type: 'boolean',
+        defaultValue: 'auto (< 620px)',
+        description: 'Mobil tek-panel görünümünü zorlar veya otomatik algılar.',
+      },
+      {
+        name: 'enableAutoReply',
+        type: 'boolean',
+        defaultValue: 'true',
+        description: 'Demo modunda canlı yazıyor göstergesi ve otomatik yanıt simülasyonu sağlar.',
+      },
+    ],
+  },
 ];

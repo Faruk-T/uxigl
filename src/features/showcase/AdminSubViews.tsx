@@ -48,6 +48,7 @@ import {
   Calendar,
   Card,
   DataTable,
+  Messenger,
   Modal,
   Pagination,
   SegmentedControl,
@@ -1143,134 +1144,12 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
 
   // 6. MESSAGES VIEW
   if (viewId === 'messages') {
-    const activeMsg =
-      MESSAGES_DATA.find((m) => m.id === selectedMsgId) ?? MESSAGES_DATA[0];
-
     return (
-      <div className="uxu-dash-chart-and-feed">
-        <Card
-          variant="glass"
-          eyebrow="MESSAGES INBOX • 3 OKUNMAMIŞ"
-          title="Gelen Kutusu (Messages)"
-          subtitle="Ekip içi bildirimler ve sistem mesajları"
-          headerIcon={<MessageSquare size={18} />}
-          headerAction={
-            <Badge tone="danger" size="xs" pulse>
-              3 Yeni
-            </Badge>
-          }
-        >
-          <div className="uxu-stack-sm">
-            {MESSAGES_DATA.map((msg) => {
-              const isSelected = msg.id === activeMsg.id;
-              return (
-                <div
-                  key={msg.id}
-                  onClick={() => setSelectedMsgId(msg.id)}
-                  style={{
-                    padding: '12px 14px',
-                    borderRadius: 'var(--uxu-radius-md)',
-                    background: isSelected
-                      ? 'var(--uxu-surface-elevated)'
-                      : 'var(--uxu-surface-tonal)',
-                    border: isSelected
-                      ? '1px solid var(--uxu-primary)'
-                      : '1px solid var(--uxu-border-subtle)',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginBottom: 4,
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Avatar name={msg.sender} size="xs" status="online" />
-                      <strong style={{ fontSize: '0.84rem' }}>{msg.sender}</strong>
-                    </div>
-                    <span
-                      style={{
-                        fontSize: '0.73rem',
-                        color: 'var(--uxu-text-tertiary)',
-                      }}
-                    >
-                      {msg.time}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      fontSize: '0.81rem',
-                      marginBottom: 2,
-                    }}
-                  >
-                    {msg.subject}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--uxu-text-secondary)',
-                    }}
-                  >
-                    {msg.preview}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-
-        <Card
-          variant="tonal"
-          eyebrow={activeMsg.role.toUpperCase()}
-          title={activeMsg.subject}
-          subtitle={`${activeMsg.sender} • ${activeMsg.time}`}
-        >
-          <div className="uxu-stack-md">
-            <p
-              style={{
-                fontSize: '0.88rem',
-                lineHeight: 1.65,
-                color: 'var(--uxu-text-primary)',
-                padding: '14px',
-                borderRadius: 'var(--uxu-radius-md)',
-                background: 'var(--uxu-surface-elevated)',
-                border: '1px solid var(--uxu-border-subtle)',
-              }}
-            >
-              {activeMsg.body}
-            </p>
-
-            <div className="uxu-quick-task-row">
-              <Input
-                placeholder="Yanıtınızı yazın..."
-                value={replyText}
-                onChange={setReplyText}
-                size="sm"
-              />
-              <Button
-                variant="filled"
-                size="sm"
-                leadingIcon={<Send size={14} />}
-                onClick={() => {
-                  if (!replyText.trim()) return;
-                  notify({
-                    title: 'Yanıt Gönderildi',
-                    description: `${activeMsg.sender} kişisine iletildi.`,
-                    tone: 'success',
-                  });
-                  setReplyText('');
-                }}
-              >
-                Gönder
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </div>
+      <Messenger
+        locale="tr"
+        height={560}
+        storageKey="uxigl.admin.messenger.v1"
+      />
     );
   }
 
