@@ -4793,11 +4793,15 @@ pre {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 13px 16px;
+  padding: 12px 15px;
   border-radius: var(--uxu-radius-lg);
-  background: var(--uxu-bg-elevated);
-  border: 1px solid var(--uxu-border-strong);
-  box-shadow: var(--uxu-shadow-elevated), var(--uxu-specular-inset);
+  background: color-mix(in srgb, var(--uxu-bg-elevated) 88%, var(--uxu-primary) 4%);
+  -webkit-backdrop-filter: blur(var(--uxu-glass-blur))
+    saturate(var(--uxu-glass-saturation));
+  backdrop-filter: blur(var(--uxu-glass-blur))
+    saturate(var(--uxu-glass-saturation));
+  border: 1px solid var(--uxu-border-subtle);
+  box-shadow: var(--uxu-shadow-elevated);
   animation: uxu-slide-up 240ms var(--uxu-spring);
 }
 
@@ -4807,33 +4811,25 @@ pre {
   animation: uxu-slide-down 240ms var(--uxu-spring);
 }
 
-/* Semantic & Glass Toast Tones */
+/* Theme-harmonized Toast Tones (no harsh neon left stripes) */
 .uxu-toast--primary {
-  border-left: 3.5px solid var(--uxu-primary);
+  border-color: color-mix(in srgb, var(--uxu-primary) 28%, var(--uxu-border-subtle));
 }
 .uxu-toast--success {
-  border-left: 3.5px solid var(--uxu-success);
-  background: color-mix(in srgb, var(--uxu-success) 10%, var(--uxu-bg-elevated));
+  border-color: color-mix(in srgb, var(--uxu-success) 26%, var(--uxu-border-subtle));
 }
 .uxu-toast--warning {
-  border-left: 3.5px solid var(--uxu-warning);
-  background: color-mix(in srgb, var(--uxu-warning) 10%, var(--uxu-bg-elevated));
+  border-color: color-mix(in srgb, var(--uxu-warning) 26%, var(--uxu-border-subtle));
 }
 .uxu-toast--danger {
-  border-left: 3.5px solid var(--uxu-danger);
-  background: color-mix(in srgb, var(--uxu-danger) 11%, var(--uxu-bg-elevated));
+  border-color: color-mix(in srgb, var(--uxu-danger) 28%, var(--uxu-border-subtle));
 }
 .uxu-toast--info {
-  border-left: 3.5px solid var(--uxu-info);
-  background: color-mix(in srgb, var(--uxu-info) 10%, var(--uxu-bg-elevated));
+  border-color: color-mix(in srgb, var(--uxu-primary) 26%, var(--uxu-border-subtle));
 }
 .uxu-toast--glass {
   background: var(--uxu-surface-glass);
-  -webkit-backdrop-filter: blur(var(--uxu-glass-blur))
-    saturate(var(--uxu-glass-saturation));
-  backdrop-filter: blur(var(--uxu-glass-blur))
-    saturate(var(--uxu-glass-saturation));
-  border: 1px solid color-mix(in srgb, var(--uxu-primary) 42%, var(--uxu-border-strong));
+  border-color: color-mix(in srgb, var(--uxu-primary) 28%, var(--uxu-border-subtle));
 }
 
 @keyframes uxu-slide-up {

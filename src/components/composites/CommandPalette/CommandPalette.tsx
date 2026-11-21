@@ -30,7 +30,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   open,
   onClose,
   actions,
-  placeholder = 'Bileşen, tema, SOLID prensibi veya komut ara...',
+  placeholder = 'Bileşen, tema, sayfa veya komut ara...',
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);

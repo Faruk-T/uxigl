@@ -156,9 +156,6 @@ const ToastViewport: React.FC<ToastViewportProps> = ({ toasts, onDismiss }) => {
                   <div className="uxu-toast__content">
                     <div className="uxu-toast__title-row">
                       <span className="uxu-toast__title">{toast.title}</span>
-                      <span className="uxu-toast__placement-tag">
-                        {placement}
-                      </span>
                     </div>
                     {toast.description && (
                       <div className="uxu-toast__desc">{toast.description}</div>
