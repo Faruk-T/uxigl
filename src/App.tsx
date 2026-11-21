@@ -71,12 +71,14 @@ import { UXILandingPage } from './features/landing/UXILandingPage';
 import { FlowWorkspaceDemo } from './features/demos/FlowWorkspaceDemo';
 import { CargoGLDemo } from './features/demos/CargoGLDemo';
 import { SynthGLDemo } from './features/demos/SynthGLDemo';
+import { MacOSGLDemo } from './features/demos/MacOSGLDemo';
 
 export type MainSectionId =
   | 'landing'
   | 'demo-flow'
   | 'demo-cargo'
   | 'demo-synth'
+  | 'demo-macos'
   | 'docs-guide'
   | 'dashboard'
   | 'components-inputs'
@@ -1001,6 +1003,21 @@ export const App: React.FC = () => {
           }}
         >
           <SynthGLDemo
+            onNavigate={handleSidebarSelect}
+            onOpenThemeStudio={() => setThemeDrawerOpen(true)}
+          />
+        </div>
+      ) : activeSectionId === 'demo-macos' ? (
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100vh',
+            overflowY: 'auto',
+          }}
+        >
+          <MacOSGLDemo
             onNavigate={handleSidebarSelect}
             onOpenThemeStudio={() => setThemeDrawerOpen(true)}
           />

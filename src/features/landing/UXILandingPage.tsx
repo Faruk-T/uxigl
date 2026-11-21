@@ -1569,6 +1569,75 @@ export default function App() {
                 </div>
               </div>
             </div>
+
+            {/* DEMO 5: MACOSGL (OS-STYLE FLOATING WINDOWS & DESKTOP/MOBILE LAUNCHER) */}
+            <div
+              style={{
+                borderRadius: currentRadiusPx + 4,
+                backgroundColor: colors.card,
+                border: `1px solid ${colors.cardBorder}`,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: isDark
+                  ? '0 20px 50px rgba(0, 0, 0, 0.5)'
+                  : '0 16px 40px rgba(15, 23, 42, 0.08)',
+              }}
+            >
+              <a
+                href="/demos/macosgl"
+                onClick={(e) => {
+                  if (RouteService.isModifiedClick(e)) return;
+                  e.preventDefault();
+                  onNavigate('demo-macos', 'macosgl');
+                }}
+                style={{
+                  display: 'block',
+                  position: 'relative',
+                  aspectRatio: '16 / 10',
+                  overflow: 'hidden',
+                  borderBottom: `1px solid ${colors.cardBorder}`,
+                  backgroundColor: isDark ? '#0B0F17' : '#F8FAFC',
+                }}
+              >
+                <img
+                  src="/demos/macosgl.jpg"
+                  alt="MacOSGL — uxiGL OS Workspace Demo"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    display: 'block',
+                  }}
+                />
+              </a>
+              <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
+                    MacOSGL
+                  </h3>
+                  <Badge size="sm" variant="tonal" tone="success">
+                    {isTR ? 'OS & Yüzen Pencere' : 'OS & Floating UI'}
+                  </Badge>
+                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: colors.muted, lineHeight: 1.6, flex: 1 }}>
+                  {isTR
+                    ? '6 farklı macOS duvar kağıdı, sağ tık menüsü, yeniden boyutlandırılıp düzenlenebilen (Grid/Cascade) yüzen pencereler ve OS Tema Stüdyosu.'
+                    : 'Pure macOS-style desktop & mobile launcher with 6 macOS wallpapers, right-click menu, resizable/arrangeable floating windows, and OS Theme Studio.'}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 6 }}>
+                  <code style={{ fontSize: 12, color: colors.muted }}>/demos/macosgl</code>
+                  <Button
+                    variant="filled"
+                    size="sm"
+                    onClick={() => onNavigate('demo-macos', 'macosgl')}
+                  >
+                    {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
