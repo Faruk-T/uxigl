@@ -353,152 +353,153 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
       {
         id: 'getting-started',
         step: '1',
-        badgeTr: 'BÖLÜM 1 • KURULUM & MİMARİ',
-        badgeEn: 'CHAPTER 1 • SETUP & ARCHITECTURE',
-        titleTr: '1. Kurulum, Mimari & Hızlı Başlangıç',
-        titleEn: '1. Installation, Architecture & Quick Start',
+        badgeTr: 'BÖLÜM 1 • BAŞLANGIÇ',
+        badgeEn: 'CHAPTER 1 • GETTING STARTED',
+        titleTr: '1. Kurulum & Başlangıç',
+        titleEn: '1. Setup & Quick Start',
         subtitleTr:
-          'truncgil-uxigl paketini NPM veya NPX CLI ile kurun; ThemeProvider, ToastProvider ve SOLID mimari ilkelerini inceleyin.',
+          'Kurulum adımları, temel yapı ve son eklenen masaüstü, tema ve dosya yöneticisi özellikleri.',
         subtitleEn:
-          'Install truncgil-uxigl via NPM or NPX CLI; configure ThemeProvider, ToastProvider, and explore the SOLID architecture.',
+          'Installation steps, core structure, and recent desktop, theme, and file manager updates.',
         icon: <Rocket size={15} />,
         subItems: [
-          { id: 'doc-sec-install', labelTr: 'NPM & NPX CLI Kurulumu', labelEn: 'NPM & NPX CLI Setup' },
-          { id: 'doc-sec-live-starter', labelTr: 'Canlı İlk Bileşen Örneği', labelEn: 'Live Starter Component' },
-          { id: 'doc-sec-solid', labelTr: 'SOLID & Sıfır Boşta GPU Mimarisi', labelEn: 'SOLID & Zero-Idle GPU Architecture' },
+          { id: 'doc-sec-install', labelTr: 'Kurulum', labelEn: 'Installation' },
+          { id: 'doc-sec-live-starter', labelTr: 'İlk Bileşen Örneği', labelEn: 'Starter Example' },
+          { id: 'doc-sec-osgl-features', labelTr: 'Son Geliştirmeler & OSGL', labelEn: 'Recent Updates & OSGL' },
+          { id: 'doc-sec-solid', labelTr: 'Katmanlar & Modüller', labelEn: 'Layers & Modules' },
         ],
       },
       {
         id: 'form-controls',
         step: '2',
-        badgeTr: 'BÖLÜM 2 • 12 FORM & EYLEM BİLEŞENİ',
-        badgeEn: 'CHAPTER 2 • 12 FORM & ACTION PRIMITIVES',
-        titleTr: '2. Form & Eylem Bileşenleri Rehberi (12 Bileşen)',
-        titleEn: '2. Complete Guide to Form & Action Controls (12 Components)',
+        badgeTr: 'BÖLÜM 2 • FORM BİLEŞENLERİ',
+        badgeEn: 'CHAPTER 2 • FORM CONTROLS',
+        titleTr: '2. Form & Eylem Bileşenleri (12)',
+        titleEn: '2. Form & Action Controls (12)',
         subtitleTr:
-          'Button, Input (5 Maske), CurrencyInput, DateTimePickerInput, MultiSelectTagInput, FileUploadDropzone, Select, Textarea, Switch, Checkbox, Slider ve İkonlar.',
+          'Button, Input, Para Birimi, Tarih/Saat, Etiket Seçici, Dosya Yükleme, Select, Switch, Slider ve İkonlar.',
         subtitleEn:
-          'Button, Input (5 Masks), CurrencyInput, DateTimePickerInput, MultiSelectTagInput, FileUploadDropzone, Select, Textarea, Switch, Checkbox, Slider & Icons.',
+          'Button, Input, Currency, Date/Time, Tags, File Upload, Select, Switch, Slider, and Icons.',
         icon: <FormInput size={15} />,
         subItems: FORM_CONTROL_GUIDES.map((g) => ({
           id: `doc-comp-${g.id}`,
-          labelTr: `${g.tag} — ${g.titleTr.split(' (')[0]}`,
-          labelEn: `${g.tag} — ${g.titleEn.split(' (')[0]}`,
+          labelTr: g.tag,
+          labelEn: g.tag,
         })),
       },
       {
         id: 'surfaces-navigation',
         step: '3',
-        badgeTr: 'BÖLÜM 3 • 11 YÜZEY, DİYALOG & GEZİNME BİLEŞENİ',
-        badgeEn: 'CHAPTER 3 • 11 SURFACES, DIALOGS & NAVIGATION',
-        titleTr: '3. Yüzey, Kart, Modal & Gezinme Rehberi (11 Bileşen)',
-        titleEn: '3. Complete Guide to Surfaces, Modals & Navigation (11 Components)',
+        badgeTr: 'BÖLÜM 3 • YÜZEY & GEZİNME',
+        badgeEn: 'CHAPTER 3 • SURFACES & NAVIGATION',
+        titleTr: '3. Kart, Modal & Gezinme (11)',
+        titleEn: '3. Cards, Modals & Navigation (11)',
         subtitleTr:
-          'Card, SegmentedControl, Tabs, Accordion, Stepper, Timeline, 6 Varyantlı Modal, 3 Yönlü Drawer, Alert ve CommandPalette (⌘K).',
+          'Card, SegmentedControl, Tabs, Accordion, Stepper, Timeline, Modal, Drawer, Alert ve Hızlı Arama.',
         subtitleEn:
-          'Card, SegmentedControl, Tabs, Accordion, Stepper, Timeline, 6-Variant Modal, 3-Way Drawer, Alert, and CommandPalette (⌘K).',
+          'Card, SegmentedControl, Tabs, Accordion, Stepper, Timeline, Modal, Drawer, Alert, and Command Palette.',
         icon: <Layers size={15} />,
         subItems: SURFACE_NAVIGATION_GUIDES.map((g) => ({
           id: `doc-comp-${g.id}`,
-          labelTr: `${g.tag} — ${g.titleTr.split(' (')[0]}`,
-          labelEn: `${g.tag} — ${g.titleEn.split(' (')[0]}`,
+          labelTr: g.tag,
+          labelEn: g.tag,
         })),
       },
       {
         id: 'data-feedback-webgl',
         step: '4',
-        badgeTr: 'BÖLÜM 4 • VERİ, DURUM & WEBGL MOTORLARI',
-        badgeEn: 'CHAPTER 4 • DATA, FEEDBACK & WEBGL ENGINES',
-        titleTr: '4. Veri, Geri Bildirim, SheetGL & FileManGL Rehberi',
-        titleEn: '4. Data, Feedback, SheetGL & FileManGL Guide',
+        badgeTr: 'BÖLÜM 4 • VERİ & DOSYA',
+        badgeEn: 'CHAPTER 4 • DATA & FILES',
+        titleTr: '4. Tablo, Bildirim, SheetGL & FileManGL',
+        titleEn: '4. Tables, Feedback, SheetGL & FileManGL',
         subtitleTr:
-          'Badge, Chip, Avatar, Progress, Skeleton, Tooltip, StatCard, Native DataTable, SheetGL 120 FPS WebGL DataGrid ve FileManGL WebGL2 VFS.',
+          'Badge, Chip, Avatar, Progress, Skeleton, Tooltip, StatCard, DataTable, SheetGL ve FileManGL.',
         subtitleEn:
-          'Badge, Chip, Avatar, Progress, Skeleton, Tooltip, StatCard, Native DataTable, SheetGL 120 FPS WebGL DataGrid, and FileManGL WebGL2 VFS.',
+          'Badge, Chip, Avatar, Progress, Skeleton, Tooltip, StatCard, DataTable, SheetGL, and FileManGL.',
         icon: <Table2 size={15} />,
         subItems: DATA_FEEDBACK_WEBGL_GUIDES.map((g) => ({
           id: `doc-comp-${g.id}`,
-          labelTr: `${g.tag} — ${g.titleTr.split(' (')[0]}`,
-          labelEn: `${g.tag} — ${g.titleEn.split(' (')[0]}`,
+          labelTr: g.tag,
+          labelEn: g.tag,
         })),
       },
       {
         id: 'layout-shell',
         step: '5',
-        badgeTr: 'BÖLÜM 5 • 5 FARKLI SIDEBAR & YERLEŞİM İSKELETİ',
-        badgeEn: 'CHAPTER 5 • 5 SIDEBAR ARCHITECTURES & LAYOUT SHELL',
-        titleTr: '5. 5 Farklı Sidebar Mimarisi & Kurumsal Yerleşim',
-        titleEn: '5. 5 Sidebar Architectures & Enterprise Layout Shell',
+        badgeTr: 'BÖLÜM 5 • YERLEŞİM',
+        badgeEn: 'CHAPTER 5 • LAYOUT',
+        titleTr: '5. Kenar Çubuğu & Sayfa Yerleşimi',
+        titleEn: '5. Sidebar & Page Layout',
         subtitleTr:
-          'Stacked Vertical, Standard Accordion, Mini-Rail, Dual-Column ve Drawer (Off-Canvas) gezinme modelleri ve 8pt uzamsal ızgara sistemi.',
+          '5 farklı kenar çubuğu (Sidebar) modu ve duyarlı ızgara sınıfları.',
         subtitleEn:
-          'Stacked Vertical, Standard Accordion, Mini-Rail, Dual-Column, and Drawer navigation architectures on an 8pt spatial grid.',
+          '5 sidebar modes and responsive grid classes.',
         icon: <Layout size={15} />,
         subItems: [
-          { id: 'doc-sec-grid-classes', labelTr: 'Hazır Responsive Grid Sınıfları', labelEn: 'Responsive Grid CSS Classes' },
-          { id: 'doc-sec-sidebar-code', labelTr: 'SidebarNavGroup[] Yapılandırması', labelEn: 'SidebarNavGroup[] Configuration' },
-          { id: 'doc-sec-sidebar-live', labelTr: '5 Sidebar Varyantı Canlı Stüdyosu', labelEn: '5 Sidebar Variants Live Studio' },
+          { id: 'doc-sec-grid-classes', labelTr: 'Izgara Sınıfları', labelEn: 'Grid Classes' },
+          { id: 'doc-sec-sidebar-code', labelTr: 'Sidebar Yapılandırması', labelEn: 'Sidebar Configuration' },
+          { id: 'doc-sec-sidebar-live', labelTr: 'Sidebar Canlı Önizleme', labelEn: 'Sidebar Live Preview' },
         ],
       },
       {
         id: 'page-templates',
         step: '6',
-        badgeTr: 'BÖLÜM 6 • 8 HAZIR SAYFA ŞABLONU & 14 DASHBOARD GÖRÜNÜMÜ',
-        badgeEn: 'CHAPTER 6 • 8 PAGE TEMPLATES & 14 DASHBOARD VIEWS',
-        titleTr: '6. Hazır Sayfa Şablonları (Login, 2FA, Pricing, Fatura, Kanban, Settings)',
-        titleEn: '6. Ready-Made Page Templates (Login, 2FA, Pricing, Invoice, Kanban, Settings)',
+        badgeTr: 'BÖLÜM 6 • HAZIR SAYFALAR',
+        badgeEn: 'CHAPTER 6 • PAGE TEMPLATES',
+        titleTr: '6. Hazır Sayfa Şablonları (8)',
+        titleEn: '6. Page Templates (8)',
         subtitleTr:
-          'Kurumsal projelerde doğrudan kullanıma hazır 8 tam sayfa tasarımı ve 14 operasyonel Dashboard alt görünümünün dokümantasyonu ve canlı demosu.',
+          'Giriş, Kayıt & 2FA, Fiyatlandırma, Profil, Fatura, Kanban, Durum ve Ayarlar sayfaları.',
         subtitleEn:
-          'Documentation and live interactive stage for all 8 ready-made enterprise page templates and 14 operational dashboard sub-views.',
+          'Login, Register & 2FA, Pricing, Profile, Invoice, Kanban, Status, and Settings pages.',
         icon: <FileCode2 size={15} />,
         subItems: [
           {
             id: 'doc-tpl-login',
-            labelTr: 'Login & Auth (Split-Screen + Yüzen Cam)',
-            labelEn: 'Login & Auth (Split-Screen + Floating Glass)',
+            labelTr: 'Giriş Sayfası (Login)',
+            labelEn: 'Login Page',
             onSelect: () => setDocsPageTemplate('page-login'),
           },
           {
             id: 'doc-tpl-register',
-            labelTr: 'Register, Onboarding & 6 Haneli 2FA OTP',
-            labelEn: 'Register, Onboarding & 6-Digit 2FA OTP',
+            labelTr: 'Kayıt & Doğrulama (2FA)',
+            labelEn: 'Register & 2FA',
             onSelect: () => setDocsPageTemplate('page-register'),
           },
           {
             id: 'doc-tpl-pricing',
-            labelTr: 'SaaS Pricing & Koltuk Hesaplayıcı',
-            labelEn: 'SaaS Pricing & Seat Calculator',
+            labelTr: 'Fiyatlandırma (Pricing)',
+            labelEn: 'Pricing',
             onSelect: () => setDocsPageTemplate('page-pricing'),
           },
           {
             id: 'doc-tpl-profile',
-            labelTr: 'User Profile & Geliştirici Portfolyosu',
-            labelEn: 'User Profile & Developer Portfolio',
+            labelTr: 'Kullanıcı Profili',
+            labelEn: 'User Profile',
             onSelect: () => setDocsPageTemplate('page-profile'),
           },
           {
             id: 'doc-tpl-invoice',
-            labelTr: 'B2B e-Fatura & Kredi Kartı Checkout',
-            labelEn: 'B2B e-Invoice & Credit Card Checkout',
+            labelTr: 'Fatura & Ödeme',
+            labelEn: 'Invoice & Checkout',
             onSelect: () => setDocsPageTemplate('page-invoice'),
           },
           {
             id: 'doc-tpl-kanban',
-            labelTr: 'Kanban Sprint & Görev Panosu',
-            labelEn: 'Kanban Sprint & Task Board',
+            labelTr: 'Kanban Görev Panosu',
+            labelEn: 'Kanban Board',
             onSelect: () => setDocsPageTemplate('page-kanban'),
           },
           {
             id: 'doc-tpl-status',
-            labelTr: '404, 500 Bakım & Canlı SLA Monitörü',
-            labelEn: '404, 500 Maintenance & Live SLA Monitor',
+            labelTr: 'Durum & Hata Sayfaları',
+            labelEn: 'Status & Error Pages',
             onSelect: () => setDocsPageTemplate('page-status'),
           },
           {
             id: 'doc-tpl-settings',
-            labelTr: 'Enterprise Settings & Tercihler (Appearance, Account, Notifications)',
-            labelEn: 'Enterprise Settings & Preferences (Appearance, Account, Notifications)',
+            labelTr: 'Hesap & Sistem Ayarları',
+            labelEn: 'Account & System Settings',
             onSelect: () => setDocsPageTemplate('page-settings'),
           },
         ],
@@ -506,37 +507,37 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
       {
         id: 'theming-tokens',
         step: '7',
-        badgeTr: 'BÖLÜM 7 • TEMA MOTORU, YÜZEY MATERYALLERİ & CSS TOKENLARI',
-        badgeEn: 'CHAPTER 7 • THEME ENGINE, SURFACE MATERIALS & CSS TOKENS',
-        titleTr: '7. Tema Motoru, Yüzey Materyalleri & CSS Tokenları',
-        titleEn: '7. Theme Engine, Surface Materials & CSS Design Tokens',
+        badgeTr: 'BÖLÜM 7 • TEMA & YAZI TİPİ',
+        badgeEn: 'CHAPTER 7 • THEME & FONTS',
+        titleTr: '7. Tema, Renk, Cam & Yazı Tipleri',
+        titleEn: '7. Theme, Colors, Glass & Fonts',
         subtitleTr:
-          'useTheme() kancası, 6 tohum renk paleti, 0–32px canlı Border Radius, tipografi ölçekleme ve --uxu-* CSS değişkenleri.',
+          'Açık/koyu mod, renk paletleri, köşe yuvarlaklığı, cam yoğunluğu, yazı tipleri ve CSS değişkenleri.',
         subtitleEn:
-          'useTheme() hook API, 6 seed palettes, live 0–32px Border Radius, typography scaling, and --uxu-* CSS custom properties.',
+          'Light/dark mode, color palettes, corner radius, glass intensity, fonts, and CSS variables.',
         icon: <Palette size={15} />,
         subItems: [
-          { id: 'doc-sec-theme-lab', labelTr: 'Canlı Tema & Radius Laboratuvarı', labelEn: 'Live Theme & Radius Lab' },
-          { id: 'doc-sec-theme-tokens', labelTr: 'Aktif CSS Token Denetçisi', labelEn: 'Live CSS Token Inspector' },
-          { id: 'doc-sec-fonts-icons', labelTr: 'Tipografi & Değişken İkonlar', labelEn: 'Typography & Variable Icons' },
+          { id: 'doc-sec-theme-lab', labelTr: 'Tema & Köşe Ayarları', labelEn: 'Theme & Radius Lab' },
+          { id: 'doc-sec-theme-tokens', labelTr: 'CSS Değişkenleri', labelEn: 'CSS Variables' },
+          { id: 'doc-sec-fonts-icons', labelTr: 'Yazı Tipleri & İkonlar', labelEn: 'Fonts & Icons' },
         ],
       },
       {
         id: 'cli-shortcuts',
         step: '8',
-        badgeTr: 'BÖLÜM 8 • 5 YÖNLÜ TOAST, KISAYOLLAR & SERVİSLER',
-        badgeEn: 'CHAPTER 8 • 5-CORNER TOAST, SHORTCUTS & SERVICES',
-        titleTr: '8. Bildirim Motoru (useToast), Kısayollar & Servis API’si',
-        titleEn: '8. Notification Engine (useToast), Shortcuts & Services API',
+        badgeTr: 'BÖLÜM 8 • BİLDİRİM & KISAYOL',
+        badgeEn: 'CHAPTER 8 • TOAST & SHORTCUTS',
+        titleTr: '8. Bildirimler, Kısayollar & Dizin',
+        titleEn: '8. Notifications, Shortcuts & Index',
         subtitleTr:
-          '5 ekran köşesinde ve 6 semantik/glass tonda çalışan useToast(), useKeyboardShortcut(), RouteService ve tam bileşen dizini.',
+          'Bildirim balonları (Toast), klavye kısayolları ve tüm bileşen listesi.',
         subtitleEn:
-          '5-viewport multi-tone useToast() engine, useKeyboardShortcut(), RouteService URL router, and the complete component directory.',
+          'Toast notifications, keyboard shortcuts, and full component index.',
         icon: <Bell size={15} />,
         subItems: [
-          { id: 'doc-sec-toast-live', labelTr: '5 Yönlü Canlı Toast Stüdyosu', labelEn: '5-Corner Live Toast Studio' },
-          { id: 'doc-sec-services-table', labelTr: 'Hooks & Core Servisler Tablosu', labelEn: 'Hooks & Core Services Reference' },
-          { id: 'doc-sec-all-catalog', labelTr: 'Tüm Bileşenler Hızlı Geçiş Dizini', labelEn: 'All Components Quick Directory' },
+          { id: 'doc-sec-toast-live', labelTr: 'Bildirim Önizleme', labelEn: 'Toast Preview' },
+          { id: 'doc-sec-services-table', labelTr: 'Kancalar & Yardımcılar', labelEn: 'Hooks & Helpers' },
+          { id: 'doc-sec-all-catalog', labelTr: 'Tüm Bileşenler', labelEn: 'All Components' },
         ],
       },
     ],
@@ -1043,19 +1044,68 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
                 </Card>
               </div>
 
+              <Card
+                id="doc-sec-osgl-features"
+                variant="glass"
+                padding="md"
+                title={isTR ? 'Son Geliştirmeler — OSGL, Tema & FileManGL' : 'Recent Updates — OSGL, Theme & FileManGL'}
+                subtitle={
+                  isTR
+                    ? 'Masaüstü arayüzü, tema stüdyosu ve dosya yöneticisine eklenen yeni özellikler'
+                    : 'New features added to the desktop shell, theme studio, and file manager'
+                }
+              >
+                <div className="uxu-props-table-scroll">
+                  <table className="uxu-props-table">
+                    <thead>
+                      <tr>
+                        <th>{isTR ? 'Alan' : 'Area'}</th>
+                        <th>{isTR ? 'Yenilikler' : 'What’s New'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><code className="uxu-prop-name">OSGL Üst Çubuk & Pencereler</code></td>
+                        <td>
+                          {isTR
+                            ? '6 sade üst menü (Uygulamalar, Bileşenler, Pencere, Görünüm, Araçlar, Dokümantasyon), sağda hızlı arama, mobil önizleme, tema, TR/EN dil seçimi ve saat. Açık renkli duvar kağıtlarında yazılar otomatik koyuya döner. Pencerelerin yeri ve boyutu hatırlanır; açık bir pencere tekrar çağrıldığında kısa bir vurgulama efektiyle öne çıkar.'
+                            : '6 clean top menus, quick search, mobile preview, theme button, TR/EN language menu, and clock. Text automatically switches to dark on light wallpapers. Window positions and sizes are remembered, and re-triggering an open window highlights it.'}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><code className="uxu-prop-name">Tema Stüdyosu & Yazı Tipleri</code></td>
+                        <td>
+                          {isTR
+                            ? 'Görünüm menüsü sadeleştirilip hızlı ayarlara ayrıldı; tüm duvar kağıdı, cam yoğunluğu, köşe yuvarlaklığı, simge stili ve 8 farklı yazı tipi (Inter, Outfit, DM Sans, Space Grotesk, Poppins, Playfair, JetBrains Mono, Sistem) seçimi Tema Stüdyosu penceresinde toplandı.'
+                            : 'View menu now holds quick toggles, while Theme Studio houses wallpapers, glass intensity, corner radius, icon styles, and 8 font families with live font scaling.'}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td><code className="uxu-prop-name">FileManGL Dosya Yöneticisi</code></td>
+                        <td>
+                          {isTR
+                            ? '5 farklı SVG ikon paketi (Windows 11, macOS Blue, Material You, Neon Cyber Glass, Minimal) Görünüm menüsünden seçilebilir. Mobil ve dar pencerelerde sol gezinme paneli gizlenir ve üstteki butonla açılır çekmece (drawer) olarak çalışır.'
+                            : 'Includes 5 selectable SVG icon packs (Windows 11, macOS Blue, Material You, Neon Cyber Glass, Minimal) and a slide-over navigation drawer on narrow/mobile viewports.'}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+
               {/* Architectural Overview Table */}
               <Card
                 variant="glass"
                 padding="md"
                 title={
                   isTR
-                    ? 'Mimari Katmanlar & Paket İçeriği Özeti'
-                    : 'Architectural Layers & Package Contents'
+                    ? 'Katmanlar & Paket İçeriği'
+                    : 'Layers & Package Contents'
                 }
                 subtitle={
                   isTR
-                    ? 'SOLID prensipleri, 8pt uzamsal ızgara ve WebGL motor entegrasyonu'
-                    : 'SOLID principles, 8pt spatial grid, and WebGL engine integration'
+                    ? 'Temel bileşenler, hazır sayfalar ve dosya/tablo motorları'
+                    : 'Core components, page templates, and table/file engines'
                 }
               >
                 <div id="doc-sec-solid" className="uxu-props-table-scroll">

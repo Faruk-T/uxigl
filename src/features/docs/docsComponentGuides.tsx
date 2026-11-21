@@ -1897,20 +1897,20 @@ export const DATA_FEEDBACK_WEBGL_GUIDES: DocComponentGuideItem[] = [
   {
     id: 'filemangl-adapter',
     tag: '<FileManGLExplorerAdapter />',
-    titleTr: 'FileManGL WebGL2 Sanal Dosya Sistemi (VFS) & 3D Disk Haritası',
-    titleEn: 'FileManGL WebGL2 Virtual File System & 3D Disk Map Explorer',
-    categoryLabelTr: 'WebGL2 Dosya Motoru',
-    categoryLabelEn: 'WebGL2 File Engine',
+    titleTr: 'FileManGL Dosya Yöneticisi',
+    titleEn: 'FileManGL File Manager',
+    categoryLabelTr: 'Dosya Yöneticisi',
+    categoryLabelEn: 'File Manager',
     playgroundId: 'filemangl-explorer',
     importStatement: "import { FileManGLExplorerAdapter } from 'truncgil-uxigl';",
     architectureNoteTr:
-      'Tek-Aktif-Motor (Single-Active-Engine) ilkesiyle yalnızca görünür olduğunda WebGL2 bağlamı açar; uxiGL temasıyla tam senkronizedir.',
+      'uxiGL temasıyla (karanlık/aydınlık) otomatik uyumludur ve dar ekranlarda çekmece menüye geçer.',
     architectureNoteEn:
-      'Follows Single-Active-Engine lifecycle and syncs dark/light theme tokens with FileManGL.',
+      'Automatically syncs with uxiGL dark/light themes and switches to a slide-over drawer on narrow viewports.',
     summaryTr:
-      'Windows 11 sekmeli gezgin deneyimi, Çift Panel (Dual-Pane) dosya transferi, WebGL2 3D Uzamsal & Sunburst Disk Haritası görünümleri ve 5 katmanlı NTFS ACL + POSIX (0755) izin motoru sunar.',
+      'Sekmeli dosya gezgini, sürükle-bırak yükleme, 5 farklı SVG ikon paketi (Windows 11, macOS Blue, Material You, Neon, Minimal), çift panel transfer ve 3D disk görünümü sunar.',
     summaryEn:
-      'WebGL2 VFS explorer featuring Dual-Pane mode, 3D Spatial & Sunburst Disk Map views, and NTFS ACL + POSIX (0755) permissions.',
+      'Tabbed file explorer with drag-and-drop uploads, 5 SVG icon packs (Windows 11, macOS Blue, Material You, Neon, Minimal), dual-pane transfer, and 3D disk view.',
     code: `<FileManGLExplorerAdapter height={500} />`,
     propsTable: [
       {
