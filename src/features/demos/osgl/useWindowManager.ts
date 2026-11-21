@@ -188,6 +188,28 @@ export function useWindowManager({
     }
   };
 
+  // Close topmost active floating window when Escape is pressed (unless a modal dialog is open)
+  const latestStateRef = useRef({ windows, closingWindowIds, closeWindow });
+  latestStateRef.current = { windows, closingWindowIds, closeWindow };
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+      const { windows: wins, closingWindowIds: closing, closeWindow: closeFn } =
+        latestStateRef.current;
+      const activeTop = wins
+        .filter((w) => !w.minimized && !closing.includes(w.id))
+        .sort((a, b) => b.zIndex - a.zIndex)[0];
+      if (activeTop) {
+        e.preventDefault();
+        closeFn(activeTop.id);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const toggleMinimize = (winId: string) =>
     setWindows((prev) => prev.map((w) => (w.id === winId ? { ...w, minimized: !w.minimized } : w)));
 

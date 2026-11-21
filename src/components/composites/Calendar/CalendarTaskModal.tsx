@@ -43,6 +43,19 @@ export const CalendarTaskModal: React.FC<CalendarTaskModalProps> = ({
     setNotes(initialDraft.notes ?? '');
   }, [open, initialDraft]);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [open, onClose]);
+
   if (!open) return null;
   const isTR = locale === 'tr';
 
