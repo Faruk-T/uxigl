@@ -12,6 +12,7 @@ import { MobileLauncher } from './osgl/MobileLauncher';
 import { DesktopGrid } from './osgl/DesktopGrid';
 import { FloatingWindows } from './osgl/FloatingWindows';
 import { ContextMenu } from './osgl/ContextMenu';
+import { DesktopWidgets } from './osgl/DesktopWidgets';
 import { Dock } from './osgl/Dock';
 
 export type { IconBgStyle, OSWallpaperId };
@@ -150,6 +151,10 @@ export function OSGLDemo({
         closeAllWindows={() => os.setWindows([])}
         dockVisible={os.dockVisible}
         onToggleDock={() => os.setDockVisible((v) => !v)}
+        widgetsVisible={os.widgetsVisible}
+        onToggleWidgets={() => os.setWidgetsVisible((v) => !v)}
+        enabledWidgets={os.enabledWidgets}
+        onToggleWidgetItem={os.toggleWidgetItem}
         onResetIcons={() => {
           const reset: Record<string, number> = {};
           ENTERPRISE_APPS.forEach((app, idx) => { reset[app.id] = idx; });
@@ -210,6 +215,21 @@ export function OSGLDemo({
           windows={os.windows}
           onOpenApp={os.openApp}
         >
+          {os.widgetsVisible && (
+            <DesktopWidgets
+              locale={os.locale}
+              isDark={os.isDark}
+              glassOpacity={os.glassOpacity}
+              glassBlur={os.glassBlur}
+              primaryColor={os.paletteTokens.primary}
+              qualityMode={os.qualityMode}
+              setQualityMode={os.sharedStudioProps.setQualityMode}
+              openWindowCount={os.windows.length}
+              enabledWidgets={os.enabledWidgets}
+              onOpenApp={os.openApp}
+            />
+          )}
+
           <FloatingWindows
             windows={os.windows}
             setWindows={os.setWindows}

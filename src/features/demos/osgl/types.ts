@@ -1,8 +1,24 @@
-﻿import type { OSWallpaperId } from '../OSGLEngine';
+import type { OSWallpaperId } from '../OSGLEngine';
 
 export type IconBgStyle = 'vivid' | 'gradient' | 'soft' | 'glass' | 'sun' | 'mono';
 export type BgMode = 'aurora' | 'gradient' | 'solid' | 'image';
 export type QualityMode = 'quality' | 'performance';
+export type DesktopWidgetId =
+  | 'clock'
+  | 'kpi'
+  | 'timer'
+  | 'todo'
+  | 'notes'
+  | 'system';
+
+export const DEFAULT_ENABLED_WIDGETS: Record<DesktopWidgetId, boolean> = {
+  clock: true,
+  kpi: true,
+  timer: true,
+  todo: true,
+  notes: true,
+  system: true,
+};
 
 export interface EnterpriseOSApp {
   id: string;
@@ -46,6 +62,8 @@ export interface PersistedOSGLState {
   uploadedBgDataUrl?: string;
   qualityMode?: QualityMode;
   dockVisible?: boolean;
+  widgetsVisible?: boolean;
+  enabledWidgets?: Record<DesktopWidgetId, boolean>;
   windowAnimation?: boolean;
   iconBgStyle?: IconBgStyle;
   iconBgColor?: string;
