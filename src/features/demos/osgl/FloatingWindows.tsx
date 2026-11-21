@@ -1,4 +1,4 @@
-﻿import React, { useRef } from 'react';
+import React, { useRef } from 'react';
 import { Badge, GoogleIcon } from '../../../components/primitives';
 import { osWasmEngine } from '../OSGLEngine';
 import { ENTERPRISE_APPS, type FloatingWindowState, type QualityMode } from './types';

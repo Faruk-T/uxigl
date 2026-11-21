@@ -101,6 +101,7 @@ export function DesktopIconTile({
       }}
     >
       <div
+        className="macosgl-app-icon-box"
         style={{
           position: 'relative',
           width: iconBoxSize,

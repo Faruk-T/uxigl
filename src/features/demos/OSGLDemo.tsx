@@ -107,9 +107,10 @@ export function OSGLDemo({
         .macosgl-scroll::-webkit-scrollbar-track { background: transparent; }
         .macosgl-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
         .macosgl-scroll:hover::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.38); }
-        .macosgl-app-btn { transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; outline: none; }
-        .macosgl-app-btn:hover { transform: translate3d(0, -3px, 0) scale(1.05); }
-        .macosgl-app-btn:active { transform: translate3d(0, 0, 0) scale(0.96); }
+        .macosgl-app-btn { outline: none; }
+        .macosgl-app-icon-box { transition: transform 0.16s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.16s ease; }
+        .macosgl-app-btn:hover .macosgl-app-icon-box { transform: translateY(-3px) scale(1.05); }
+        .macosgl-app-btn:active .macosgl-app-icon-box { transform: translateY(0) scale(0.96); }
         .macosgl-resize-handle { opacity: 0; transition: opacity 0.15s ease; }
         .macosgl-resize-handle:hover { opacity: 0.55; }
         .macosgl-fullbleed,

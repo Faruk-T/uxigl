@@ -1,16 +1,29 @@
-﻿import React, { memo, useState } from 'react';
-import { Badge, Input, Switch } from '../../../components/primitives';
+import React, { memo, useState } from 'react';
 import { SheetGLGridAdapter } from '../../../components/composites/SheetGLGridAdapter/SheetGLGridAdapter';
 import { FileManGLExplorerAdapter } from '../../../components/composites/FileManGLExplorerAdapter/FileManGLExplorerAdapter';
+import { Calendar } from '../../../components/composites/Calendar';
 import { AnalyticsDashboardView } from '../../showcase/AnalyticsDashboardView';
+import {
+  AdminSubViews,
+  type ExtendedAdminViewId,
+} from '../../showcase/AdminSubViews';
 import {
   PageTemplatesShowcaseView,
   type PageTemplateId,
 } from '../../showcase/PageTemplatesShowcaseView';
 import { EnterpriseSettingsPage } from '../../showcase/EnterpriseSettingsPage';
+import { InteractivePlayground } from '../../playground/InteractivePlayground';
 import { ArchitectureDocsView } from '../../docs/ArchitectureDocsView';
 import type { EnterpriseOSApp } from './types';
 import { ThemeStudioPanel, type ThemeStudioPanelProps } from './ThemeStudioPanel';
+
+const ADMIN_VIEW_IDS = new Set<ExtendedAdminViewId>([
+  'users',
+  'products',
+  'forms',
+  'messages',
+  'security',
+]);
 
 export const WindowContent = memo(function WindowContent({
   app,
@@ -25,8 +38,7 @@ export const WindowContent = memo(function WindowContent({
   const [activePage, setActivePage] = useState<PageTemplateId>(() =>
     app.id.startsWith('page-') ? (app.id as PageTemplateId) : 'page-login'
   );
-  const [formSwitch, setFormSwitch] = useState(true);
-  const [formInput, setFormInput] = useState('');
+  const [selectedComponentId, setSelectedComponentId] = useState<string>('button');
 
   if (renderWindowContent) {
     const custom = renderWindowContent(app.id);
@@ -60,12 +72,42 @@ export const WindowContent = memo(function WindowContent({
     );
   }
 
-  if (app.id === 'settings' || app.id === 'security') {
+  if (app.id === 'elements-overview') {
+    return (
+      <InteractivePlayground
+        selectedComponentId={selectedComponentId}
+        onSelectComponent={setSelectedComponentId}
+        onOpenCommandPalette={() => {}}
+      />
+    );
+  }
+
+  if (ADMIN_VIEW_IDS.has(app.id as ExtendedAdminViewId)) {
+    return (
+      <AdminSubViews
+        viewId={app.id as ExtendedAdminViewId}
+        onSelectElementComponent={setSelectedComponentId}
+      />
+    );
+  }
+
+  if (app.id === 'settings') {
     return <EnterpriseSettingsPage />;
   }
 
   if (app.id === 'docs') {
     return <ArchitectureDocsView />;
+  }
+
+  if (app.id === 'calendar') {
+    return (
+      <Calendar
+        locale="tr"
+        defaultView="week"
+        showClock
+        storageKey="uxigl.osgl.calendar.v1"
+      />
+    );
   }
 
   if (app.id.startsWith('page-')) {
@@ -82,60 +124,5 @@ export const WindowContent = memo(function WindowContent({
     return <ThemeStudioPanel {...studioProps} />;
   }
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <div>
-          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>{app.label}</h3>
-          <p style={{ margin: '2px 0 0', fontSize: 12.5, opacity: 0.72 }}>
-            uxiGL {app.category} modülü — yüzen pencere içinde tam etkileşimli içerik.
-          </p>
-        </div>
-        {app.badge && (
-          <Badge variant="tonal" tone="info">
-            {app.badge}
-          </Badge>
-        )}
-      </div>
-
-      <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-        <div style={{ flex: 1 }}>
-          <Input
-            placeholder={`${app.label} içinde hızlı işlem veya arama...`}
-            value={formInput}
-            onChange={(val) => setFormInput(val)}
-          />
-        </div>
-        <Switch value={formSwitch} onChange={setFormSwitch} />
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: 10,
-        }}
-      >
-        {[
-          { k: 'Aktif Kayıt', v: '1.248' },
-          { k: 'Canlı Senkron', v: formSwitch ? 'Açık' : 'Duraklatıldı' },
-          { k: 'Yanıt Süresi', v: '14 ms' },
-        ].map((item) => (
-          <div
-            key={item.k}
-            style={{
-              padding: 12,
-              borderRadius: 12,
-              backgroundColor: 'rgba(148, 163, 184, 0.12)',
-              border: '1px solid rgba(148, 163, 184, 0.18)',
-            }}
-          >
-            <div style={{ fontSize: 11, opacity: 0.7 }}>{item.k}</div>
-            <div style={{ fontSize: 18, fontWeight: 800, marginTop: 4 }}>{item.v}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <AdminSubViews viewId="forms" onSelectElementComponent={setSelectedComponentId} />;
 });
-
