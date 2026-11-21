@@ -745,7 +745,7 @@ const SegmentedTabsAccordionLiveMiniDemo: React.FC = () => {
   const [tab, setTab] = useState('t1');
   return (
     <div className="uxu-stack-md">
-      <SegmentedControl
+      <SegmentedControl<'glass' | 'tonal' | 'hybrid'>
         value={seg}
         onChange={setSeg}
         fullWidth
