@@ -233,6 +233,8 @@ export function OSGLDemo({
               enabledWidgets={os.enabledWidgets}
               widgetPositions={os.widgetPositions}
               onMoveWidget={os.updateWidgetPosition}
+              widgetSizes={os.widgetSizes}
+              onResizeWidget={os.updateWidgetSize}
               viewportSize={os.viewportSize}
               onOpenApp={os.openApp}
             />

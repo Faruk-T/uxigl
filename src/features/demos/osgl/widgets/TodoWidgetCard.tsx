@@ -46,18 +46,19 @@ export function TodoWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
     setTodoDraft('');
   };
 
-  const { isTR, primaryColor, subtleBg, subtleBorder, cardStyle } = theme;
+  const { isTR, primaryColor, subtleBg, subtleBorder, cardStyle, scale } = theme;
+  const s = Math.max(0.88, Math.min(1.4, scale));
 
   return (
     <div style={cardStyle}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: 12, fontWeight: 700 }}>{isTR ? 'Yapılacaklar' : 'To-Do List'}</span>
-        <span style={{ fontSize: 11, opacity: 0.65 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <span style={{ fontSize: Math.round(12 * s), fontWeight: 700 }}>{isTR ? 'Yapılacaklar' : 'To-Do List'}</span>
+        <span style={{ fontSize: Math.round(11 * s), opacity: 0.65 }}>
           {todos.filter((t) => t.done).length}/{todos.length}
         </span>
       </div>
 
-      <div style={{ display: 'flex', gap: 6 }}>
+      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
         <input
           type="text"
           value={todoDraft}
@@ -100,7 +101,7 @@ export function TodoWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
         </button>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 132, overflowY: 'auto' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 5, flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {todos.map((item) => (
           <div
             key={item.id}
@@ -111,7 +112,7 @@ export function TodoWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
               padding: '4px 6px',
               borderRadius: 8,
               backgroundColor: subtleBg,
-              fontSize: 11.5,
+              fontSize: Math.round(11.5 * s),
             }}
           >
             <button

@@ -25,31 +25,49 @@ export interface WidgetPosition {
   y: number;
 }
 
+export interface WidgetSize {
+  width: number;
+  height: number;
+}
+
 export const WIDGET_CARD_WIDTH = 272;
 export const WIDGET_GRID_STEP = 20;
+export const WIDGET_MIN_WIDTH = 220;
+export const WIDGET_MAX_WIDTH = 560;
+export const WIDGET_MIN_HEIGHT = 96;
+export const WIDGET_MAX_HEIGHT = 520;
+
+export const DEFAULT_WIDGET_SIZES: Record<DesktopWidgetId, WidgetSize> = {
+  clock: { width: 280, height: 120 },
+  kpi: { width: 280, height: 220 },
+  timer: { width: 280, height: 120 },
+  todo: { width: 280, height: 200 },
+  notes: { width: 280, height: 140 },
+  system: { width: 280, height: 120 },
+};
 
 export function getDefaultWidgetPositions(
   viewportWidth = 1366
 ): Record<DesktopWidgetId, WidgetPosition> {
-  const colRight = Math.max(20, Math.round((viewportWidth - WIDGET_CARD_WIDTH - 20) / WIDGET_GRID_STEP) * WIDGET_GRID_STEP);
-  const colLeft = Math.max(20, colRight - WIDGET_CARD_WIDTH - 20);
+  const colRight = Math.max(20, Math.round((viewportWidth - 280 - 20) / WIDGET_GRID_STEP) * WIDGET_GRID_STEP);
+  const colLeft = Math.max(20, colRight - 280 - 20);
   if (viewportWidth >= 1180) {
     return {
       clock: { x: colRight, y: 20 },
-      kpi: { x: colRight, y: 120 },
-      system: { x: colRight, y: 300 },
+      kpi: { x: colRight, y: 160 },
+      system: { x: colRight, y: 400 },
       timer: { x: colLeft, y: 20 },
-      todo: { x: colLeft, y: 180 },
+      todo: { x: colLeft, y: 160 },
       notes: { x: colLeft, y: 380 },
     };
   }
   return {
     clock: { x: colRight, y: 20 },
-    kpi: { x: colRight, y: 120 },
-    timer: { x: colRight, y: 300 },
-    todo: { x: colRight, y: 440 },
-    notes: { x: colRight, y: 620 },
-    system: { x: colRight, y: 760 },
+    kpi: { x: colRight, y: 160 },
+    timer: { x: colRight, y: 400 },
+    todo: { x: colRight, y: 540 },
+    notes: { x: colRight, y: 760 },
+    system: { x: colRight, y: 920 },
   };
 }
 
@@ -98,6 +116,7 @@ export interface PersistedOSGLState {
   widgetsVisible?: boolean;
   enabledWidgets?: Record<DesktopWidgetId, boolean>;
   widgetPositions?: Partial<Record<DesktopWidgetId, WidgetPosition>>;
+  widgetSizes?: Partial<Record<DesktopWidgetId, WidgetSize>>;
   windowAnimation?: boolean;
   iconBgStyle?: IconBgStyle;
   iconBgColor?: string;

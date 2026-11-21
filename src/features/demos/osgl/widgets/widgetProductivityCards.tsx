@@ -24,13 +24,14 @@ export function FocusTimerWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
 
   const mins = String(Math.floor(timerSec / 60)).padStart(2, '0');
   const secs = String(timerSec % 60).padStart(2, '0');
-  const { isTR, primaryColor, subtleBg, subtleBorder, cardStyle } = theme;
+  const { isTR, primaryColor, subtleBg, subtleBorder, cardStyle, scale } = theme;
+  const s = Math.max(0.88, Math.min(1.65, scale));
 
   return (
     <div style={cardStyle}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700 }}>
-          <Clock size={14} color={primaryColor} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: Math.round(12 * s), fontWeight: 700 }}>
+          <Clock size={Math.round(14 * s)} color={primaryColor} />
           <span>{isTR ? 'Odak Sayacı' : 'Focus Timer'}</span>
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
@@ -46,7 +47,7 @@ export function FocusTimerWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
                 border: `1px solid ${subtleBorder}`,
                 backgroundColor: Math.ceil(timerSec / 60) === m ? subtleBg : 'transparent',
                 color: 'inherit',
-                fontSize: 10.5,
+                fontSize: Math.round(10.5 * Math.min(1.25, s)),
                 fontWeight: 700,
                 padding: '2px 6px',
                 borderRadius: 6,
@@ -58,8 +59,8 @@ export function FocusTimerWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
           ))}
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
-        <span style={{ fontSize: 22, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
+        <span style={{ fontSize: Math.round(22 * s), fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
           {mins}:{secs}
         </span>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -128,13 +129,14 @@ export function QuickNotesWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
     }
   }, [noteText]);
 
-  const { isTR, primaryColor, subtleBg, subtleBorder, cardStyle } = theme;
+  const { isTR, primaryColor, subtleBg, subtleBorder, cardStyle, scale } = theme;
+  const s = Math.max(0.88, Math.min(1.5, scale));
 
   return (
     <div style={cardStyle}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700 }}>
-          <StickyNote size={14} color={primaryColor} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: Math.round(12 * s), fontWeight: 700 }}>
+          <StickyNote size={Math.round(14 * s)} color={primaryColor} />
           <span>{isTR ? 'Hızlı Notlar' : 'Quick Notes'}</span>
         </span>
         {noteText && (
@@ -160,17 +162,17 @@ export function QuickNotesWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
         value={noteText}
         onChange={(e) => setNoteText(e.target.value)}
         placeholder={isTR ? 'Buraya hızlı not alabilirsiniz...' : 'Jot down a quick note...'}
-        rows={3}
         style={{
           width: '100%',
-          resize: 'vertical',
-          minHeight: 58,
+          flex: 1,
+          resize: 'none',
+          minHeight: 54,
           padding: '7px 9px',
           borderRadius: 9,
           border: `1px solid ${subtleBorder}`,
           backgroundColor: subtleBg,
           color: 'inherit',
-          fontSize: 11.5,
+          fontSize: Math.round(11.5 * Math.min(1.35, s)),
           lineHeight: 1.4,
           fontFamily: 'inherit',
           outline: 'none',

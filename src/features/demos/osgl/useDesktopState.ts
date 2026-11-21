@@ -8,6 +8,7 @@ import {
 } from '../OSGLEngine';
 import {
   DEFAULT_ENABLED_WIDGETS,
+  DEFAULT_WIDGET_SIZES,
   ENTERPRISE_APPS,
   getDefaultWidgetPositions,
   loadOSGLState,
@@ -17,6 +18,7 @@ import {
   type IconBgStyle,
   type QualityMode,
   type WidgetPosition,
+  type WidgetSize,
 } from './types';
 import { FULLBLEED_APP_IDS, useWindowManager } from './useWindowManager';
 import { computeDesktopAppearance, useOSGLPersistence } from './useDesktopPersistence';
@@ -87,8 +89,18 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
   const updateWidgetPosition = (id: DesktopWidgetId, pos: WidgetPosition) => {
     setWidgetPositions((prev) => ({ ...prev, [id]: pos }));
   };
+  const [widgetSizes, setWidgetSizes] = useState<
+    Record<DesktopWidgetId, WidgetSize>
+  >(() => ({
+    ...DEFAULT_WIDGET_SIZES,
+    ...(savedState?.widgetSizes ?? {}),
+  }));
+  const updateWidgetSize = (id: DesktopWidgetId, size: WidgetSize) => {
+    setWidgetSizes((prev) => ({ ...prev, [id]: size }));
+  };
   const resetWidgetPositions = () => {
     setWidgetPositions(getDefaultWidgetPositions(viewportSize.w));
+    setWidgetSizes(DEFAULT_WIDGET_SIZES);
   };
   const [windowAnimation, setWindowAnimation] = useState<boolean>(
     savedState?.windowAnimation ?? true
@@ -180,6 +192,7 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     widgetsVisible,
     enabledWidgets,
     widgetPositions,
+    widgetSizes,
     windowAnimation,
     iconBgStyle,
     iconBgColor,
@@ -291,6 +304,8 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     toggleWidgetItem,
     widgetPositions,
     updateWidgetPosition,
+    widgetSizes,
+    updateWidgetSize,
     resetWidgetPositions,
     windowAnimation,
     iconBgStyle,
