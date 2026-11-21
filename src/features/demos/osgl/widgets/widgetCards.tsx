@@ -22,54 +22,66 @@ export function ClockWidgetCard({
   theme: WidgetThemeStyle;
   onOpenCalendar: () => void;
 }) {
-  const isCompact = theme.width >= theme.height * 1.45;
+  const showMiniCalendar = theme.width >= 360 && theme.height >= 170;
+  const clockColWidth = showMiniCalendar ? (theme.width - 40) * 0.46 : theme.width - 26;
+  const isCompact = !showMiniCalendar && clockColWidth >= theme.height * 1.45;
   const dialSize = isCompact
-    ? Math.round(Math.max(58, Math.min(theme.height - 28, theme.width * 0.34, 156)))
-    : Math.round(Math.max(76, Math.min(theme.width - 56, theme.height * 0.50, 196)));
-  const digitalScale = Math.max(0.88, Math.min(1.65, theme.scale));
+    ? Math.round(Math.max(58, Math.min(theme.height - 28, clockColWidth * 0.36, 152)))
+    : Math.round(Math.max(72, Math.min(clockColWidth - 24, theme.height * (showMiniCalendar ? 0.46 : 0.50), 184)));
+  const digitalScale = Math.max(
+    0.85,
+    Math.min(1.55, showMiniCalendar ? theme.scale * 0.88 : theme.scale)
+  );
+
+  // Build current month calendar grid (Monday-first)
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const todayDate = now.getDate();
+  const firstDay = new Date(year, month, 1);
+  const startOffset = (firstDay.getDay() + 6) % 7; // Monday = 0
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  const monthLabel = now.toLocaleDateString(theme.isTR ? 'tr-TR' : 'en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+  const weekdays = theme.isTR
+    ? ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pa']
+    : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
+  const cells: { day: number; inMonth: boolean; isToday: boolean }[] = [];
+  for (let i = startOffset - 1; i >= 0; i--) {
+    cells.push({ day: daysInPrevMonth - i, inMonth: false, isToday: false });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, inMonth: true, isToday: d === todayDate });
+  }
+  while (cells.length < 42) {
+    cells.push({
+      day: cells.length - (startOffset + daysInMonth) + 1,
+      inMonth: false,
+      isToday: false,
+    });
+  }
+
+  const calScale = Math.max(0.9, Math.min(1.35, theme.scale * 0.92));
 
   return (
-    <div style={theme.cardStyle}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: isCompact ? 'center' : 'flex-start',
-          justifyContent: 'space-between',
-          gap: 8,
-          height: '100%',
-          minHeight: 0,
-        }}
-      >
-        <AnalogDigitalClock
-          size={dialSize}
-          compact={isCompact}
-          scale={digitalScale}
-          showSeconds
-          showDate
-          showFormatToggle
-          locale={theme.isTR ? 'tr' : 'en'}
-          variant="glass"
-          style={{
-            flex: 1,
-            minWidth: 0,
-            height: '100%',
-            background: 'transparent',
-            border: 'none',
-            boxShadow: 'none',
-            padding: 0,
-            gap: Math.round(10 * Math.min(1.4, theme.scale)),
-            justifyContent: isCompact ? 'flex-start' : 'center',
-          }}
-        />
+    <div style={{ ...theme.cardStyle, position: 'relative' }}>
+      {!showMiniCalendar && (
         <button
           type="button"
           onClick={onOpenCalendar}
           title={theme.isTR ? 'Takvimi Aç' : 'Open Calendar'}
           style={{
-            width: Math.round(32 * Math.min(1.3, theme.scale)),
-            height: Math.round(32 * Math.min(1.3, theme.scale)),
-            flexShrink: 0,
-            borderRadius: 10,
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            zIndex: 2,
+            width: Math.round(30 * Math.min(1.25, theme.scale)),
+            height: Math.round(30 * Math.min(1.25, theme.scale)),
+            borderRadius: 9,
             border: 'none',
             backgroundColor: theme.subtleBg,
             color: theme.primaryColor,
@@ -77,11 +89,155 @@ export function ClockWidgetCard({
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            alignSelf: 'flex-start',
           }}
         >
-          <Calendar size={Math.round(16 * Math.min(1.3, theme.scale))} />
+          <Calendar size={Math.round(15 * Math.min(1.25, theme.scale))} />
         </button>
+      )}
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: showMiniCalendar ? '1fr 1.15fr' : '1fr',
+          alignItems: 'center',
+          gap: showMiniCalendar ? 14 : 0,
+          width: '100%',
+          height: '100%',
+          minHeight: 0,
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+            minWidth: 0,
+            minHeight: 0,
+          }}
+        >
+          <AnalogDigitalClock
+            size={dialSize}
+            compact={isCompact}
+            scale={digitalScale}
+            showSeconds
+            showDate
+            showFormatToggle
+            locale={theme.isTR ? 'tr' : 'en'}
+            variant="glass"
+            style={{
+              width: '100%',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+              padding: 0,
+              gap: Math.round(8 * Math.min(1.35, theme.scale)),
+              justifyContent: 'center',
+            }}
+          />
+        </div>
+
+        {showMiniCalendar && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              height: '100%',
+              minWidth: 0,
+              minHeight: 0,
+              paddingLeft: 12,
+              borderLeft: `1px solid ${theme.subtleBorder}`,
+              gap: Math.round(5 * calScale),
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 6,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: Math.round(12.5 * calScale),
+                  fontWeight: 700,
+                  textTransform: 'capitalize',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {monthLabel}
+              </span>
+              <button
+                type="button"
+                onClick={onOpenCalendar}
+                title={theme.isTR ? 'Takvimi Aç' : 'Open Calendar'}
+                style={{
+                  width: Math.round(26 * calScale),
+                  height: Math.round(26 * calScale),
+                  borderRadius: 8,
+                  border: 'none',
+                  backgroundColor: theme.subtleBg,
+                  color: theme.primaryColor,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                <Calendar size={Math.round(13.5 * calScale)} />
+              </button>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+                gap: 2,
+                textAlign: 'center',
+              }}
+            >
+              {weekdays.map((wd) => (
+                <div
+                  key={wd}
+                  style={{
+                    fontSize: Math.round(9.5 * calScale),
+                    fontWeight: 700,
+                    opacity: 0.55,
+                    paddingBottom: 2,
+                  }}
+                >
+                  {wd}
+                </div>
+              ))}
+              {cells.map((cell, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={onOpenCalendar}
+                  style={{
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: `${Math.round(3 * calScale)}px 0`,
+                    fontSize: Math.round(10.5 * calScale),
+                    fontWeight: cell.isToday ? 800 : 500,
+                    fontVariantNumeric: 'tabular-nums',
+                    backgroundColor: cell.isToday ? theme.primaryColor : 'transparent',
+                    color: cell.isToday ? '#ffffff' : 'inherit',
+                    opacity: cell.inMonth || cell.isToday ? 1 : 0.3,
+                    cursor: 'pointer',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {cell.day}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
