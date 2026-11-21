@@ -43,8 +43,10 @@ function printHelp() {
 
 ${BOLD}Commands:${RESET}
   ${GREEN}init${RESET} [target-file]      Generate a ready-to-use <UXIWorkspace /> component in your React project
-                          (Default: src/components/UXIWorkspace.tsx)
+                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|macosgl>)
   ${GREEN}create${RESET} <project-name>   Scaffold a new Vite + React + TypeScript + uxiGL starter app
+                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|macosgl>)
+  ${GREEN}template${RESET} <name>         Quick-select and generate a template in one command
   ${GREEN}demo${RESET}                    Launch the interactive uxiGL Showcase & Documentation server
   ${GREEN}doctor${RESET}                  Verify Node.js, build artifacts, styles, and environment readiness
   ${GREEN}help${RESET}                    Show this help message
@@ -59,10 +61,84 @@ ${BOLD}Single-Command Installation:${RESET}
 ${BOLD}CLI Examples:${RESET}
   ${DIM}# 1. Generate ready-to-use UXIWorkspace.tsx component:${RESET}
   npx truncgil-uxigl init
+  npx truncgil-uxigl init --template macosgl
+  npx truncgil-uxigl template flowgl
 
-  ${DIM}# 2. Scaffold a brand-new starter project:${RESET}
-  npx truncgil-uxigl create my-uxigl-app
+  ${DIM}# 2. Scaffold a brand-new starter project with a chosen template:${RESET}
+  npx truncgil-uxigl create my-uxigl-app --template macosgl
+  npx truncgil-uxigl create my-flow-app --template flowgl
 `);
+}
+
+const TEMPLATE_REGISTRY = {
+  enterprisegl: {
+    label: 'EnterpriseGL',
+    importSymbol: 'EnterpriseGLTemplate',
+    description: 'Veri yoğun kurumsal yönetim paneli (KPI + Analitik)',
+  },
+  flowgl: {
+    label: 'FlowGL',
+    importSymbol: 'FlowGLTemplate',
+    description: 'Ferah 3 kolonlu master-detail çalışma alanı',
+  },
+  cargogl: {
+    label: 'CargoGL',
+    importSymbol: 'CargoGLTemplate',
+    description: 'Akıllı lojistik ve filo takip paneli',
+  },
+  synthgl: {
+    label: 'SynthGL',
+    importSymbol: 'SynthGLTemplate',
+    description: 'AI iş akışı ve ajan orkestrasyon stüdyosu',
+  },
+  macosgl: {
+    label: 'MacOSGL',
+    importSymbol: 'MacOSGLTemplate',
+    description: 'macOS / Ubuntu / Windows 11 duvar kağıtlı, yüzen pencereli OS şablonu',
+  },
+};
+
+function normalizeTemplateId(raw) {
+  if (!raw) return null;
+  const key = String(raw).trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (key === 'enterprise' || key === 'enterprisegl') return 'enterprisegl';
+  if (key === 'flow' || key === 'flowgl') return 'flowgl';
+  if (key === 'cargo' || key === 'cargogl') return 'cargogl';
+  if (key === 'synth' || key === 'synthgl') return 'synthgl';
+  if (key === 'macos' || key === 'macosgl' || key === 'eduos' || key === 'os') return 'macosgl';
+  return null;
+}
+
+function buildTemplateComponentCode(templateId, componentName) {
+  const entry = TEMPLATE_REGISTRY[templateId];
+  if (!entry) return STARTER_COMPONENT_TEMPLATE.replace(/UXIWorkspace/g, componentName);
+
+  const renderProps =
+    templateId === 'enterprisegl'
+      ? ''
+      : `\n          onNavigate={() => {}}\n          onOpenThemeStudio={() => {}}`;
+
+  return `import React from 'react';
+import {
+  ThemeProvider,
+  ToastProvider,
+  ${entry.importSymbol},
+} from 'truncgil-uxigl';
+import 'truncgil-uxigl/styles';
+
+export function ${componentName}() {
+  return (
+    <ThemeProvider defaultTheme="system" defaultRadius={12}>
+      <ToastProvider>
+        <${entry.importSymbol}${renderProps}
+        />
+      </ToastProvider>
+    </ThemeProvider>
+  );
+}
+
+export default ${componentName};
+`;
 }
 
 const STARTER_COMPONENT_TEMPLATE = `import React, { useState } from 'react';
@@ -197,6 +273,7 @@ function handleInit(rawArgs) {
   printBanner();
   let dirOpt = null;
   let nameOpt = null;
+  let templateOpt = null;
   let positionalPath = null;
 
   for (let i = 0; i < rawArgs.length; i++) {
@@ -205,9 +282,19 @@ function handleInit(rawArgs) {
       dirOpt = rawArgs[++i];
     } else if (arg === '--name' || arg === '-n') {
       nameOpt = rawArgs[++i];
+    } else if (arg === '--template' || arg === '-t') {
+      templateOpt = rawArgs[++i];
+    } else if (arg.startsWith('--template=')) {
+      templateOpt = arg.split('=')[1];
     } else if (!arg.startsWith('-') && !positionalPath) {
       positionalPath = arg;
     }
+  }
+
+  const templateId = normalizeTemplateId(templateOpt);
+  if (templateOpt && !templateId) {
+    console.error(`${YELLOW}⚠ Unknown template "${templateOpt}". Available templates: ${Object.keys(TEMPLATE_REGISTRY).join(', ')}${RESET}`);
+    process.exit(1);
   }
 
   const componentName = (nameOpt || 'UXIWorkspace').replace(/\.(tsx|ts|jsx|js)$/i, '');
@@ -219,10 +306,11 @@ function handleInit(rawArgs) {
     fs.mkdirSync(outDir, { recursive: true });
   }
 
-  const customizedTemplate = STARTER_COMPONENT_TEMPLATE.replace(/UXIWorkspace/g, componentName);
+  const customizedTemplate = buildTemplateComponentCode(templateId, componentName);
 
   fs.writeFileSync(outPath, customizedTemplate, 'utf8');
-  console.log(`${GREEN}✔ Created uxiGL starter component at:${RESET} ${BOLD}${outPath}${RESET}`);
+  const label = templateId ? ` (${TEMPLATE_REGISTRY[templateId].label})` : '';
+  console.log(`${GREEN}✔ Created uxiGL starter component${label} at:${RESET} ${BOLD}${outPath}${RESET}`);
   console.log(`
 ${BOLD}Next steps:${RESET}
   1. Ensure ${CYAN}truncgil-uxigl${RESET} is installed in your project:
@@ -232,10 +320,26 @@ ${BOLD}Next steps:${RESET}
 `);
 }
 
-function handleCreate(projectName) {
+function handleCreate(projectName, rawArgs = []) {
   printBanner();
-  if (!projectName) {
-    console.error(`${YELLOW}⚠ Please specify a project directory name:${RESET}\n  npx truncgil-uxigl create my-uxigl-app`);
+  if (!projectName || projectName.startsWith('-')) {
+    console.error(`${YELLOW}⚠ Please specify a project directory name:${RESET}\n  npx truncgil-uxigl create my-uxigl-app --template macosgl`);
+    process.exit(1);
+  }
+
+  let templateOpt = null;
+  for (let i = 0; i < rawArgs.length; i++) {
+    const arg = rawArgs[i];
+    if (arg === '--template' || arg === '-t') {
+      templateOpt = rawArgs[++i];
+    } else if (arg.startsWith('--template=')) {
+      templateOpt = arg.split('=')[1];
+    }
+  }
+
+  const templateId = normalizeTemplateId(templateOpt);
+  if (templateOpt && !templateId) {
+    console.error(`${YELLOW}⚠ Unknown template "${templateOpt}". Available templates: ${Object.keys(TEMPLATE_REGISTRY).join(', ')}${RESET}`);
     process.exit(1);
   }
 
@@ -327,7 +431,7 @@ export default defineConfig({
 
   fs.writeFileSync(
     path.join(targetDir, 'src', 'components', 'UXIWorkspace.tsx'),
-    STARTER_COMPONENT_TEMPLATE,
+    buildTemplateComponentCode(templateId, 'UXIWorkspace'),
     'utf8'
   );
   fs.writeFileSync(
@@ -389,16 +493,36 @@ function handleDemo() {
   spawnSync('npx', ['vite'], { cwd: pkgRoot, stdio: 'inherit', shell: true });
 }
 
+function handleTemplate(rawArgs) {
+  const chosen = rawArgs[0];
+  if (!chosen || chosen === 'list' || chosen === '--list') {
+    printBanner();
+    console.log(`${BOLD}Available uxiGL Templates:${RESET}`);
+    for (const [id, info] of Object.entries(TEMPLATE_REGISTRY)) {
+      console.log(`  ${CYAN}${id.padEnd(14)}${RESET} ${BOLD}${info.label}${RESET} — ${info.description}`);
+    }
+    console.log(`\n${BOLD}Usage:${RESET}
+  npx truncgil-uxigl template macosgl
+  npx truncgil-uxigl init --template flowgl
+  npx truncgil-uxigl create my-app --template macosgl
+`);
+    return;
+  }
+  handleInit(['--template', chosen, ...rawArgs.slice(1)]);
+}
+
 const args = process.argv.slice(2);
 const invokedBin = path.basename(process.argv[1] || '');
 const cmd = (args[0] || 'help').toLowerCase();
 
-if (invokedBin.includes('create-uxigl') && args[0] && !['init', 'create', 'doctor', 'demo', 'help', '-v', '--version'].includes(cmd)) {
-  handleCreate(args[0]);
+if (invokedBin.includes('create-uxigl') && args[0] && !['init', 'create', 'template', 'use', 'doctor', 'demo', 'help', '-v', '--version'].includes(cmd)) {
+  handleCreate(args[0], args.slice(1));
 } else if (cmd === 'init' || cmd === 'setup') {
   handleInit(args.slice(1));
 } else if (cmd === 'create') {
-  handleCreate(args[1]);
+  handleCreate(args[1], args.slice(2));
+} else if (cmd === 'template' || cmd === 'use') {
+  handleTemplate(args.slice(1));
 } else if (cmd === 'doctor' || cmd === 'info' || cmd === 'check') {
   handleDoctor();
 } else if (cmd === 'demo' || cmd === 'studio' || cmd === 'start') {
