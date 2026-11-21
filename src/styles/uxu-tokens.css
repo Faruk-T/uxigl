@@ -5588,11 +5588,26 @@ pre {
 }
 .uxu-syn-tag {
   color: var(--uxu-secondary);
+  font-weight: 700;
+}
+.uxu-syn-attr {
+  color: var(--uxu-info);
+  font-weight: 600;
+}
+.uxu-syn-fn {
+  color: var(--uxu-primary-hover);
+  font-weight: 600;
+}
+.uxu-syn-type {
+  color: var(--uxu-warning);
   font-weight: 600;
 }
 .uxu-syn-number {
   color: var(--uxu-warning);
   font-weight: 600;
+}
+.uxu-syn-punct {
+  color: var(--uxu-text-muted);
 }
 .uxu-syn-comment {
   color: var(--uxu-text-muted);
@@ -6093,7 +6108,7 @@ pre {
   opacity: 0.8;
 }
 
-/* Utility Helpers */
+/* Utility Helpers (8pt Spatial Grid) */
 .uxu-stack-sm {
   display: flex;
   flex-direction: column;
@@ -6102,7 +6117,12 @@ pre {
 .uxu-stack-md {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+}
+.uxu-stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 .uxu-card-footer-row {
   display: flex;

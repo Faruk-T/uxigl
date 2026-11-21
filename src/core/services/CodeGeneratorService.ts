@@ -18,7 +18,11 @@ export type CodeTokenType =
   | 'string'
   | 'comment'
   | 'tag'
+  | 'attr'
+  | 'fn'
+  | 'type'
   | 'number'
+  | 'punct'
   | 'plain';
 
 export interface CodeToken {
@@ -27,7 +31,7 @@ export interface CodeToken {
 }
 
 const TOKEN_REGEX =
-  /(\/\/[^\n]*|#[^\n]*)|('[^'\n]*'|"[^"\n]*"|`[^`]*`)|\b(import|from|export|function|return|const|let|var|true|false|undefined|type|interface)\b|(<\/?[A-Za-z][A-Za-z0-9.]*|\/>)|\b(\d+(?:\.\d+)?)\b/g;
+  /(\/\/[^\n]*|#[^\n]*)|('[^'\n]*'|"[^"\n]*"|`[^`]*`)|\b(import|from|export|default|function|return|const|let|var|true|false|null|undefined|type|interface|if|else|async|await|new|typeof|as|npm|npx|pnpm|yarn|bun|install|add|init|run|dev)\b|(<\/?[A-Za-z][A-Za-z0-9.]*|\/>)|(\b[a-zA-Z_][a-zA-Z0-9_-]*(?==))|(\b[a-z_][a-zA-Z0-9_]*(?=\s*\())|(\b[A-Z][a-zA-Z0-9_]*\b)|\b(\d+(?:\.\d+)?)\b|([{}()[\]=>]+)/g;
 
 export class CodeGeneratorService {
   public static generateSnippet(config: CodeGenConfig): string {
@@ -78,7 +82,15 @@ export class CodeGeneratorService {
       } else if (match[4]) {
         tokens.push({ type: 'tag', value: match[4] });
       } else if (match[5]) {
-        tokens.push({ type: 'number', value: match[5] });
+        tokens.push({ type: 'attr', value: match[5] });
+      } else if (match[6]) {
+        tokens.push({ type: 'fn', value: match[6] });
+      } else if (match[7]) {
+        tokens.push({ type: 'type', value: match[7] });
+      } else if (match[8]) {
+        tokens.push({ type: 'number', value: match[8] });
+      } else if (match[9]) {
+        tokens.push({ type: 'punct', value: match[9] });
       }
 
       lastIndex = TOKEN_REGEX.lastIndex;
