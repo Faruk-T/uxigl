@@ -22,6 +22,19 @@ export {
   type PageTemplateId,
   type PageTemplatesShowcaseViewProps,
 } from './features/showcase/PageTemplatesShowcaseView';
+export {
+  LoginPage,
+  RegisterPage,
+  PricingPage,
+  ProfilePage,
+  InvoicePage,
+  KanbanPage,
+  StatusPage,
+  type LoginPageProps,
+  type RegisterPageProps,
+  type PricingPageProps,
+  type StatusPageProps,
+} from './features/showcase/pages';
 export { EnterpriseSettingsPage } from './features/showcase/EnterpriseSettingsPage';
 export {
   AnalyticsDashboardView,

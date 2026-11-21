@@ -2124,6 +2124,7 @@ export default function App() {
                 activePageId={landingPageDemoId}
                 onPageChange={setLandingPageDemoId}
                 onNavigateHome={() => onNavigate('dashboard', 'overview')}
+                showHeader
               />
             )}
 

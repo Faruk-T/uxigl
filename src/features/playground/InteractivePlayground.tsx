@@ -2267,6 +2267,7 @@ export function CloudFileManagerExample() {
             <PageTemplatesShowcaseView
               activePageId={playgroundPageId}
               onPageChange={setPlaygroundPageId}
+              showHeader
             />
           </div>
         );
