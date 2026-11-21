@@ -1,5 +1,4 @@
-﻿import React, { useRef } from 'react';
-import { Grid2x2, RotateCcw, Trash2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
 import { GoogleIcon } from '../../../components/primitives';
 import {
   DOCK_APP_IDS,
@@ -41,6 +40,42 @@ export function Dock({
   const dockItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const dockRestingCenters = useRef<number[]>([]);
   const dockRafRef = useRef<number | null>(null);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  const renderDockTooltip = (label: string) => (
+    <span
+      role="tooltip"
+      style={{
+        position: 'absolute',
+        bottom: 'calc(100% + 12px)',
+        left: 0,
+        right: 0,
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+        zIndex: 20,
+      }}
+    >
+      <span
+        style={{
+          padding: '5px 10px',
+          borderRadius: 8,
+          backgroundColor: isDark ? 'rgba(15, 23, 42, 0.90)' : 'rgba(255, 255, 255, 0.94)',
+          color: isDark ? '#f8fafc' : '#0f172a',
+          backdropFilter: glassBlur > 0 ? 'blur(16px) saturate(160%)' : undefined,
+          WebkitBackdropFilter: glassBlur > 0 ? 'blur(16px) saturate(160%)' : undefined,
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.14)' : '1px solid rgba(15, 23, 42, 0.10)',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.22)',
+          fontSize: 12,
+          fontWeight: 600,
+          lineHeight: 1.2,
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {label}
+      </span>
+    </span>
+  );
 
   const handleMouseEnter = () => {
     dockRestingCenters.current = dockItemRefs.current.map((btn) => {
@@ -132,12 +167,17 @@ export function Dock({
             key={id}
             ref={(el) => { dockItemRefs.current[idx] = el; }}
             type="button"
-            title={app.label}
+            aria-label={app.label}
+            onMouseEnter={() => setHoveredIdx(idx)}
+            onMouseLeave={() => setHoveredIdx((prev) => (prev === idx ? null : prev))}
+            onFocus={() => setHoveredIdx(idx)}
+            onBlur={() => setHoveredIdx((prev) => (prev === idx ? null : prev))}
             onClick={() => onOpenApp(id)}
             style={{
               position: 'relative',
               width: 46,
               height: 46,
+              padding: 0,
               borderRadius: 13,
               border: dockSurf.border ?? 'none',
               background: dockSurf.background,
@@ -152,6 +192,7 @@ export function Dock({
               flexShrink: 0,
             }}
           >
+            {hoveredIdx === idx && renderDockTooltip(app.label)}
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
               <GoogleIcon name={app.googleIcon} size={28} />
             </span>
@@ -164,41 +205,86 @@ export function Dock({
 
       <div style={{ width: 1, height: 30, alignSelf: 'center', backgroundColor: isDark ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.16)', margin: '0 2px' }} />
 
-      <button
-        ref={(el) => { dockItemRefs.current[DOCK_APP_IDS.length] = el; }}
-        type="button"
-        title="Pencereleri Izgara Diz"
-        onClick={onArrangeGrid}
-        style={{ width: 44, height: 44, borderRadius: 13, border: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)', color: isDark ? '#f8fafc' : '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out', flexShrink: 0 }}
-      >
-        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
-          <Grid2x2 size={18} />
-        </span>
-      </button>
-
-      <button
-        ref={(el) => { dockItemRefs.current[DOCK_APP_IDS.length + 1] = el; }}
-        type="button"
-        title="Pencereleri Sıfırla"
-        onClick={onResetWindows}
-        style={{ width: 44, height: 44, borderRadius: 13, border: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)', color: isDark ? '#f8fafc' : '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out', flexShrink: 0 }}
-      >
-        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
-          <RotateCcw size={18} />
-        </span>
-      </button>
-
-      <button
-        ref={(el) => { dockItemRefs.current[DOCK_APP_IDS.length + 2] = el; }}
-        type="button"
-        title="Tüm Pencereleri Kapat"
-        onClick={onCloseAll}
-        style={{ width: 44, height: 44, borderRadius: 13, border: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)', color: isDark ? '#f8fafc' : '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out', flexShrink: 0 }}
-      >
-        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
-          <Trash2 size={18} />
-        </span>
-      </button>
+      {(
+        [
+          {
+            id: 'dock-arrange-grid',
+            label: 'Pencereleri Izgara Diz',
+            googleIcon: 'grid_view',
+            gradient: 'linear-gradient(135deg, #0ea5e9, #0369a1)',
+            onClick: onArrangeGrid,
+          },
+          {
+            id: 'dock-reset-windows',
+            label: 'Pencereleri Sıfırla',
+            googleIcon: 'restart_alt',
+            gradient: 'linear-gradient(135deg, #f59e0b, #b45309)',
+            onClick: onResetWindows,
+          },
+          {
+            id: 'dock-close-all',
+            label: 'Tüm Pencereleri Kapat',
+            googleIcon: 'delete_sweep',
+            gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)',
+            onClick: onCloseAll,
+          },
+        ] as const
+      ).map((action, offsetIdx) => {
+        const idx = DOCK_APP_IDS.length + offsetIdx;
+        const dockSurf = resolveIconSurface(
+          {
+            id: action.id,
+            label: action.label,
+            shortLabel: action.label,
+            googleIcon: action.googleIcon,
+            category: 'Apps',
+            gradient: action.gradient,
+          },
+          iconBgStyle,
+          primaryColor,
+          isDark,
+          iconColor,
+          iconBgColor,
+          iconGradColor1,
+          iconGradColor2
+        );
+        return (
+          <button
+            key={action.id}
+            ref={(el) => { dockItemRefs.current[idx] = el; }}
+            type="button"
+            aria-label={action.label}
+            onMouseEnter={() => setHoveredIdx(idx)}
+            onMouseLeave={() => setHoveredIdx((prev) => (prev === idx ? null : prev))}
+            onFocus={() => setHoveredIdx(idx)}
+            onBlur={() => setHoveredIdx((prev) => (prev === idx ? null : prev))}
+            onClick={action.onClick}
+            style={{
+              position: 'relative',
+              width: 46,
+              height: 46,
+              padding: 0,
+              borderRadius: 13,
+              border: dockSurf.border ?? 'none',
+              background: dockSurf.background,
+              backdropFilter: dockSurf.backdropFilter,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: dockSurf.color,
+              boxShadow: '0 8px 18px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.4)',
+              transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out',
+              flexShrink: 0,
+            }}
+          >
+            {hoveredIdx === idx && renderDockTooltip(action.label)}
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
+              <GoogleIcon name={action.googleIcon} size={26} />
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
