@@ -17,6 +17,8 @@ export interface AnalogDigitalClockProps {
   showFormatToggle?: boolean;
   /** Optional compact horizontal layout. */
   compact?: boolean;
+  /** Optional scale multiplier for digital typography & controls (default `1`). */
+  scale?: number;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -37,6 +39,7 @@ export const AnalogDigitalClock: React.FC<AnalogDigitalClockProps> = ({
   showDate = true,
   showFormatToggle = true,
   compact = false,
+  scale = 1,
   className = '',
   style,
 }) => {
@@ -245,7 +248,7 @@ export const AnalogDigitalClock: React.FC<AnalogDigitalClockProps> = ({
           <span
             data-testid="digital-clock-time"
             style={{
-              fontSize: compact ? '1.3rem' : '1.45rem',
+              fontSize: `${(compact ? 1.3 : 1.45) * scale}rem`,
               fontWeight: 800,
               letterSpacing: '-0.03em',
               fontVariantNumeric: 'tabular-nums',
@@ -257,7 +260,7 @@ export const AnalogDigitalClock: React.FC<AnalogDigitalClockProps> = ({
             {showSeconds && (
               <span
                 style={{
-                  fontSize: '0.88rem',
+                  fontSize: `${0.88 * scale}rem`,
                   fontWeight: 600,
                   color: 'var(--uxu-primary)',
                   marginLeft: 2,
@@ -271,7 +274,7 @@ export const AnalogDigitalClock: React.FC<AnalogDigitalClockProps> = ({
           {is12h && (
             <span
               style={{
-                fontSize: '0.68rem',
+                fontSize: `${0.68 * scale}rem`,
                 fontWeight: 700,
                 padding: '1px 5px',
                 borderRadius: 5,
@@ -287,7 +290,7 @@ export const AnalogDigitalClock: React.FC<AnalogDigitalClockProps> = ({
         {showDate && (
           <div
             style={{
-              fontSize: '0.74rem',
+              fontSize: `${0.74 * scale}rem`,
               fontWeight: 500,
               color: 'var(--uxu-text-secondary)',
               textTransform: 'capitalize',
@@ -308,7 +311,7 @@ export const AnalogDigitalClock: React.FC<AnalogDigitalClockProps> = ({
               border: '1px solid var(--uxu-border-subtle)',
               backgroundColor: 'var(--uxu-surface-tonal)',
               color: 'var(--uxu-text-secondary)',
-              fontSize: '0.66rem',
+              fontSize: `${0.66 * scale}rem`,
               fontWeight: 700,
               cursor: 'pointer',
             }}
