@@ -108,7 +108,7 @@ export class RouteService {
       case 'demo-synth':
         return '/demos/synthgl';
       case 'demo-macos':
-        return '/demos/macosgl';
+        return '/demos/osgl';
       case 'docs-guide': {
         const sub =
           subItemId && DOCS_TOPIC_IDS.has(subItemId)
@@ -218,11 +218,11 @@ export class RouteService {
           path: '/demos/synthgl',
         };
       }
-      if (second === 'macosgl' || second === 'macos' || second === 'eduos') {
+      if (second === 'osgl' || second === 'os' || second === 'macosgl' || second === 'macos' || second === 'eduos') {
         return {
           sectionId: 'demo-macos',
-          subItemId: 'macosgl',
-          path: '/demos/macosgl',
+          subItemId: 'osgl',
+          path: '/demos/osgl',
         };
       }
       return {

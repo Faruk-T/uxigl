@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ============================================================================
  * MacOSGL — WebAssembly (WASM) Window Solver + WebGL GPU Wallpaper Engine
  * ============================================================================
@@ -9,7 +9,7 @@
  *    with automatic CSS fallback if WebGL is unavailable.
  */
 
-export type MacOSWallpaperId =
+export type OSWallpaperId =
   | 'sequoia'
   | 'sonoma'
   | 'ventura'
@@ -28,7 +28,7 @@ export interface WallpaperPalette {
   colorBg: [number, number, number];
 }
 
-export const MACOS_WALLPAPERS: Record<MacOSWallpaperId, WallpaperPalette> = {
+export const OS_WALLPAPERS: Record<OSWallpaperId, WallpaperPalette> = {
   sequoia: {
     name: 'Sequoia Wave',
     isLight: false,
@@ -118,7 +118,7 @@ interface WasmExports {
   clamp: (val: number, min: number, max: number) => number;
 }
 
-class MacOSWasmEngine {
+class OSWasmEngine {
   public isWasmActive = false;
   private wasmClamp: ((val: number, min: number, max: number) => number) | null = null;
 
@@ -193,7 +193,7 @@ class MacOSWasmEngine {
   }
 }
 
-export const macOSWasmEngine = new MacOSWasmEngine();
+export const osWasmEngine = new OSWasmEngine();
 
 const VERTEX_SHADER = `
 attribute vec2 a_pos;
@@ -237,7 +237,7 @@ void main() {
  * Attaches a hardware-accelerated WebGL shader loop to a <canvas> element.
  * Returns a cleanup function.
  */
-export function startMacOSWebGLWallpaper(
+export function startOSWebGLWallpaper(
   canvas: HTMLCanvasElement,
   getPalette: () => WallpaperPalette,
   getIsDark: () => boolean = () => false,

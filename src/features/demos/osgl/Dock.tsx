@@ -1,0 +1,204 @@
+﻿import React, { useRef } from 'react';
+import { Grid2x2, RotateCcw, Trash2 } from 'lucide-react';
+import { GoogleIcon } from '../../../components/primitives';
+import {
+  DOCK_APP_IDS,
+  ENTERPRISE_APPS,
+  resolveIconSurface,
+  type FloatingWindowState,
+  type IconBgStyle,
+} from './types';
+
+export function Dock({
+  isDark,
+  glassBlur,
+  windows,
+  iconBgStyle,
+  iconBgColor,
+  iconGradColor1,
+  iconGradColor2,
+  iconColor,
+  primaryColor,
+  onOpenApp,
+  onArrangeGrid,
+  onResetWindows,
+  onCloseAll,
+}: {
+  isDark: boolean;
+  glassBlur: number;
+  windows: FloatingWindowState[];
+  iconBgStyle: IconBgStyle;
+  iconBgColor: string;
+  iconGradColor1: string;
+  iconGradColor2: string;
+  iconColor: string;
+  primaryColor: string;
+  onOpenApp: (id: string) => void;
+  onArrangeGrid: () => void;
+  onResetWindows: () => void;
+  onCloseAll: () => void;
+}) {
+  const dockItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const dockRestingCenters = useRef<number[]>([]);
+  const dockRafRef = useRef<number | null>(null);
+
+  const handleMouseEnter = () => {
+    dockRestingCenters.current = dockItemRefs.current.map((btn) => {
+      if (!btn) return 0;
+      const rect = btn.getBoundingClientRect();
+      return rect.left + rect.width / 2;
+    });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const clientX = e.clientX;
+    if (dockRestingCenters.current.length === 0) handleMouseEnter();
+    if (dockRafRef.current !== null) cancelAnimationFrame(dockRafRef.current);
+    dockRafRef.current = requestAnimationFrame(() => {
+      const maxDist = 150;
+      dockItemRefs.current.forEach((btn, idx) => {
+        if (!btn) return;
+        const baseSize = idx >= DOCK_APP_IDS.length ? 44 : 46;
+        const center = dockRestingCenters.current[idx] ?? 0;
+        const dist = Math.abs(clientX - center);
+        const factor = dist < maxDist ? Math.cos((dist / maxDist) * (Math.PI / 2)) : 0;
+        const scale = 1 + factor * 0.48;
+        const nextSize = Math.round(baseSize * scale);
+        btn.style.transition = 'none';
+        btn.style.width = `${nextSize}px`;
+        btn.style.height = `${nextSize}px`;
+        btn.style.borderRadius = `${Math.round(13 * scale)}px`;
+        const glyph = btn.firstElementChild as HTMLElement | null;
+        if (glyph) {
+          glyph.style.transition = 'none';
+          glyph.style.transform = `scale(${scale.toFixed(3)})`;
+        }
+      });
+      dockRafRef.current = null;
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (dockRafRef.current !== null) {
+      cancelAnimationFrame(dockRafRef.current);
+      dockRafRef.current = null;
+    }
+    dockRestingCenters.current = [];
+    dockItemRefs.current.forEach((btn, idx) => {
+      if (!btn) return;
+      const baseSize = idx >= DOCK_APP_IDS.length ? 44 : 46;
+      btn.style.transition = 'width 0.16s ease-out, height 0.16s ease-out, border-radius 0.16s ease-out';
+      btn.style.width = `${baseSize}px`;
+      btn.style.height = `${baseSize}px`;
+      btn.style.borderRadius = '13px';
+      const glyph = btn.firstElementChild as HTMLElement | null;
+      if (glyph) {
+        glyph.style.transition = 'transform 0.16s ease-out';
+        glyph.style.transform = 'scale(1)';
+      }
+    });
+  };
+
+  return (
+    <div
+      data-macos-dock="true"
+      onMouseEnter={handleMouseEnter}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        position: 'absolute',
+        left: '50%',
+        bottom: 14,
+        transform: 'translateX(-50%)',
+        padding: '10px 14px',
+        borderRadius: 22,
+        backgroundColor: isDark ? 'rgba(15, 23, 42, 0.62)' : 'rgba(255, 255, 255, 0.54)',
+        backdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
+        WebkitBackdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
+        border: isDark ? '1px solid rgba(255, 255, 255, 0.14)' : '1px solid rgba(255, 255, 255, 0.56)',
+        boxShadow: isDark ? '0 22px 54px rgba(0, 0, 0, 0.55)' : '0 20px 50px rgba(15, 23, 42, 0.22)',
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: 10,
+        zIndex: 1950,
+      }}
+    >
+      {DOCK_APP_IDS.map((id, idx) => {
+        const app = ENTERPRISE_APPS.find((m) => m.id === id)!;
+        const isRunning = windows.some((w) => w.appId === id);
+        const dockSurf = resolveIconSurface(app, iconBgStyle, primaryColor, isDark, iconColor, iconBgColor, iconGradColor1, iconGradColor2);
+        return (
+          <button
+            key={id}
+            ref={(el) => { dockItemRefs.current[idx] = el; }}
+            type="button"
+            title={app.label}
+            onClick={() => onOpenApp(id)}
+            style={{
+              position: 'relative',
+              width: 46,
+              height: 46,
+              borderRadius: 13,
+              border: dockSurf.border ?? 'none',
+              background: dockSurf.background,
+              backdropFilter: dockSurf.backdropFilter,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: dockSurf.color,
+              boxShadow: '0 8px 18px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.4)',
+              transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out',
+              flexShrink: 0,
+            }}
+          >
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
+              <GoogleIcon name={app.googleIcon} size={28} />
+            </span>
+            {isRunning && (
+              <span style={{ position: 'absolute', bottom: -7, width: 4.5, height: 4.5, borderRadius: 999, backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.45)' }} />
+            )}
+          </button>
+        );
+      })}
+
+      <div style={{ width: 1, height: 30, alignSelf: 'center', backgroundColor: isDark ? 'rgba(255,255,255,0.16)' : 'rgba(15,23,42,0.16)', margin: '0 2px' }} />
+
+      <button
+        ref={(el) => { dockItemRefs.current[DOCK_APP_IDS.length] = el; }}
+        type="button"
+        title="Pencereleri Izgara Diz"
+        onClick={onArrangeGrid}
+        style={{ width: 44, height: 44, borderRadius: 13, border: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)', color: isDark ? '#f8fafc' : '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out', flexShrink: 0 }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
+          <Grid2x2 size={18} />
+        </span>
+      </button>
+
+      <button
+        ref={(el) => { dockItemRefs.current[DOCK_APP_IDS.length + 1] = el; }}
+        type="button"
+        title="Pencereleri Sıfırla"
+        onClick={onResetWindows}
+        style={{ width: 44, height: 44, borderRadius: 13, border: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)', color: isDark ? '#f8fafc' : '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out', flexShrink: 0 }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
+          <RotateCcw size={18} />
+        </span>
+      </button>
+
+      <button
+        ref={(el) => { dockItemRefs.current[DOCK_APP_IDS.length + 2] = el; }}
+        type="button"
+        title="Tüm Pencereleri Kapat"
+        onClick={onCloseAll}
+        style={{ width: 44, height: 44, borderRadius: 13, border: 'none', backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(15,23,42,0.08)', color: isDark ? '#f8fafc' : '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'width 0.1s ease-out, height 0.1s ease-out, border-radius 0.1s ease-out', flexShrink: 0 }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.1s ease-out', pointerEvents: 'none' }}>
+          <Trash2 size={18} />
+        </span>
+      </button>
+    </div>
+  );
+}

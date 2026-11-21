@@ -1570,7 +1570,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* DEMO 5: MACOSGL (OS-STYLE FLOATING WINDOWS & DESKTOP/MOBILE LAUNCHER) */}
+            {/* DEMO 5: OSGL (OS-STYLE FLOATING WINDOWS & DESKTOP/MOBILE LAUNCHER) */}
             <div
               style={{
                 borderRadius: currentRadiusPx + 4,
@@ -1585,11 +1585,11 @@ export default function App() {
               }}
             >
               <a
-                href="/demos/macosgl"
+                href="/demos/osgl"
                 onClick={(e) => {
                   if (RouteService.isModifiedClick(e)) return;
                   e.preventDefault();
-                  onNavigate('demo-macos', 'macosgl');
+                  onNavigate('demo-macos', 'osgl');
                 }}
                 style={{
                   display: 'block',
@@ -1602,7 +1602,7 @@ export default function App() {
               >
                 <img
                   src="/demos/macosgl.jpg"
-                  alt="MacOSGL — uxiGL OS Workspace Demo"
+                  alt="OSGL — uxiGL OS Workspace Demo"
                   style={{
                     width: '100%',
                     height: '100%',
@@ -1615,7 +1615,7 @@ export default function App() {
               <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                   <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
-                    MacOSGL
+                    OSGL
                   </h3>
                   <Badge size="sm" variant="tonal" tone="success">
                     {isTR ? 'OS & Yüzen Pencere' : 'OS & Floating UI'}
@@ -1623,15 +1623,15 @@ export default function App() {
                 </div>
                 <p style={{ margin: 0, fontSize: 13.5, color: colors.muted, lineHeight: 1.6, flex: 1 }}>
                   {isTR
-                    ? '6 farklı macOS duvar kağıdı, sağ tık menüsü, yeniden boyutlandırılıp düzenlenebilen (Grid/Cascade) yüzen pencereler ve OS Tema Stüdyosu.'
-                    : 'Pure macOS-style desktop & mobile launcher with 6 macOS wallpapers, right-click menu, resizable/arrangeable floating windows, and OS Theme Studio.'}
+                    ? 'WebGL Aurora duvar kağıtları, sağ tık menüsü, çoklu simge seçimi, yeniden boyutlandırılıp düzenlenebilen yüzen pencereler ve OS Tema Stüdyosu.'
+                    : 'OS-style desktop & mobile launcher with WebGL Aurora wallpapers, right-click menu, multi-select, resizable/arrangeable floating windows, and OS Theme Studio.'}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 6 }}>
-                  <code style={{ fontSize: 12, color: colors.muted }}>/demos/macosgl</code>
+                  <code style={{ fontSize: 12, color: colors.muted }}>/demos/osgl</code>
                   <Button
                     variant="filled"
                     size="sm"
-                    onClick={() => onNavigate('demo-macos', 'macosgl')}
+                    onClick={() => onNavigate('demo-macos', 'osgl')}
                   >
                     {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
                   </Button>

@@ -48,11 +48,13 @@ export {
   type SynthGLDemoProps,
 } from './features/demos/SynthGLDemo';
 export {
-  MacOSGLDemo as MacOSGLTemplate,
-  MacOSGLDemo,
-  type MacOSGLDemoProps,
-  type MacOSWallpaperId,
-} from './features/demos/MacOSGLDemo';
+  OSGLDemo as OSGLTemplate,
+  OSGLDemo as MacOSGLTemplate,
+  OSGLDemo,
+  type OSGLDemoProps,
+  type OSWallpaperId,
+  type IconBgStyle,
+} from './features/demos/OSGLDemo';
 
 // 4. Providers & Hooks
 export { ThemeProvider, useTheme } from './providers/ThemeProvider';

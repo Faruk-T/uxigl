@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import {
   Sun,
   Moon,
@@ -71,7 +71,7 @@ import { UXILandingPage } from './features/landing/UXILandingPage';
 import { FlowWorkspaceDemo } from './features/demos/FlowWorkspaceDemo';
 import { CargoGLDemo } from './features/demos/CargoGLDemo';
 import { SynthGLDemo } from './features/demos/SynthGLDemo';
-import { MacOSGLDemo } from './features/demos/MacOSGLDemo';
+import { OSGLDemo } from './features/demos/OSGLDemo';
 
 export type MainSectionId =
   | 'landing'
@@ -1014,10 +1014,10 @@ export const App: React.FC = () => {
             zIndex: 10,
             width: '100%',
             height: '100vh',
-            overflowY: 'auto',
+            overflow: 'hidden',
           }}
         >
-          <MacOSGLDemo
+          <OSGLDemo
             onNavigate={handleSidebarSelect}
             onOpenThemeStudio={() => setThemeDrawerOpen(true)}
           />

@@ -43,9 +43,9 @@ function printHelp() {
 
 ${BOLD}Commands:${RESET}
   ${GREEN}init${RESET} [target-file]      Generate a ready-to-use <UXIWorkspace /> component in your React project
-                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|macosgl>)
+                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|osgl>)
   ${GREEN}create${RESET} <project-name>   Scaffold a new Vite + React + TypeScript + uxiGL starter app
-                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|macosgl>)
+                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|osgl>)
   ${GREEN}template${RESET} <name>         Quick-select and generate a template in one command
   ${GREEN}demo${RESET}                    Launch the interactive uxiGL Showcase & Documentation server
   ${GREEN}doctor${RESET}                  Verify Node.js, build artifacts, styles, and environment readiness
@@ -91,10 +91,10 @@ const TEMPLATE_REGISTRY = {
     importSymbol: 'SynthGLTemplate',
     description: 'AI iş akışı ve ajan orkestrasyon stüdyosu',
   },
-  macosgl: {
-    label: 'MacOSGL',
-    importSymbol: 'MacOSGLTemplate',
-    description: 'macOS / Ubuntu / Windows 11 duvar kağıtlı, yüzen pencereli OS şablonu',
+  osgl: {
+    label: 'OSGL',
+    importSymbol: 'OSGLTemplate',
+    description: 'WebGL Aurora arka planlı, yüzen pencereli masaüstü & mobil OS şablonu',
   },
 };
 
@@ -105,7 +105,7 @@ function normalizeTemplateId(raw) {
   if (key === 'flow' || key === 'flowgl') return 'flowgl';
   if (key === 'cargo' || key === 'cargogl') return 'cargogl';
   if (key === 'synth' || key === 'synthgl') return 'synthgl';
-  if (key === 'macos' || key === 'macosgl' || key === 'eduos' || key === 'os') return 'macosgl';
+  if (key === 'osgl' || key === 'os' || key === 'macos' || key === 'macosgl' || key === 'eduos') return 'osgl';
   return null;
 }
 
