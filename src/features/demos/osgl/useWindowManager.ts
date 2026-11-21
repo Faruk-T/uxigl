@@ -10,6 +10,34 @@ export const FULLBLEED_APP_IDS = new Set([
   'file-manager',
 ]);
 
+const DESKTOP_PADDING_X = 12;
+const DESKTOP_TOP_BAR_H = 44;
+const DESKTOP_DOCK_RESERVE = 96;
+
+export function clampWindowToViewport(
+  win: FloatingWindowState,
+  vw: number,
+  vh: number
+): FloatingWindowState {
+  if (win.maximized) return win;
+  const maxAvailW = Math.max(280, vw - DESKTOP_PADDING_X * 2);
+  const maxAvailH = Math.max(220, vh - DESKTOP_TOP_BAR_H - DESKTOP_DOCK_RESERVE);
+  const minW = Math.min(340, maxAvailW);
+  const minH = Math.min(240, maxAvailH);
+
+  const width = Math.max(minW, Math.min(win.width, maxAvailW));
+  const height = Math.max(minH, Math.min(win.height, maxAvailH));
+  const maxX = Math.max(DESKTOP_PADDING_X, vw - width - DESKTOP_PADDING_X);
+  const maxY = Math.max(8, maxAvailH - height + 8);
+  const x = Math.max(DESKTOP_PADDING_X, Math.min(win.x, maxX));
+  const y = Math.max(8, Math.min(win.y, maxY));
+
+  if (x === win.x && y === win.y && width === win.width && height === win.height) {
+    return win;
+  }
+  return { ...win, x, y, width, height };
+}
+
 export function useWindowManager({
   savedState,
   showMobileLayout,
@@ -25,21 +53,44 @@ export function useWindowManager({
   qualityMode: QualityMode;
   notify: (input: { title: string; description: string; tone: 'info' | 'success' | 'warning' | 'danger' }) => void;
 }) {
-  const [windows, setWindows] = useState<FloatingWindowState[]>(() =>
-    savedState?.windows ?? [
+  const [windows, setWindows] = useState<FloatingWindowState[]>(() => {
+    const initial = savedState?.windows ?? [
       {
         id: 'win-overview',
         appId: 'overview',
         x: 320,
-        y: 62,
+        y: 20,
         width: 680,
         height: 480,
         zIndex: 20,
         minimized: false,
         maximized: false,
       },
-    ]
-  );
+    ];
+    if (typeof window === 'undefined') return initial;
+    return initial.map((w) => clampWindowToViewport(w, window.innerWidth, window.innerHeight));
+  });
+
+  // Automatically clamp/resize all floating windows when the browser viewport shrinks or resizes
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleViewportResize = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      setWindows((prev) => {
+        let changed = false;
+        const next = prev.map((w) => {
+          const clamped = clampWindowToViewport(w, vw, vh);
+          if (clamped !== w) changed = true;
+          return clamped;
+        });
+        return changed ? next : prev;
+      });
+    };
+    handleViewportResize();
+    window.addEventListener('resize', handleViewportResize);
+    return () => window.removeEventListener('resize', handleViewportResize);
+  }, []);
   const [windowBoundsByApp, setWindowBoundsByApp] = useState<Record<string, WindowBounds>>(
     () => savedState?.windowBoundsByApp ?? {}
   );
@@ -99,20 +150,24 @@ export function useWindowManager({
       appId === 'analytics' ||
       appId === 'docs' ||
       appId.startsWith('page-');
-    setWindows((prev) => [
-      ...prev,
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const newWin = clampWindowToViewport(
       {
         id: `win-${appId}-${Date.now()}`,
         appId,
         x: savedBounds?.x ?? 240 + offset,
-        y: savedBounds?.y ?? 58 + offset,
+        y: savedBounds?.y ?? 20 + offset,
         width: savedBounds?.width ?? (isLargeApp ? 720 : appId === 'os-theme-studio' ? 430 : 580),
         height: savedBounds?.height ?? (isLargeApp ? 500 : appId === 'os-theme-studio' ? 540 : 440),
         zIndex: nextZ,
         minimized: false,
         maximized: appId === 'docs',
       },
-    ]);
+      vw,
+      vh
+    );
+    setWindows((prev) => [...prev, newWin]);
   };
 
   const focusWindow = (winId: string) => {

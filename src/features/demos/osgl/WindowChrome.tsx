@@ -1,4 +1,5 @@
-﻿import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 
 export function TrafficLights({
   maximized,
@@ -111,13 +112,14 @@ export function ContextMenuItem({
         display: 'flex',
         alignItems: 'center',
         gap: 9,
-        padding: '7px 10px',
-        borderRadius: 8,
+        padding: '6px 10px',
+        borderRadius: 7,
         border: 'none',
         background: 'transparent',
         color: 'inherit',
-        fontSize: 12.5,
-        fontWeight: 600,
+        fontSize: 13,
+        fontWeight: 400,
+        letterSpacing: '-0.008em',
         cursor: 'pointer',
         textAlign: 'left',
         width: '100%',
@@ -135,6 +137,85 @@ export function ContextMenuItem({
   );
 }
 
+export function ContextSubMenu({
+  icon,
+  label,
+  isDark,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  isDark: boolean;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      style={{ position: 'relative', width: '100%' }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        aria-expanded={open}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 9,
+          padding: '6px 10px',
+          borderRadius: 7,
+          border: 'none',
+          backgroundColor: open ? 'rgba(59, 130, 246, 0.16)' : 'transparent',
+          color: 'inherit',
+          fontSize: 13,
+          fontWeight: 400,
+          letterSpacing: '-0.008em',
+          cursor: 'pointer',
+          textAlign: 'left',
+          width: '100%',
+        }}
+      >
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}>
+          {icon}
+          <span>{label}</span>
+        </span>
+        <ChevronRight size={13} style={{ opacity: 0.65, flexShrink: 0 }} />
+      </button>
+
+      {open && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            top: -4,
+            left: 'calc(100% + 4px)',
+            minWidth: 210,
+            padding: 6,
+            borderRadius: 12,
+            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.94)' : 'rgba(255, 255, 255, 0.96)',
+            color: isDark ? '#f8fafc' : '#0f172a',
+            backdropFilter: 'blur(24px)',
+            border: isDark ? '1px solid rgba(255,255,255,0.14)' : '1px solid rgba(15,23,42,0.12)',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.32)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            zIndex: 2200,
+          }}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export const MenuBarClock = memo(function MenuBarClock() {
   const [clock, setClock] = useState(() =>
     new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
@@ -146,7 +227,7 @@ export const MenuBarClock = memo(function MenuBarClock() {
     return () => clearInterval(timer);
   }, []);
   return (
-    <span style={{ fontSize: 12, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+    <span style={{ fontSize: 12.5, fontWeight: 500, letterSpacing: '-0.01em', fontVariantNumeric: 'tabular-nums' }}>
       {clock}
     </span>
   );

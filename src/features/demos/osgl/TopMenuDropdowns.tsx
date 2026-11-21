@@ -20,7 +20,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { ContextMenuItem } from './WindowChrome';
+import { ContextMenuItem, ContextSubMenu } from './WindowChrome';
 import type { DesktopWidgetId } from './types';
 
 export type TopMenuKey = 'apps' | 'components' | 'window' | 'view' | 'tools' | 'lang' | null;
@@ -102,7 +102,13 @@ export function TopMenuDropdowns({
             <ContextMenuItem icon={<FolderOpen size={14} />} label="FileManGL Explorer" onClick={() => { onOpenApp('filemangl-explorer'); closeAllMenus(); }} />
             <ContextMenuItem icon={<FileText size={14} />} label="Forms & Inputs" onClick={() => { onOpenApp('forms'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Box size={14} />} label="UI Components" onClick={() => { onOpenApp('elements-overview'); closeAllMenus(); }} />
-            <ContextMenuItem icon={<Layers size={14} />} label="Page Templates" onClick={() => { onOpenApp('page-login'); closeAllMenus(); }} />
+            <ContextSubMenu icon={<Layers size={14} />} label="Page Templates" isDark={isDark}>
+              <ContextMenuItem icon={<Layers size={14} />} label="Login & Auth" onClick={() => { onOpenApp('page-login'); closeAllMenus(); }} />
+              <ContextMenuItem icon={<Sparkles size={14} />} label="SaaS Pricing" onClick={() => { onOpenApp('page-pricing'); closeAllMenus(); }} />
+              <ContextMenuItem icon={<Grid2x2 size={14} />} label="Kanban Board" onClick={() => { onOpenApp('page-kanban'); closeAllMenus(); }} />
+              <ContextMenuItem icon={<FileText size={14} />} label="User Profile" onClick={() => { onOpenApp('page-profile'); closeAllMenus(); }} />
+              <ContextMenuItem icon={<Palette size={14} />} label="Enterprise Settings" onClick={() => { onOpenApp('page-settings'); closeAllMenus(); }} />
+            </ContextSubMenu>
           </div>
         )}
       </div>
@@ -116,6 +122,11 @@ export function TopMenuDropdowns({
             <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? 'Izgara Dizilimi (Grid)' : 'Tile Grid'} onClick={() => { arrangeWindows('grid'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Layers size={14} />} label={isTR ? 'Kademeli Dizilim (Cascade)' : 'Cascade'} onClick={() => { arrangeWindows('cascade'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Columns2 size={14} />} label={isTR ? 'Yan Yana Diz' : 'Side by Side'} onClick={() => { arrangeWindows('side-by-side'); closeAllMenus(); }} />
+            <ContextSubMenu icon={<Monitor size={14} />} label={isTR ? 'Hızlı Düzenler' : 'Quick Layouts'} isDark={isDark}>
+              <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? '2×2 Eşit Izgara' : '2×2 Even Grid'} onClick={() => { arrangeWindows('grid'); closeAllMenus(); }} />
+              <ContextMenuItem icon={<Columns2 size={14} />} label={isTR ? 'Sol / Sağ Bölünmüş' : 'Split Left / Right'} onClick={() => { arrangeWindows('side-by-side'); closeAllMenus(); }} />
+              <ContextMenuItem icon={<Layers size={14} />} label={isTR ? 'Kademeli Yığın' : 'Stacked Cascade'} onClick={() => { arrangeWindows('cascade'); closeAllMenus(); }} />
+            </ContextSubMenu>
             <div style={{ height: 1, backgroundColor: 'rgba(148,163,184,0.2)', margin: '4px 0' }} />
             <ContextMenuItem icon={<X size={14} />} label={isTR ? 'Tüm Pencereleri Kapat' : 'Close All Windows'} onClick={() => { closeAllWindows(); closeAllMenus(); }} />
           </div>
@@ -146,10 +157,11 @@ export function TopMenuDropdowns({
               />
             )}
             {widgetsVisible && enabledWidgets && onToggleWidgetItem && (
-              <div style={{ padding: '4px 6px 2px', marginTop: 2, borderTop: '1px solid rgba(148,163,184,0.18)', display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <div style={{ padding: '2px 6px', fontSize: 10, fontWeight: 700, opacity: 0.55, textTransform: 'uppercase' }}>
-                  {isTR ? 'Masaüstü Widgetları' : 'Desktop Widgets'}
-                </div>
+              <ContextSubMenu
+                icon={<Grid2x2 size={14} />}
+                label={isTR ? 'Masaüstü Widgetları' : 'Desktop Widgets'}
+                isDark={isDark}
+              >
                 {(
                   [
                     { id: 'clock', tr: 'Saat & Takvim', en: 'Clock & Calendar' },
@@ -171,7 +183,7 @@ export function TopMenuDropdowns({
                     onClick={() => onToggleWidgetItem(w.id)}
                   />
                 ))}
-              </div>
+              </ContextSubMenu>
             )}
             <ContextMenuItem
               icon={<Sparkles size={14} />}

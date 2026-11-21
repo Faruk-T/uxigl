@@ -56,6 +56,8 @@ export function FloatingWindows({
     startY: number;
     origX: number;
     origY: number;
+    winW: number;
+    winH: number;
     curX: number;
     curY: number;
     rafId: number | null;
@@ -65,6 +67,8 @@ export function FloatingWindows({
     winId: string;
     startX: number;
     startY: number;
+    origX: number;
+    origY: number;
     origW: number;
     origH: number;
     curW: number;
@@ -75,17 +79,30 @@ export function FloatingWindows({
   const handlePointerDownTitle = (e: React.PointerEvent<HTMLDivElement>, win: FloatingWindowState) => {
     if (win.maximized) return;
     onFocus(win.id);
-    dragRef.current = { winId: win.id, startX: e.clientX, startY: e.clientY, origX: win.x, origY: win.y, curX: win.x, curY: win.y, rafId: null };
+    dragRef.current = {
+      winId: win.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: win.x,
+      origY: win.y,
+      winW: win.width,
+      winH: win.height,
+      curX: win.x,
+      curY: win.y,
+      rafId: null,
+    };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const handlePointerMoveTitle = (e: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag) return;
-    const maxW = typeof window !== 'undefined' ? window.innerWidth - 120 : 1400;
-    const maxH = typeof window !== 'undefined' ? window.innerHeight - 100 : 900;
-    drag.curX = osWasmEngine.clamp(drag.origX + (e.clientX - drag.startX), 8, maxW);
-    drag.curY = osWasmEngine.clamp(drag.origY + (e.clientY - drag.startY), 44, maxH);
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const maxW = Math.max(12, vw - drag.winW - 12);
+    const maxH = Math.max(8, vh - 44 - 96 - drag.winH + 8);
+    drag.curX = osWasmEngine.clamp(drag.origX + (e.clientX - drag.startX), 12, maxW);
+    drag.curY = osWasmEngine.clamp(drag.origY + (e.clientY - drag.startY), 8, maxH);
     if (drag.rafId === null) {
       drag.rafId = requestAnimationFrame(() => {
         const el = windowRefs.current[drag.winId];
@@ -108,15 +125,30 @@ export function FloatingWindows({
     e.stopPropagation();
     if (win.maximized) return;
     onFocus(win.id);
-    resizeRef.current = { winId: win.id, startX: e.clientX, startY: e.clientY, origW: win.width, origH: win.height, curW: win.width, curH: win.height, rafId: null };
+    resizeRef.current = {
+      winId: win.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: win.x,
+      origY: win.y,
+      origW: win.width,
+      origH: win.height,
+      curW: win.width,
+      curH: win.height,
+      rafId: null,
+    };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const handlePointerMoveResize = (e: React.PointerEvent<HTMLDivElement>) => {
     const res = resizeRef.current;
     if (!res) return;
-    res.curW = osWasmEngine.clamp(res.origW + (e.clientX - res.startX), 360, 1600);
-    res.curH = osWasmEngine.clamp(res.origH + (e.clientY - res.startY), 280, 1000);
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const maxW = Math.max(280, vw - res.origX - 12);
+    const maxH = Math.max(220, vh - 44 - 96 - res.origY + 8);
+    res.curW = osWasmEngine.clamp(res.origW + (e.clientX - res.startX), Math.min(340, maxW), maxW);
+    res.curH = osWasmEngine.clamp(res.origH + (e.clientY - res.startY), Math.min(240, maxH), maxH);
     if (res.rafId === null) {
       res.rafId = requestAnimationFrame(() => {
         const el = windowRefs.current[res.winId];
@@ -175,6 +207,8 @@ export function FloatingWindows({
                 contain: 'layout style',
                 width: win.maximized ? 'calc(100% - 28px)' : win.width,
                 height: win.maximized ? 'calc(100% - 104px)' : win.height,
+                maxWidth: 'calc(100% - 24px)',
+                maxHeight: 'calc(100% - 104px)',
                 zIndex: win.zIndex,
                 borderRadius: customRadiusPx ? customRadiusPx + 6 : 18,
                 backgroundColor: `color-mix(in srgb, ${paletteTokens.bgElevated} ${Math.round(glassOpacity * 100)}%, transparent)`,

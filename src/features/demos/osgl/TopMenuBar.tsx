@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UXILogo } from '../../../components/brand/UXILogo';
+import uxiNoBgPng from '../../../assets/logo/uxi_no_bg.png';
 import type { ThemeStudioPanelProps } from './ThemeStudioPanel';
 import type { DesktopWidgetId } from './types';
 import { TopMenuDropdowns, type TopMenuKey } from './TopMenuDropdowns';
@@ -106,9 +107,10 @@ export function TopMenuBar({
     background: active ? topPillBg : 'transparent',
     color: topTextColor,
     fontSize: 13,
-    fontWeight: 600,
-    padding: '4px 9px',
-    borderRadius: 7,
+    fontWeight: 500,
+    letterSpacing: '-0.008em',
+    padding: '3px 9px',
+    borderRadius: 6,
     cursor: 'pointer',
     whiteSpace: 'nowrap',
   });
@@ -168,8 +170,15 @@ export function TopMenuBar({
             cursor: onNavigate ? 'pointer' : 'default',
           }}
         >
-          <UXILogo size={24} />
-          <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: '-0.02em' }}>OSGL</span>
+          <UXILogo
+            width={24}
+            height={22}
+            src={uxiNoBgPng}
+            style={{
+              filter: effectiveIsLightBg ? 'brightness(0) opacity(0.88)' : 'brightness(100)',
+            }}
+          />
+          <span style={{ fontWeight: 700, fontSize: 13.5, letterSpacing: '-0.015em' }}>OSGL</span>
         </button>
 
         {!showMobileLayout && (

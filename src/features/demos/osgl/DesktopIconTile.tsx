@@ -145,12 +145,15 @@ export function DesktopIconTile({
       </div>
       <span
         style={{
-          fontSize: 11.5,
-          fontWeight: 600,
+          fontSize: 12,
+          fontWeight: 500,
+          letterSpacing: '-0.01em',
           color: barTextColor,
-          textShadow: effectiveIsLightBg ? 'none' : '0 1px 6px rgba(0, 0, 0, 0.65)',
+          textShadow: effectiveIsLightBg
+            ? 'none'
+            : '0 1px 2px rgba(0, 0, 0, 0.55), 0 1px 6px rgba(0, 0, 0, 0.42)',
           textAlign: 'center',
-          lineHeight: 1.2,
+          lineHeight: 1.25,
         }}
       >
         {app.label}
