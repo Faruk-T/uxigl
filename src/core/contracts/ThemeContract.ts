@@ -23,6 +23,9 @@ export type FontFamilyPreset =
   | 'outfit-material'
   | 'dm-sans'
   | 'space-grotesk'
+  | 'poppins-ui'
+  | 'playfair-editorial'
+  | 'jetbrains-mono'
   | 'system-sf';
 
 export type GoogleIconStyle = 'rounded' | 'outlined' | 'sharp';

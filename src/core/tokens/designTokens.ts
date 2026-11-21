@@ -443,6 +443,39 @@ export const FONT_FAMILY_PRESETS: Record<
       "'Space Grotesk', 'Plus Jakarta Sans', sans-serif",
     monoStack: "'JetBrains Mono', 'Fira Code', monospace",
   },
+  'poppins-ui': {
+    id: 'poppins-ui',
+    name: 'Poppins (Modern)',
+    badge: 'Yumuşak Geometrik',
+    description: 'Dengeli ve sıcak geometrik hatlara sahip modern arayüz yazı tipi.',
+    sansStack:
+      "'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    displayStack:
+      "'Poppins', 'Plus Jakarta Sans', sans-serif",
+    monoStack: "'JetBrains Mono', 'Fira Code', monospace",
+  },
+  'playfair-editorial': {
+    id: 'playfair-editorial',
+    name: 'Playfair × Inter',
+    badge: 'Editoryal Serif',
+    description: 'Klasik yüksek kontrastlı serif başlıklar ve temiz Inter gövde metni.',
+    sansStack:
+      "'Playfair Display', Georgia, 'Times New Roman', serif",
+    displayStack:
+      "'Playfair Display', Georgia, serif",
+    monoStack: "'JetBrains Mono', 'Fira Code', monospace",
+  },
+  'jetbrains-mono': {
+    id: 'jetbrains-mono',
+    name: 'JetBrains Mono',
+    badge: 'Geliştirici / Kod',
+    description: 'Sabit genişlikli terminal ve kod odaklı geliştirici tipografisi.',
+    sansStack:
+      "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+    displayStack:
+      "'JetBrains Mono', 'Fira Code', monospace",
+    monoStack: "'JetBrains Mono', 'Fira Code', monospace",
+  },
   'system-sf': {
     id: 'system-sf',
     name: 'Sistem Yerel (OS)',
