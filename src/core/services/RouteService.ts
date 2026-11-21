@@ -41,6 +41,7 @@ export const SURFACE_COMPONENT_IDS = new Set([
   'sidebar',
   'modal-command',
   'page-templates',
+  'calendar-clock',
 ]);
 
 export const FEEDBACK_COMPONENT_IDS = new Set([

@@ -1318,4 +1318,137 @@ notify({
       },
     ],
   },
+  {
+    id: 'calendar-clock',
+    name: 'Calendar & AnalogDigitalClock',
+    turkishTitle: 'Tam Teşekküllü Takvim (Ay / Hafta / Gün / Ajanda · Drag & Drop) & Analog/Dijital Saat',
+    category: 'surfaces',
+    summary:
+      'İçerisinde canlı Analog + Dijital Saat (<AnalogDigitalClock />) barındıran; Aylık, Haftalık (saatlik çizelge), Günlük ve Ajanda görünümleri, boş saat dilimine tıklayarak görev ekleme, görevleri sürükle-bırak (Drag & Drop) ile başka güne veya saate taşıma, kategori filtreleme ve localStorage kalıcılığı sunan tam teşekküllü kurumsal takvim bileşeni.',
+    importPath: 'truncgil-uxigl',
+    importStatement:
+      "import { Calendar, AnalogDigitalClock, type CalendarTaskEvent, type CalendarViewMode } from 'truncgil-uxigl';",
+    dos: [
+      'Haftalık (week) veya Günlük (day) görünümde kullanıcıların görev kartlarını sürükleyip başka bir saat dilimine bırakarak hızlıca yeniden planlamasını sağlayın.',
+      'Sol kenar çubuğunda canlı Analog + Dijital Saati (showClock={true}) ve mini ay gezginini birlikte sunarak zaman farkındalığını güçlendirin.',
+      'Kurumsal uygulamalarda kontrollü (events + onEventsChange) veya otomatik kalıcı (storageKey) modlarından birini seçin.',
+    ],
+    donts: [
+      'Aylık görünümde tek bir gün hücresine 3 ten fazla görev rozetini sıkıştırmayın; +N daha özeti ve Gün/Ajanda görünümünü kullanın.',
+      'Saatlik çizelgede başlangıç saatini ve süreyi doğrulamadan görev eklemeyin.',
+    ],
+    accessibilityNotes: [
+      'Analog saat SVG üzerinde role="img" ve güncel saat bilgisini içeren aria-label üretir; dijital saat tabular-nums ile kaymasız okunur.',
+      'Görev ekleme/düzenleme penceresi role="dialog" ve aria-modal="true" nitelikleriyle açılır.',
+    ],
+    examples: [
+      {
+        id: 'calendar-full-example',
+        title: '1. Tam Teşekküllü Takvim (Haftalık / Aylık / Drag & Drop + Analog/Dijital Saat)',
+        description:
+          'Aylık, haftalık, günlük, ajanda görünümleri, canlı Analog/Dijital saat, kategori filtreleri ve sürükle-bırak saat taşıma.',
+        code: `import { Calendar } from 'truncgil-uxigl';
+
+export function SprintCalendar() {
+  return (
+    <Calendar
+      locale="tr"
+      defaultView="week"
+      showClock={true}
+      storageKey="my-app.calendar.v1"
+    />
+  );
+}`,
+      },
+      {
+        id: 'clock-standalone-example',
+        title: '2. Bağımsız Analog + Dijital Saat (<AnalogDigitalClock />)',
+        description:
+          '24H/12H geçişli, saniye ibreli SVG kadranlı ve tarih göstergeli canlı saat bileşeni.',
+        code: `import { AnalogDigitalClock } from 'truncgil-uxigl';
+
+export function LiveClockCard() {
+  return (
+    <AnalogDigitalClock
+      size={140}
+      locale="tr"
+      variant="glass"
+      showSeconds={true}
+      showDate={true}
+      showFormatToggle={true}
+    />
+  );
+}`,
+      },
+      {
+        id: 'calendar-controlled-example',
+        title: '3. Kontrollü Takvim & Drag-Drop Senkronizasyonu',
+        description:
+          'Dış state üzerinden görev ekleme, düzenleme ve sürükle-bırak saat değişimlerini yönetme.',
+        code: `import { useState } from 'react';
+import { Calendar, type CalendarTaskEvent } from 'truncgil-uxigl';
+
+export function ControlledScheduler() {
+  const [events, setEvents] = useState<CalendarTaskEvent[]>([
+    {
+      id: 'ev-1',
+      title: 'Tasarım Sistemi Toplantısı',
+      date: '2026-11-21',
+      startHour: 10,
+      startMinute: 0,
+      durationMinutes: 60,
+      category: 'meeting',
+    },
+  ]);
+
+  return (
+    <Calendar
+      events={events}
+      onEventsChange={setEvents}
+      defaultView="week"
+      showClock={true}
+    />
+  );
+}`,
+      },
+    ],
+    propsTable: [
+      {
+        name: 'defaultView',
+        type: "'month' | 'week' | 'day' | 'agenda'",
+        defaultValue: "'week'",
+        description: 'Başlangıç takvim görünümü (Aylık, Haftalık, Günlük veya Ajanda).',
+      },
+      {
+        name: 'showClock',
+        type: 'boolean',
+        defaultValue: 'true',
+        description: 'Sol panelde canlı Analog + Dijital Saati gösterir.',
+      },
+      {
+        name: 'events / onEventsChange',
+        type: 'CalendarTaskEvent[] / (next: CalendarTaskEvent[]) => void',
+        defaultValue: 'undefined',
+        description: 'Kontrollü görev listesi ve sürükle-bırak/ekleme/silme geri çağırımı.',
+      },
+      {
+        name: 'storageKey',
+        type: 'string',
+        defaultValue: 'undefined',
+        description: 'Verildiğinde kontrolsüz görev değişikliklerini localStorage üzerine kalıcı yazar.',
+      },
+      {
+        name: 'locale',
+        type: "'tr' | 'en'",
+        defaultValue: "'tr'",
+        description: 'Ay, gün, saat formatı ve arayüz etiketlerinin dili.',
+      },
+      {
+        name: 'AnalogDigitalClockProps',
+        type: '{ size?: number; showSeconds?: boolean; hour12?: boolean; compact?: boolean; variant?: "glass" | "tonal" }',
+        defaultValue: 'size: 136, showSeconds: true',
+        description: 'Analog/Dijital saat kadran çapı, 12/24 saat modu ve kompakt yerleşim seçenekleri.',
+      },
+    ],
+  },
 ];

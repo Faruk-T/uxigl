@@ -58,6 +58,7 @@ import {
   Pagination,
   SheetGLGridAdapter,
   FileManGLExplorerAdapter,
+  Calendar,
 } from '../../components/composites';
 import { UXILogo } from '../../components/brand/UXILogo';
 import { CodeGeneratorService } from '../../core/services/CodeGeneratorService';
@@ -415,8 +416,8 @@ export const ComponentDocCard: React.FC<ComponentDocCardProps> = ({
                 ? 'Kopyalandı'
                 : 'Copied'
               : isTR
-              ? 'Kodu Kopyala'
-              : 'Copy Code'}
+                ? 'Kodu Kopyala'
+                : 'Copy Code'}
           </Button>
         </div>
         <pre className="uxu-code-block">
@@ -523,7 +524,7 @@ const InputLiveMiniDemo: React.FC = () => {
         prefixText="https://"
         suffixText=".uxigl.com"
         value="kurumsal"
-        onChange={() => {}}
+        onChange={() => { }}
       />
     </div>
   );
@@ -1921,5 +1922,78 @@ export const DATA_FEEDBACK_WEBGL_GUIDES: DocComponentGuideItem[] = [
       },
     ],
     renderLiveDemo: () => <FileManGLExplorerAdapter height={440} />,
+  },
+  {
+    id: 'calendar-clock',
+    tag: '<Calendar /> & <AnalogDigitalClock />',
+    titleTr: 'Tam Teşekküllü Takvim (Ay / Hafta / Gün / Ajanda · Drag & Drop) & Analog/Dijital Saat',
+    titleEn: 'Full-Featured Calendar (Month / Week / Day / Agenda · Drag & Drop) & Analog/Digital Clock',
+    categoryLabelTr: 'Zamanlama & Takvim',
+    categoryLabelEn: 'Scheduling & Clock',
+    playgroundId: 'calendar-clock',
+    importStatement:
+      "import { Calendar, AnalogDigitalClock, type CalendarTaskEvent } from 'truncgil-uxigl';",
+    architectureNoteTr:
+      'SOLID (SRP/DIP) ile tasarlanmıştır: AnalogDigitalClock, CalendarMonthView, CalendarWeekView, CalendarDayView, CalendarAgendaView ve CalendarTaskModal bağımsız modüllerdir. HTML5 Drag & Drop ile görevleri günler veya saat dilimleri arasında sürükleyip bırakabilirsiniz.',
+    architectureNoteEn:
+      'Modular SOLID architecture: AnalogDigitalClock, Month/Week/Day/Agenda views, and TaskModal are decoupled. Supports HTML5 Drag & Drop rescheduling across days and hourly slots.',
+    summaryTr:
+      'Canlı SVG Analog + Dijital Saat (24H/12H geçişli, saniye ibreli), 4 görünüm modu (Aylık, Saatlik Haftalık, Günlük, Ajanda), boş saat slotuna tıklayarak hızlı görev ekleme, görev düzenleme/silme/tamamlama, kategori filtreleme, mini ay gezgini ve sürükle-bırak (Drag & Drop) saat/gün taşıma özelliklerini tek bileşende sunar.',
+    summaryEn:
+      'All-in-one scheduler featuring a live Analog + Digital Clock (24H/12H toggle), Month/Week/Day/Agenda views, click-to-add hourly slots, task CRUD modal, category filters, and HTML5 Drag & Drop rescheduling.',
+    code: `import { Calendar, AnalogDigitalClock } from 'truncgil-uxigl';
+
+// 1. Tam Teşekküllü Takvim (İçinde Canlı Analog + Dijital Saat ile)
+<Calendar
+  locale="tr"
+  defaultView="week"       // 'month' | 'week' | 'day' | 'agenda'
+  showClock={true}         // Sol panelde canlı Analog + Dijital Saat
+  storageKey="app.cal.v1"  // Opsiyonel localStorage kalıcılığı
+/>
+
+// 2. Bağımsız Analog + Dijital Saat Bileşeni
+<AnalogDigitalClock
+  size={136}
+  showSeconds={true}
+  hour12={false}
+  variant="glass"
+  showFormatToggle={true}
+/>`,
+    propsTable: [
+      {
+        name: 'defaultView',
+        type: "'month' | 'week' | 'day' | 'agenda'",
+        defaultValue: "'week'",
+        description:
+          'Aylık 7×6 ızgara, Haftalık saatlik çizelge (07:00-22:00), Günlük zaman çizelgesi veya Ajanda listesi.',
+      },
+      {
+        name: 'showClock',
+        type: 'boolean',
+        defaultValue: 'true',
+        description: 'Takvim sol panelinde canlı Analog + Dijital Saat bileşenini gösterir.',
+      },
+      {
+        name: 'events / onEventsChange',
+        type: 'CalendarTaskEvent[] / (next: CalendarTaskEvent[]) => void',
+        defaultValue: 'undefined',
+        description:
+          'Kontrollü görev state yönetimi; görev ekleme, düzenleme ve Drag & Drop taşıma sonrası güncel diziyi döndürür.',
+      },
+      {
+        name: 'storageKey',
+        type: 'string',
+        defaultValue: 'undefined',
+        description: 'Kontrolsüz kullanımda görevleri localStorage üzerinde otomatik saklar.',
+      },
+    ],
+    renderLiveDemo: () => (
+      <Calendar
+        locale="tr"
+        defaultView="week"
+        showClock
+        storageKey="uxigl.docs.calendar.v1"
+      />
+    ),
   },
 ];

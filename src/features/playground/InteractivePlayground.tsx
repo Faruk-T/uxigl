@@ -85,6 +85,8 @@ import {
   DataTable,
   SheetGLGridAdapter,
   FileManGLExplorerAdapter,
+  Calendar,
+  AnalogDigitalClock,
   type NativeTableVariant,
 } from '../../components/composites';
 import type {
@@ -1413,7 +1415,7 @@ export function CloudFileManagerExample() {
             <SegmentedControl
               label="Görünüm Modu Seçici (Sliding Pill)"
               value={segmentValue}
-              onChange={setSegmentValue}
+              onChange={(v) => setSegmentValue(v as 'tonal' | 'spatial' | 'adaptive')}
               size={controlSize}
               disabled={isDisabled}
               fullWidth
@@ -2464,7 +2466,7 @@ export function CloudFileManagerExample() {
                 <SegmentedControl
                   size="sm"
                   value={playgroundTableVariant}
-                  onChange={setPlaygroundTableVariant}
+                  onChange={(v) => setPlaygroundTableVariant(v as NativeTableVariant)}
                   options={[
                     { value: 'default', label: 'Standart' },
                     { value: 'striped', label: 'Zebra' },
@@ -2568,6 +2570,22 @@ export function CloudFileManagerExample() {
         return (
           <div className="uxu-stage-showcase">
             <FileManGLExplorerAdapter height={540} />
+          </div>
+        );
+
+      case 'calendar-clock':
+        return (
+          <div className="uxu-stage-showcase" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <Calendar
+              locale="tr"
+              defaultView="week"
+              showClock
+              storageKey="uxigl.playground.calendar.v1"
+            />
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <AnalogDigitalClock size={120} compact locale="tr" variant="glass" />
+              <AnalogDigitalClock size={120} compact locale="en" hour12 variant="tonal" />
+            </div>
           </div>
         );
 
@@ -3029,7 +3047,7 @@ export function CloudFileManagerExample() {
                 <span className="uxu-inspector-label">Native Tablo Stili</span>
                 <SegmentedControl<NativeTableVariant>
                   value={playgroundTableVariant}
-                  onChange={setPlaygroundTableVariant}
+                  onChange={(v) => setPlaygroundTableVariant(v as NativeTableVariant)}
                   size="sm"
                   fullWidth
                   options={[

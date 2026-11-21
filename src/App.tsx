@@ -380,6 +380,14 @@ export const App: React.FC = () => {
             badge: 'VFS',
             badgeTone: 'info',
           },
+          {
+            id: 'calendar-clock',
+            label: 'Calendar & Clock',
+            href: '/components/surfaces/calendar-clock',
+            icon: <GoogleIcon name="calendar_month" size={16} />,
+            badge: 'D&D',
+            badgeTone: 'success',
+          },
         ],
       },
       {

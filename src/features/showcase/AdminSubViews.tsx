@@ -45,6 +45,7 @@ import {
   Textarea,
 } from '../../components/primitives';
 import {
+  Calendar,
   Card,
   DataTable,
   Modal,
@@ -1275,158 +1276,13 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
 
   // 7. CALENDAR VIEW
   if (viewId === 'calendar') {
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
-    const handleAddCalendarEvent = () => {
-      if (!newEventTitle.trim()) return;
-      setCalendarEvents((prev) => [
-        ...prev,
-        {
-          day: selectedCalendarDay,
-          title: newEventTitle.trim(),
-          tag: 'Yeni Plan',
-          tone: 'primary' as const,
-          time: newEventTime,
-        },
-      ]);
-      setNewEventTitle('');
-      notify({
-        title: 'Takvim Etkinliği Eklendi',
-        description: `${selectedCalendarDay} Ekim 2026 (${newEventTime}) için kaydedildi.`,
-        tone: 'success',
-      });
-    };
-
     return (
-      <div className="uxu-dash-chart-and-feed">
-        <Card
-          variant="glass"
-          eyebrow="CALENDAR • EKİM 2026 SÜRÜM TAKVİMİ"
-          title="Release & Operations Calendar"
-          subtitle="Bir güne tıklayarak seçin ve sağ panelden o güne yeni etkinlik ekleyin"
-          headerIcon={<CalendarIcon size={18} />}
-          headerAction={
-            <Badge tone="primary" size="xs">
-              Seçili Gün: {selectedCalendarDay} Ekim
-            </Badge>
-          }
-        >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(7, 1fr)',
-              gap: 8,
-            }}
-          >
-            {['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((d) => (
-              <div
-                key={d}
-                style={{
-                  textAlign: 'center',
-                  fontSize: '0.74rem',
-                  fontWeight: 700,
-                  color: 'var(--uxu-text-secondary)',
-                  paddingBottom: 4,
-                }}
-              >
-                {d}
-              </div>
-            ))}
-            {days.map((day) => {
-              const ev = calendarEvents.find((e) => e.day === day);
-              const isSelected = day === selectedCalendarDay;
-              return (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => setSelectedCalendarDay(day)}
-                  style={{
-                    minHeight: 62,
-                    padding: '6px 8px',
-                    borderRadius: 'var(--uxu-radius-sm)',
-                    background: isSelected
-                      ? 'var(--uxu-primary-container)'
-                      : ev
-                      ? 'var(--uxu-surface-elevated)'
-                      : 'var(--uxu-surface-tonal)',
-                    border: isSelected
-                      ? '1.5px solid var(--uxu-primary)'
-                      : '1px solid var(--uxu-border-subtle)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '0.76rem',
-                      fontWeight: isSelected ? 800 : 600,
-                      color: isSelected
-                        ? 'var(--uxu-primary)'
-                        : 'var(--uxu-text-secondary)',
-                    }}
-                  >
-                    {day}
-                  </span>
-                  {ev && (
-                    <Badge tone={ev.tone} size="xs">
-                      {ev.tag}
-                    </Badge>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        <Card
-          variant="tonal"
-          eyebrow={`SEÇİLİ GÜN: ${selectedCalendarDay} EKİM 2026`}
-          title="Etkinlik Ekle & Yaklaşan Takvim"
-          subtitle="Planlanan sürüm ve denetim takvimi"
-        >
-          <div className="uxu-stack-md">
-            <div className="uxu-stack-xs">
-              <Input
-                label={`${selectedCalendarDay} Ekim İçin Yeni Etkinlik Başlığı`}
-                placeholder="Örn: Prod Kümesi Bakım Penceresi"
-                value={newEventTitle}
-                onChange={setNewEventTitle}
-                size="sm"
-              />
-              <div className="uxu-stage-row" style={{ justifyContent: 'space-between' }}>
-                <Input
-                  type="text"
-                  placeholder="Saat (Örn: 14:00)"
-                  value={newEventTime}
-                  onChange={setNewEventTime}
-                  size="sm"
-                />
-                <Button
-                  variant="filled"
-                  size="sm"
-                  leadingIcon={<Plus size={14} />}
-                  onClick={handleAddCalendarEvent}
-                >
-                  Takvime Ekle
-                </Button>
-              </div>
-            </div>
-
-            <Timeline
-              items={calendarEvents.map((ev, idx) => ({
-                id: `cal-${ev.day}-${idx}`,
-                title: ev.title,
-                description: `${ev.day} Ekim 2026 • Saat ${ev.time}`,
-                timestamp: `${ev.day} Eki`,
-                tone: ev.tone,
-                badge: ev.tag,
-              }))}
-            />
-          </div>
-        </Card>
-      </div>
+      <Calendar
+        locale="tr"
+        defaultView="week"
+        showClock
+        storageKey="uxigl.admin.calendar.v1"
+      />
     );
   }
 
