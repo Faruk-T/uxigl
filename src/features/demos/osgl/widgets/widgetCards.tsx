@@ -1,7 +1,33 @@
-import React from 'react';
-import { Activity, Calendar, TrendingUp } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Activity, Calendar, Plus, TrendingUp } from 'lucide-react';
 import { AnalogDigitalClock } from '../../../../components/composites/Clock/AnalogDigitalClock';
+import { CalendarTaskModal } from '../../../../components/composites/Calendar/CalendarTaskModal';
+import {
+  buildSeedCalendarEvents,
+  CATEGORY_META,
+  parseIsoDate,
+  toIsoDate,
+} from '../../../../components/composites/Calendar/calendarUtils';
+import type { CalendarTaskEvent } from '../../../../components/composites/Calendar/types';
 import type { QualityMode } from '../types';
+
+const OSGL_CALENDAR_STORAGE_KEY = 'uxigl.osgl.calendar.v1';
+const OSGL_CALENDAR_SYNC_EVENT = 'uxigl:osgl-calendar-sync';
+
+function loadCalendarEvents(): CalendarTaskEvent[] {
+  if (typeof window === 'undefined') return buildSeedCalendarEvents();
+  try {
+    const raw = window.localStorage.getItem(OSGL_CALENDAR_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed as CalendarTaskEvent[];
+    }
+  } catch {
+    // ignore storage errors
+  }
+  return buildSeedCalendarEvents();
+}
 
 export interface WidgetThemeStyle {
   cardStyle: React.CSSProperties;
@@ -22,22 +48,112 @@ export function ClockWidgetCard({
   theme: WidgetThemeStyle;
   onOpenCalendar: () => void;
 }) {
+  const [events, setEvents] = useState<CalendarTaskEvent[]>(() => loadCalendarEvents());
+  const todayIso = toIsoDate(new Date());
+  const [selectedIso, setSelectedIso] = useState<string>(todayIso);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [draftEvent, setDraftEvent] = useState<Partial<CalendarTaskEvent>>({
+    date: todayIso,
+    startHour: 9,
+    startMinute: 0,
+    durationMinutes: 60,
+    category: 'work',
+  });
+
+  useEffect(() => {
+    const sync = () => setEvents(loadCalendarEvents());
+    window.addEventListener('storage', sync);
+    window.addEventListener(OSGL_CALENDAR_SYNC_EVENT, sync);
+    return () => {
+      window.removeEventListener('storage', sync);
+      window.removeEventListener(OSGL_CALENDAR_SYNC_EVENT, sync);
+    };
+  }, []);
+
+  const persistEvents = (updater: (prev: CalendarTaskEvent[]) => CalendarTaskEvent[]) => {
+    setEvents((prev) => {
+      const next = updater(prev);
+      try {
+        window.localStorage.setItem(OSGL_CALENDAR_STORAGE_KEY, JSON.stringify(next));
+        window.dispatchEvent(new Event(OSGL_CALENDAR_SYNC_EVENT));
+      } catch {
+        // ignore storage errors
+      }
+      return next;
+    });
+  };
+
+  const openCreateModal = (dateIso: string = selectedIso) => {
+    setEditingEventId(null);
+    setDraftEvent({
+      title: '',
+      date: dateIso,
+      startHour: 10,
+      startMinute: 0,
+      durationMinutes: 60,
+      category: 'work',
+      location: '',
+      notes: '',
+    });
+    setModalOpen(true);
+  };
+
+  const openEditModal = (ev: CalendarTaskEvent) => {
+    setEditingEventId(ev.id);
+    setDraftEvent(ev);
+    setModalOpen(true);
+  };
+
+  const handleSaveEvent = (
+    payload: Omit<CalendarTaskEvent, 'id'>,
+    editId?: string | null
+  ) => {
+    if (editId) {
+      persistEvents((prev) =>
+        prev.map((ev) => (ev.id === editId ? { ...payload, id: editId } : ev))
+      );
+    } else {
+      persistEvents((prev) => [
+        ...prev,
+        { ...payload, id: `osgl-cal-${Date.now()}` },
+      ]);
+    }
+    setSelectedIso(payload.date);
+    setModalOpen(false);
+  };
+
+  const handleDeleteEvent = (id: string) => {
+    persistEvents((prev) => prev.filter((ev) => ev.id !== id));
+    setModalOpen(false);
+  };
+
   const showMiniCalendar = theme.width >= 360 && theme.height >= 170;
+  const showDayEvents = theme.width >= 340 && theme.height >= 260;
+  const clockAreaHeight = showDayEvents ? Math.round(theme.height * 0.56) : theme.height;
   const clockColWidth = showMiniCalendar ? (theme.width - 40) * 0.46 : theme.width - 26;
-  const isCompact = !showMiniCalendar && clockColWidth >= theme.height * 1.45;
+  const isCompact = !showMiniCalendar && clockColWidth >= clockAreaHeight * 1.45;
   const dialSize = isCompact
-    ? Math.round(Math.max(58, Math.min(theme.height - 28, clockColWidth * 0.36, 152)))
-    : Math.round(Math.max(72, Math.min(clockColWidth - 24, theme.height * (showMiniCalendar ? 0.46 : 0.50), 184)));
+    ? Math.round(Math.max(54, Math.min(clockAreaHeight - 28, clockColWidth * 0.36, 146)))
+    : Math.round(
+        Math.max(
+          68,
+          Math.min(
+            clockColWidth - 24,
+            clockAreaHeight * (showMiniCalendar ? 0.46 : 0.5),
+            168
+          )
+        )
+      );
   const digitalScale = Math.max(
-    0.85,
-    Math.min(1.55, showMiniCalendar ? theme.scale * 0.88 : theme.scale)
+    0.84,
+    Math.min(1.45, showMiniCalendar ? theme.scale * 0.84 : theme.scale)
   );
 
   // Build current month calendar grid (Monday-first)
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth();
-  const todayDate = now.getDate();
   const firstDay = new Date(year, month, 1);
   const startOffset = (firstDay.getDay() + 6) % 7; // Monday = 0
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -50,51 +166,97 @@ export function ClockWidgetCard({
     ? ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pa']
     : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
-  const cells: { day: number; inMonth: boolean; isToday: boolean }[] = [];
+  const eventCountByIso = events.reduce<Record<string, number>>((acc, ev) => {
+    acc[ev.date] = (acc[ev.date] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  const cells: { iso: string; day: number; inMonth: boolean; isToday: boolean }[] = [];
   for (let i = startOffset - 1; i >= 0; i--) {
-    cells.push({ day: daysInPrevMonth - i, inMonth: false, isToday: false });
+    const d = daysInPrevMonth - i;
+    const iso = toIsoDate(new Date(year, month - 1, d));
+    cells.push({ iso, day: d, inMonth: false, isToday: iso === todayIso });
   }
   for (let d = 1; d <= daysInMonth; d++) {
-    cells.push({ day: d, inMonth: true, isToday: d === todayDate });
+    const iso = toIsoDate(new Date(year, month, d));
+    cells.push({ iso, day: d, inMonth: true, isToday: iso === todayIso });
   }
   while (cells.length < 42) {
-    cells.push({
-      day: cells.length - (startOffset + daysInMonth) + 1,
-      inMonth: false,
-      isToday: false,
-    });
+    const d = cells.length - (startOffset + daysInMonth) + 1;
+    const iso = toIsoDate(new Date(year, month + 1, d));
+    cells.push({ iso, day: d, inMonth: false, isToday: iso === todayIso });
   }
 
-  const calScale = Math.max(0.9, Math.min(1.35, theme.scale * 0.92));
+  const calScale = Math.max(0.86, Math.min(1.25, theme.scale * 0.88));
+  const selectedDayEvents = events
+    .filter((ev) => ev.date === selectedIso)
+    .sort((a, b) => a.startHour * 60 + a.startMinute - (b.startHour * 60 + b.startMinute));
+  const selectedDayLabel =
+    selectedIso === todayIso
+      ? theme.isTR
+        ? 'Bugün'
+        : 'Today'
+      : parseIsoDate(selectedIso).toLocaleDateString(theme.isTR ? 'tr-TR' : 'en-US', {
+          day: 'numeric',
+          month: 'short',
+        });
 
   return (
     <div style={{ ...theme.cardStyle, position: 'relative' }}>
       {!showMiniCalendar && (
-        <button
-          type="button"
-          onClick={onOpenCalendar}
-          title={theme.isTR ? 'Takvimi Aç' : 'Open Calendar'}
+        <div
           style={{
             position: 'absolute',
-            top: 10,
-            right: 10,
+            top: 9,
+            right: 9,
             zIndex: 2,
-            width: Math.round(30 * Math.min(1.25, theme.scale)),
-            height: Math.round(30 * Math.min(1.25, theme.scale)),
-            borderRadius: 9,
-            border: 'none',
-            backgroundColor: theme.subtleBg,
-            color: theme.primaryColor,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
+            gap: 5,
           }}
         >
-          <Calendar size={Math.round(15 * Math.min(1.25, theme.scale))} />
-        </button>
+          <button
+            type="button"
+            onClick={() => openCreateModal(selectedIso)}
+            title={theme.isTR ? 'Yeni Etkinlik Ekle' : 'Add Event'}
+            style={{
+              width: Math.round(28 * Math.min(1.2, theme.scale)),
+              height: Math.round(28 * Math.min(1.2, theme.scale)),
+              borderRadius: 8,
+              border: 'none',
+              backgroundColor: theme.primaryColor,
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <Plus size={Math.round(14 * Math.min(1.2, theme.scale))} />
+          </button>
+          <button
+            type="button"
+            onClick={onOpenCalendar}
+            title={theme.isTR ? 'Takvimi Aç' : 'Open Calendar'}
+            style={{
+              width: Math.round(28 * Math.min(1.2, theme.scale)),
+              height: Math.round(28 * Math.min(1.2, theme.scale)),
+              borderRadius: 8,
+              border: 'none',
+              backgroundColor: theme.subtleBg,
+              color: theme.primaryColor,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            <Calendar size={Math.round(14 * Math.min(1.2, theme.scale))} />
+          </button>
+        </div>
       )}
 
+      {/* Top Section: Analog/Digital Clock + Optional Mini Calendar */}
       <div
         style={{
           display: 'grid',
@@ -102,7 +264,7 @@ export function ClockWidgetCard({
           alignItems: 'center',
           gap: showMiniCalendar ? 14 : 0,
           width: '100%',
-          height: '100%',
+          flex: showDayEvents ? '0 0 auto' : '1 1 auto',
           minHeight: 0,
         }}
       >
@@ -132,7 +294,7 @@ export function ClockWidgetCard({
               border: 'none',
               boxShadow: 'none',
               padding: 0,
-              gap: Math.round(8 * Math.min(1.35, theme.scale)),
+              gap: Math.round(7 * Math.min(1.3, theme.scale)),
               justifyContent: 'center',
             }}
           />
@@ -144,12 +306,11 @@ export function ClockWidgetCard({
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              height: '100%',
               minWidth: 0,
               minHeight: 0,
               paddingLeft: 12,
               borderLeft: `1px solid ${theme.subtleBorder}`,
-              gap: Math.round(5 * calScale),
+              gap: Math.round(4 * calScale),
             }}
           >
             <div
@@ -170,26 +331,46 @@ export function ClockWidgetCard({
               >
                 {monthLabel}
               </span>
-              <button
-                type="button"
-                onClick={onOpenCalendar}
-                title={theme.isTR ? 'Takvimi Aç' : 'Open Calendar'}
-                style={{
-                  width: Math.round(26 * calScale),
-                  height: Math.round(26 * calScale),
-                  borderRadius: 8,
-                  border: 'none',
-                  backgroundColor: theme.subtleBg,
-                  color: theme.primaryColor,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                }}
-              >
-                <Calendar size={Math.round(13.5 * calScale)} />
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+                <button
+                  type="button"
+                  onClick={() => openCreateModal(selectedIso)}
+                  title={theme.isTR ? 'Yeni Etkinlik Ekle' : 'Add Event'}
+                  style={{
+                    width: Math.round(25 * calScale),
+                    height: Math.round(25 * calScale),
+                    borderRadius: 7,
+                    border: 'none',
+                    backgroundColor: theme.primaryColor,
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Plus size={Math.round(13.5 * calScale)} />
+                </button>
+                <button
+                  type="button"
+                  onClick={onOpenCalendar}
+                  title={theme.isTR ? 'Takvimi Aç' : 'Open Calendar'}
+                  style={{
+                    width: Math.round(25 * calScale),
+                    height: Math.round(25 * calScale),
+                    borderRadius: 7,
+                    border: 'none',
+                    backgroundColor: theme.subtleBg,
+                    color: theme.primaryColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Calendar size={Math.round(13 * calScale)} />
+                </button>
+              </div>
             </div>
 
             <div
@@ -213,32 +394,242 @@ export function ClockWidgetCard({
                   {wd}
                 </div>
               ))}
-              {cells.map((cell, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={onOpenCalendar}
-                  style={{
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: `${Math.round(3 * calScale)}px 0`,
-                    fontSize: Math.round(10.5 * calScale),
-                    fontWeight: cell.isToday ? 800 : 500,
-                    fontVariantNumeric: 'tabular-nums',
-                    backgroundColor: cell.isToday ? theme.primaryColor : 'transparent',
-                    color: cell.isToday ? '#ffffff' : 'inherit',
-                    opacity: cell.inMonth || cell.isToday ? 1 : 0.3,
-                    cursor: 'pointer',
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {cell.day}
-                </button>
-              ))}
+              {cells.map((cell) => {
+                const isSelected = cell.iso === selectedIso;
+                const hasEvents = (eventCountByIso[cell.iso] ?? 0) > 0;
+                return (
+                  <button
+                    key={cell.iso}
+                    type="button"
+                    onClick={() => setSelectedIso(cell.iso)}
+                    style={{
+                      position: 'relative',
+                      border: isSelected && !cell.isToday ? `1px solid ${theme.primaryColor}` : '1px solid transparent',
+                      borderRadius: 6,
+                      padding: `${Math.round(2.5 * calScale)}px 0`,
+                      fontSize: Math.round(10.5 * calScale),
+                      fontWeight: cell.isToday || isSelected ? 800 : 500,
+                      fontVariantNumeric: 'tabular-nums',
+                      backgroundColor: cell.isToday
+                        ? theme.primaryColor
+                        : isSelected
+                        ? theme.subtleBg
+                        : 'transparent',
+                      color: cell.isToday ? '#ffffff' : 'inherit',
+                      opacity: cell.inMonth || cell.isToday || isSelected ? 1 : 0.3,
+                      cursor: 'pointer',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {cell.day}
+                    {hasEvents && (
+                      <span
+                        aria-hidden="true"
+                        style={{
+                          position: 'absolute',
+                          bottom: 1,
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          width: 3,
+                          height: 3,
+                          borderRadius: '50%',
+                          backgroundColor: cell.isToday ? '#ffffff' : theme.primaryColor,
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
       </div>
+
+      {/* Bottom Section: Selected Day's Events + Add Event Action */}
+      {showDayEvents && (
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            paddingTop: 8,
+            borderTop: `1px solid ${theme.subtleBorder}`,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 8,
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: Math.round(11.5 * calScale), fontWeight: 700 }}>
+                {selectedDayLabel}{' '}
+                <span style={{ opacity: 0.6, fontWeight: 500 }}>
+                  {theme.isTR ? 'Etkinlikleri' : 'Events'}
+                </span>
+              </span>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  padding: '1px 6px',
+                  borderRadius: 999,
+                  backgroundColor: theme.subtleBg,
+                  opacity: 0.8,
+                }}
+              >
+                {selectedDayEvents.length}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => openCreateModal(selectedIso)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '3px 9px',
+                borderRadius: 999,
+                border: 'none',
+                backgroundColor: theme.subtleBg,
+                color: theme.primaryColor,
+                fontSize: Math.round(10.5 * calScale),
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              <Plus size={12} />
+              <span>{theme.isTR ? 'Yeni Etkinlik' : 'New Event'}</span>
+            </button>
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 5,
+            }}
+          >
+            {selectedDayEvents.length === 0 ? (
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: Math.round(11 * calScale),
+                  opacity: 0.6,
+                  padding: '8px 0',
+                }}
+              >
+                {theme.isTR
+                  ? 'Bu gün için planlanmış etkinlik yok.'
+                  : 'No events scheduled for this day.'}
+              </div>
+            ) : (
+              selectedDayEvents.map((ev) => {
+                const cat = CATEGORY_META[ev.category] ?? CATEGORY_META.work;
+                const timeStr = `${String(ev.startHour).padStart(2, '0')}:${String(
+                  ev.startMinute
+                ).padStart(2, '0')}`;
+                return (
+                  <button
+                    key={ev.id}
+                    type="button"
+                    onClick={() => openEditModal(ev)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      padding: '6px 9px',
+                      borderRadius: 9,
+                      border: `1px solid ${theme.subtleBorder}`,
+                      backgroundColor: theme.subtleBg,
+                      color: 'inherit',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      width: '100%',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 7,
+                        height: 7,
+                        borderRadius: '50%',
+                        backgroundColor: cat.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontSize: Math.round(10.5 * calScale),
+                        fontWeight: 700,
+                        fontVariantNumeric: 'tabular-nums',
+                        opacity: 0.78,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {timeStr}
+                    </span>
+                    <span
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        fontSize: Math.round(11.5 * calScale),
+                        fontWeight: 600,
+                      }}
+                    >
+                      {ev.title}
+                    </span>
+                    {ev.location && (
+                      <span
+                        style={{
+                          fontSize: 10,
+                          opacity: 0.55,
+                          flexShrink: 0,
+                          maxWidth: 90,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {ev.location}
+                      </span>
+                    )}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
+      {typeof document !== 'undefined' &&
+        modalOpen &&
+        createPortal(
+          <CalendarTaskModal
+            open={modalOpen}
+            locale={theme.isTR ? 'tr' : 'en'}
+            initialDraft={draftEvent}
+            editingEventId={editingEventId}
+            onClose={() => setModalOpen(false)}
+            onSave={handleSaveEvent}
+            onDelete={handleDeleteEvent}
+          />,
+          document.body
+        )}
     </div>
   );
 }
