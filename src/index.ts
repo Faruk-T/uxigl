@@ -28,6 +28,32 @@ export {
   type AnalyticsDashboardViewProps,
 } from './features/showcase/AnalyticsDashboardView';
 
+// 3b. Ready-to-Use Full Application Templates (EnterpriseGL, FlowGL, CargoGL, SynthGL, MacOSGL)
+export {
+  AnalyticsDashboardView as EnterpriseGLTemplate,
+} from './features/showcase/AnalyticsDashboardView';
+export {
+  FlowWorkspaceDemo as FlowGLTemplate,
+  FlowWorkspaceDemo,
+  type FlowWorkspaceDemoProps,
+} from './features/demos/FlowWorkspaceDemo';
+export {
+  CargoGLDemo as CargoGLTemplate,
+  CargoGLDemo,
+  type CargoGLDemoProps,
+} from './features/demos/CargoGLDemo';
+export {
+  SynthGLDemo as SynthGLTemplate,
+  SynthGLDemo,
+  type SynthGLDemoProps,
+} from './features/demos/SynthGLDemo';
+export {
+  MacOSGLDemo as MacOSGLTemplate,
+  MacOSGLDemo,
+  type MacOSGLDemoProps,
+  type MacOSWallpaperId,
+} from './features/demos/MacOSGLDemo';
+
 // 4. Providers & Hooks
 export { ThemeProvider, useTheme } from './providers/ThemeProvider';
 export { ToastProvider, useToast } from './providers/ToastProvider';
