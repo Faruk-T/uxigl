@@ -23,7 +23,7 @@ import {
 import { ContextMenuItem, ContextSubMenu } from './WindowChrome';
 import type { DesktopWidgetId } from './types';
 
-export type TopMenuKey = 'apps' | 'components' | 'window' | 'view' | 'tools' | 'lang' | null;
+export type TopMenuKey = 'apps' | 'components' | 'window' | 'view' | 'tools' | 'lang' | 'widgets' | null;
 
 export function TopMenuDropdowns({
   activeMenu,

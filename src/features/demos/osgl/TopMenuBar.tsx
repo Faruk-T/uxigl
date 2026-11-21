@@ -24,6 +24,7 @@ export function TopMenuBar({
   onToggleWidgets,
   enabledWidgets,
   onToggleWidgetItem,
+  onResetWidgetPositions,
   onResetIcons,
   onOpenApp,
   onOpenThemeStudio,
@@ -49,6 +50,7 @@ export function TopMenuBar({
   onToggleWidgets?: () => void;
   enabledWidgets?: Record<DesktopWidgetId, boolean>;
   onToggleWidgetItem?: (id: DesktopWidgetId) => void;
+  onResetWidgetPositions?: () => void;
   onResetIcons: () => void;
   onOpenApp: (id: string) => void;
   onOpenThemeStudio: () => void;
@@ -226,6 +228,11 @@ export function TopMenuBar({
         closeAllMenus={closeAllMenus}
         onOpenSpotlight={onOpenSpotlight}
         onOpenThemeStudio={onOpenThemeStudio}
+        widgetsVisible={widgetsVisible}
+        onToggleWidgets={onToggleWidgets}
+        enabledWidgets={enabledWidgets}
+        onToggleWidgetItem={onToggleWidgetItem}
+        onResetWidgetPositions={onResetWidgetPositions}
         trayIconBtnStyle={trayIconBtnStyle}
         dropdownStyle={dropdownStyle}
       />

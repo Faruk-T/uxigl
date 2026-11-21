@@ -159,6 +159,7 @@ export function OSGLDemo({
         onToggleWidgets={() => os.setWidgetsVisible((v) => !v)}
         enabledWidgets={os.enabledWidgets}
         onToggleWidgetItem={os.toggleWidgetItem}
+        onResetWidgetPositions={os.resetWidgetPositions}
         onResetIcons={() => {
           const reset: Record<string, number> = {};
           ENTERPRISE_APPS.forEach((app, idx) => { reset[app.id] = idx; });
@@ -230,6 +231,9 @@ export function OSGLDemo({
               setQualityMode={os.sharedStudioProps.setQualityMode}
               openWindowCount={os.windows.length}
               enabledWidgets={os.enabledWidgets}
+              widgetPositions={os.widgetPositions}
+              onMoveWidget={os.updateWidgetPosition}
+              viewportSize={os.viewportSize}
               onOpenApp={os.openApp}
             />
           )}

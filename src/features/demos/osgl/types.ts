@@ -20,6 +20,39 @@ export const DEFAULT_ENABLED_WIDGETS: Record<DesktopWidgetId, boolean> = {
   system: true,
 };
 
+export interface WidgetPosition {
+  x: number;
+  y: number;
+}
+
+export const WIDGET_CARD_WIDTH = 272;
+export const WIDGET_GRID_STEP = 20;
+
+export function getDefaultWidgetPositions(
+  viewportWidth = 1366
+): Record<DesktopWidgetId, WidgetPosition> {
+  const colRight = Math.max(20, Math.round((viewportWidth - WIDGET_CARD_WIDTH - 20) / WIDGET_GRID_STEP) * WIDGET_GRID_STEP);
+  const colLeft = Math.max(20, colRight - WIDGET_CARD_WIDTH - 20);
+  if (viewportWidth >= 1180) {
+    return {
+      clock: { x: colRight, y: 20 },
+      kpi: { x: colRight, y: 120 },
+      system: { x: colRight, y: 300 },
+      timer: { x: colLeft, y: 20 },
+      todo: { x: colLeft, y: 180 },
+      notes: { x: colLeft, y: 380 },
+    };
+  }
+  return {
+    clock: { x: colRight, y: 20 },
+    kpi: { x: colRight, y: 120 },
+    timer: { x: colRight, y: 300 },
+    todo: { x: colRight, y: 440 },
+    notes: { x: colRight, y: 620 },
+    system: { x: colRight, y: 760 },
+  };
+}
+
 export interface EnterpriseOSApp {
   id: string;
   label: string;
@@ -64,6 +97,7 @@ export interface PersistedOSGLState {
   dockVisible?: boolean;
   widgetsVisible?: boolean;
   enabledWidgets?: Record<DesktopWidgetId, boolean>;
+  widgetPositions?: Partial<Record<DesktopWidgetId, WidgetPosition>>;
   windowAnimation?: boolean;
   iconBgStyle?: IconBgStyle;
   iconBgColor?: string;
