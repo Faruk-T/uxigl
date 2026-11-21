@@ -55,6 +55,11 @@ export {
   type OSWallpaperId,
   type IconBgStyle,
 } from './features/demos/OSGLDemo';
+export {
+  TesseraGLDemo as TesseraGLTemplate,
+  TesseraGLDemo,
+  type TesseraGLDemoProps,
+} from './features/demos/TesseraGLDemo';
 
 // 4. Providers & Hooks
 export { ThemeProvider, useTheme } from './providers/ThemeProvider';

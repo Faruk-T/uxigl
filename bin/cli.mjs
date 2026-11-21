@@ -43,9 +43,9 @@ function printHelp() {
 
 ${BOLD}Commands:${RESET}
   ${GREEN}init${RESET} [target-file]      Generate a ready-to-use <UXIWorkspace /> component in your React project
-                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|osgl>)
+                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|osgl|tesseragl>)
   ${GREEN}create${RESET} <project-name>   Scaffold a new Vite + React + TypeScript + uxiGL starter app
-                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|osgl>)
+                          (Supports: --template <enterprisegl|flowgl|cargogl|synthgl|osgl|tesseragl>)
   ${GREEN}template${RESET} <name>         Quick-select and generate a template in one command
   ${GREEN}demo${RESET}                    Launch the interactive uxiGL Showcase & Documentation server
   ${GREEN}doctor${RESET}                  Verify Node.js, build artifacts, styles, and environment readiness
@@ -96,6 +96,11 @@ const TEMPLATE_REGISTRY = {
     importSymbol: 'OSGLTemplate',
     description: 'WebGL Aurora arka planlı, yüzen pencereli masaüstü & mobil OS şablonu',
   },
+  tesseragl: {
+    label: 'TesseraGL',
+    importSymbol: 'TesseraGLTemplate',
+    description: '4 kolonlu Tessera çalışma alanı, sprint kapasite ve takım performans panosu',
+  },
 };
 
 function normalizeTemplateId(raw) {
@@ -106,6 +111,7 @@ function normalizeTemplateId(raw) {
   if (key === 'cargo' || key === 'cargogl') return 'cargogl';
   if (key === 'synth' || key === 'synthgl') return 'synthgl';
   if (key === 'osgl' || key === 'os' || key === 'macos' || key === 'macosgl' || key === 'eduos') return 'osgl';
+  if (key === 'tessera' || key === 'tesseragl') return 'tesseragl';
   return null;
 }
 

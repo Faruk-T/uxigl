@@ -13,6 +13,7 @@ export type RouteMainSectionId =
   | 'demo-cargo'
   | 'demo-synth'
   | 'demo-macos'
+  | 'demo-tessera'
   | 'docs-guide'
   | 'dashboard'
   | 'components-inputs'
@@ -109,6 +110,8 @@ export class RouteService {
         return '/demos/synthgl';
       case 'demo-macos':
         return '/demos/osgl';
+      case 'demo-tessera':
+        return '/demos/tessera';
       case 'docs-guide': {
         const sub =
           subItemId && DOCS_TOPIC_IDS.has(subItemId)
@@ -223,6 +226,13 @@ export class RouteService {
           sectionId: 'demo-macos',
           subItemId: 'osgl',
           path: '/demos/osgl',
+        };
+      }
+      if (second === 'tessera' || second === 'tesseragl' || second === 'your-work') {
+        return {
+          sectionId: 'demo-tessera',
+          subItemId: 'tessera',
+          path: '/demos/tessera',
         };
       }
       return {

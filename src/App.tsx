@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Sun,
   Moon,
@@ -72,6 +72,7 @@ import { FlowWorkspaceDemo } from './features/demos/FlowWorkspaceDemo';
 import { CargoGLDemo } from './features/demos/CargoGLDemo';
 import { SynthGLDemo } from './features/demos/SynthGLDemo';
 import { OSGLDemo } from './features/demos/OSGLDemo';
+import { TesseraGLDemo } from './features/demos/TesseraGLDemo';
 
 export type MainSectionId =
   | 'landing'
@@ -79,6 +80,7 @@ export type MainSectionId =
   | 'demo-cargo'
   | 'demo-synth'
   | 'demo-macos'
+  | 'demo-tessera'
   | 'docs-guide'
   | 'dashboard'
   | 'components-inputs'
@@ -899,6 +901,15 @@ export const App: React.FC = () => {
         icon: <GoogleIcon name="tune" size={16} />,
         onSelect: () => handleSidebarSelect('page-settings'),
       },
+      {
+        id: 'view-demo-tessera',
+        title: 'TesseraGL — Project & Your Work Dashboard Template',
+        subtitle: '4 kolonlu Tessera çalışma alanı, Sprint kapasitesi, Workload halkaları ve ekip performansı',
+        category: 'Hazır Uygulama Şablonları',
+        icon: <LayoutDashboard size={16} />,
+        shortcut: 'D T',
+        onSelect: () => handleSidebarSelect('demo-tessera', 'tessera'),
+      },
     ];
 
     const themeActions: CommandActionItem[] = [
@@ -1018,6 +1029,21 @@ export const App: React.FC = () => {
           }}
         >
           <OSGLDemo
+            onNavigate={handleSidebarSelect}
+            onOpenThemeStudio={() => setThemeDrawerOpen(true)}
+          />
+        </div>
+      ) : activeSectionId === 'demo-tessera' ? (
+        <div
+          style={{
+            position: 'relative',
+            zIndex: 10,
+            width: '100%',
+            height: '100vh',
+            overflowY: 'auto',
+          }}
+        >
+          <TesseraGLDemo
             onNavigate={handleSidebarSelect}
             onOpenThemeStudio={() => setThemeDrawerOpen(true)}
           />

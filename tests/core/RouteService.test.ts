@@ -9,10 +9,11 @@ describe('RouteService.buildPath', () => {
     expect(RouteService.buildPath('landing')).toBe('/');
   });
 
-  it('returns /demos/* paths for demo-flow, demo-cargo, and demo-synth sections', () => {
+  it('returns /demos/* paths for demo-flow, demo-cargo, demo-synth, and demo-tessera sections', () => {
     expect(RouteService.buildPath('demo-flow')).toBe('/demos/flow-workspace');
     expect(RouteService.buildPath('demo-cargo')).toBe('/demos/cargogl');
     expect(RouteService.buildPath('demo-synth')).toBe('/demos/synthgl');
+    expect(RouteService.buildPath('demo-tessera')).toBe('/demos/tessera');
   });
 
   it('returns /docs/getting-started for docs-guide with no subItem', () => {
@@ -166,6 +167,14 @@ describe('RouteService.parsePath', () => {
         sectionId: 'demo-synth',
         subItemId: 'synthgl',
         path: '/demos/synthgl',
+      });
+    }
+
+    for (const tesseraPath of ['/demos/tessera', '/demos/tesseragl', '/demo/tessera', '/demos/your-work']) {
+      expect(RouteService.parsePath(tesseraPath)).toEqual({
+        sectionId: 'demo-tessera',
+        subItemId: 'tessera',
+        path: '/demos/tessera',
       });
     }
   });
