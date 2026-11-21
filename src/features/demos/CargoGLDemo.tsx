@@ -26,6 +26,7 @@ import {
 import { useTheme } from '../../providers/ThemeProvider';
 import { useToast } from '../../providers/ToastProvider';
 import { Avatar, Badge, Button, Input, Switch } from '../../components/primitives';
+import { UXILogo } from '../../components/brand/UXILogo';
 import { DemoLoginView } from './DemoLoginView';
 
 export interface CargoGLDemoProps {
@@ -308,21 +309,7 @@ export const CargoGLDemo: React.FC<CargoGLDemoProps> = ({
           <div>
             {/* Brand */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px 20px' }}>
-              <div
-                style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 10,
-                  background: 'linear-gradient(135deg, var(--uxu-secondary) 0%, var(--uxu-primary) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  boxShadow: '0 6px 18px var(--uxu-accent-glow)',
-                }}
-              >
-                <Box size={18} />
-              </div>
+              <UXILogo size={34} />
               <div>
                 <div style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.02em' }}>
                   CargoGL

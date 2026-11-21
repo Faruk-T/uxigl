@@ -345,8 +345,8 @@ export default function App() {
               <span
                 style={{
                   fontSize: isMobile ? 20 : 23,
-                  fontWeight: 900,
-                  letterSpacing: '-0.035em',
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
                   color: colors.text,
                   fontFamily:
                     "-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif",
@@ -355,10 +355,8 @@ export default function App() {
                 uxi
                 <span
                   style={{
-                    background:
-                      'linear-gradient(110deg, #2FF58E 0%, #00C8FF 45%, #818CF8 75%, #C084FC 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
+                    color: isDark ? '#94A3B8' : '#64748B',
+                    fontWeight: 600,
                   }}
                 >
                   GL
@@ -367,11 +365,10 @@ export default function App() {
               <span
                 style={{
                   fontSize: isMobile ? 10.5 : 11.5,
-                  fontWeight: 600,
+                  fontWeight: 500,
                   fontFamily: "'JetBrains Mono', monospace",
-                  color: isDark ? '#38BDF8' : '#0284C7',
+                  color: isDark ? '#64748B' : '#94A3B8',
                   letterSpacing: '-0.02em',
-                  opacity: 0.92,
                 }}
               >
                 v{__UXIGL_VERSION__}
@@ -780,8 +777,8 @@ export default function App() {
             }}
           />
           <UXILogo
-            width={isMobile ? 220 : 340}
-            height={isMobile ? 125 : 193}
+            width={isMobile ? 168 : 220}
+            height={isMobile ? 168 : 220}
             glow={true}
             style={{
               position: 'relative',
@@ -1642,6 +1639,230 @@ export default function App() {
                 </div>
               </div>
             </div>
+
+            {/* DEMO 6: TESSERAGL (PROJECT & YOUR WORK WORKSPACE) */}
+            <div
+              style={{
+                borderRadius: currentRadiusPx + 4,
+                backgroundColor: colors.card,
+                border: `1px solid ${colors.cardBorder}`,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                boxShadow: isDark
+                  ? '0 20px 50px rgba(0, 0, 0, 0.5)'
+                  : '0 16px 40px rgba(15, 23, 42, 0.08)',
+              }}
+            >
+              <a
+                href="/demos/tessera"
+                onClick={(e) => {
+                  if (RouteService.isModifiedClick(e)) return;
+                  e.preventDefault();
+                  onNavigate('demo-tessera', 'tessera');
+                }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative',
+                  aspectRatio: '16 / 10',
+                  overflow: 'hidden',
+                  borderBottom: `1px solid ${colors.cardBorder}`,
+                  backgroundColor: isDark ? '#0F131B' : '#FFFFFF',
+                  textDecoration: 'none',
+                  color: isDark ? '#F3F4F6' : '#111827',
+                  fontFamily: "'Inter', sans-serif",
+                }}
+              >
+                {/* Miniature 4-Column Tessera Live Preview */}
+                <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
+                  {/* Rail */}
+                  <div
+                    style={{
+                      width: 24,
+                      backgroundColor: isDark ? '#0B0E14' : '#F7F8FA',
+                      borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#ECEEF2'}`,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      padding: '8px 0',
+                      gap: 6,
+                    }}
+                  >
+                    <div style={{ width: 14, height: 14, borderRadius: 4, background: '#2563EB' }} />
+                    <div style={{ width: 12, height: 12, borderRadius: 3, background: 'rgba(37,99,235,0.14)' }} />
+                    <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#CBD5E1' }} />
+                  </div>
+                  {/* Main Area */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    {/* Top Bar */}
+                    <div
+                      style={{
+                        height: 24,
+                        padding: '0 10px',
+                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#ECEEF2'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: 8.5,
+                      }}
+                    >
+                      <span style={{ color: isDark ? '#94A3B8' : '#6B7280' }}>
+                        Tessera / <strong style={{ color: isDark ? '#F8FAFC' : '#111827' }}>Dashboard</strong>
+                      </span>
+                      <span
+                        style={{
+                          padding: '2px 8px',
+                          borderRadius: 4,
+                          backgroundColor: isDark ? '#171D29' : '#F6F7F8',
+                          color: isDark ? '#94A3B8' : '#6B7280',
+                          fontSize: 7.5,
+                        }}
+                      >
+                        Search tasks, docs, people ⌘K
+                      </span>
+                      <span
+                        style={{
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          backgroundColor: isDark ? '#F8FAFC' : '#18181B',
+                          color: isDark ? '#0F172A' : '#FFFFFF',
+                          fontSize: 7.5,
+                          fontWeight: 600,
+                        }}
+                      >
+                        + Invite
+                      </span>
+                    </div>
+                    {/* Body Columns */}
+                    <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '84px minmax(0, 1fr) 104px', minHeight: 0 }}>
+                      {/* Projects Sidebar */}
+                      <div
+                        style={{
+                          padding: 8,
+                          borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#ECEEF2'}`,
+                          fontSize: 7.5,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 4,
+                        }}
+                      >
+                        <div style={{ fontWeight: 600, fontSize: 8.5 }}>Projects</div>
+                        <div style={{ padding: '3px 5px', borderRadius: 4, border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#E2E4E9'}`, textAlign: 'center', fontWeight: 500 }}>
+                          + New work item
+                        </div>
+                        <div style={{ padding: '3px 5px', borderRadius: 4, backgroundColor: isDark ? '#1E2636' : '#F1F3F5', fontWeight: 600 }}>
+                          Your work · 12
+                        </div>
+                        <div style={{ color: isDark ? '#94A3B8' : '#6B7280', paddingLeft: 4 }}>Tessera Core</div>
+                        <div style={{ color: isDark ? '#64748B' : '#9CA3AF', paddingLeft: 10 }}>• Overview</div>
+                        <div style={{ color: isDark ? '#64748B' : '#9CA3AF', paddingLeft: 10 }}>• Work items</div>
+                      </div>
+                      {/* Center Dashboard */}
+                      <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 8.5, fontWeight: 600 }}>
+                          <span>Your work</span>
+                          <span style={{ fontSize: 7.5, color: '#EF4444', border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : '#E2E4E9'}`, padding: '1px 5px', borderRadius: 99 }}>● Live</span>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+                          {[
+                            { label: 'Created', val: '15', sub: '+3 this week' },
+                            { label: 'Assigned', val: '12', sub: '2 due today' },
+                            { label: 'Subscribed', val: '20', sub: '+5 new' },
+                          ].map((k) => (
+                            <div
+                              key={k.label}
+                              style={{
+                                padding: '6px 7px',
+                                borderRadius: 6,
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.09)' : '#E6E8EC'}`,
+                              }}
+                            >
+                              <div style={{ fontSize: 7, color: isDark ? '#94A3B8' : '#6B7280' }}>{k.label}</div>
+                              <div style={{ fontSize: 13, fontWeight: 600, margin: '2px 0' }}>{k.val}</div>
+                              <div style={{ fontSize: 6.8, color: '#16A34A', fontWeight: 600 }}>{k.sub}</div>
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, flex: 1 }}>
+                          <div style={{ padding: 7, borderRadius: 6, border: `1px solid ${isDark ? 'rgba(255,255,255,0.09)' : '#E6E8EC'}`, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                            <div>
+                              <div style={{ fontSize: 7.5, fontWeight: 600 }}>Cycle capacity</div>
+                              <div style={{ fontSize: 12, fontWeight: 600, marginTop: 3 }}>240h</div>
+                            </div>
+                            <div style={{ display: 'flex', gap: 2, height: 5 }}>
+                              <div style={{ width: '50%', background: '#2563EB', borderRadius: 99 }} />
+                              <div style={{ width: '30%', background: '#F97316', borderRadius: 99 }} />
+                              <div style={{ width: '20%', background: isDark ? '#334155' : '#E5E7EB', borderRadius: 99 }} />
+                            </div>
+                          </div>
+                          <div style={{ padding: 7, borderRadius: 6, border: `1px solid ${isDark ? 'rgba(255,255,255,0.09)' : '#E6E8EC'}`, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                            <div style={{ fontSize: 7.5, fontWeight: 600 }}>Team performance</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4, alignItems: 'end', height: 42 }}>
+                              <div style={{ height: '24%', background: '#1A9844', borderRadius: 3 }} />
+                              <div style={{ height: '65%', background: '#F59E0B', borderRadius: 3 }} />
+                              <div style={{ height: '87%', background: '#2E67FF', borderRadius: 3 }} />
+                              <div style={{ height: '34%', background: isDark ? '#334155' : '#E5E7EB', borderRadius: 3 }} />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Right Profile Panel */}
+                      <div
+                        style={{
+                          padding: 8,
+                          borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#ECEEF2'}`,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <div>
+                          <div style={{ height: 24, borderRadius: 6, background: 'linear-gradient(120deg, #FDD6C8, #C7DFFF, #F5CCF8)' }} />
+                          <div style={{ fontSize: 8.5, fontWeight: 600, marginTop: 6 }}>Yasir Ahmad Noori</div>
+                          <div style={{ fontSize: 7, color: '#16A34A' }}>@yasirnoori · Online</div>
+                          <div style={{ marginTop: 6, padding: 5, borderRadius: 5, backgroundColor: isDark ? '#171D29' : '#F6F7F8', fontSize: 7 }}>
+                            Sprint 14 · 71%
+                            <div style={{ height: 3, marginTop: 3, borderRadius: 99, background: 'linear-gradient(90deg, #F87171, #D946EF, #3B82F6)', width: '71%' }} />
+                          </div>
+                        </div>
+                        <div style={{ padding: 6, borderRadius: 6, backgroundColor: isDark ? '#151B26' : '#F5F7FF', border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#E6E8EC'}`, fontSize: 7 }}>
+                          <div style={{ fontWeight: 600 }}>Your week, summarized</div>
+                          <div style={{ marginTop: 4, display: 'inline-block', padding: '2px 5px', borderRadius: 4, background: isDark ? '#F8FAFC' : '#18181B', color: isDark ? '#0F172A' : '#FFFFFF', fontSize: 6.5 }}>
+                            ✦ Generate recap
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </a>
+              <div style={{ padding: isMobile ? 16 : 22, display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <h3 style={{ margin: 0, fontSize: 19, fontWeight: 800, color: colors.text }}>
+                    TesseraGL
+                  </h3>
+                  <Badge size="sm" variant="tonal" tone="primary">
+                    {isTR ? 'Proje & Sprint' : 'Project & Sprint'}
+                  </Badge>
+                </div>
+                <p style={{ margin: 0, fontSize: 13.5, color: colors.muted, lineHeight: 1.6, flex: 1 }}>
+                  {isTR
+                    ? '4 kolonlu Tessera çalışma alanı: ikon rayı, proje ağacı, sprint kapasitesi, hedef çizgili takım performans grafiği ve üye profili yan paneli.'
+                    : '4-column Tessera workspace featuring icon rail, collapsible project tree, cycle capacity, team performance chart, and member profile sidebar.'}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, paddingTop: 6 }}>
+                  <code style={{ fontSize: 12, color: colors.muted }}>/demos/tessera</code>
+                  <Button
+                    variant="filled"
+                    size="sm"
+                    onClick={() => onNavigate('demo-tessera', 'tessera')}
+                  >
+                    {isTR ? 'Demoyu Aç →' : 'Launch Demo →'}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2083,14 +2304,12 @@ export default function App() {
           }}
         >
           <UXILogo size={20} preserveRatio />
-          <span style={{ fontWeight: 800, color: colors.text }}>
+          <span style={{ fontWeight: 800, color: colors.text, letterSpacing: '-0.02em' }}>
             uxi
             <span
               style={{
-                background:
-                  'linear-gradient(110deg, #2FF58E 0%, #00C8FF 45%, #818CF8 75%, #C084FC 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                color: isDark ? '#94A3B8' : '#64748B',
+                fontWeight: 600,
               }}
             >
               GL
@@ -2099,9 +2318,9 @@ export default function App() {
           <span
             style={{
               fontSize: 11.5,
-              fontWeight: 600,
+              fontWeight: 500,
               fontFamily: "'JetBrains Mono', monospace",
-              color: isDark ? '#38BDF8' : '#0284C7',
+              color: isDark ? '#64748B' : '#94A3B8',
             }}
           >
             v{__UXIGL_VERSION__}

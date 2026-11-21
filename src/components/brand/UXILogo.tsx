@@ -1,5 +1,6 @@
-import React, { useId } from 'react';
-import defaultLogoPng from '../../assets/logo/uxi_no_bg.png';
+import React, { useEffect, useId, useState } from 'react';
+import squircleLightPng from '../../assets/logo/uxi_squircle_light.png';
+import squircleDarkPng from '../../assets/logo/uxi_squircle_dark.png';
 
 export interface UXILogoProps {
   size?: number;
@@ -9,16 +10,23 @@ export interface UXILogoProps {
   className?: string;
   style?: React.CSSProperties;
   variant?: 'image' | 'svg';
+  surfaceMode?: 'light' | 'dark' | 'auto';
   src?: string;
   alt?: string;
   preserveRatio?: boolean;
 }
 
+function readDomTheme(): 'light' | 'dark' {
+  if (typeof document === 'undefined') return 'dark';
+  return document.documentElement.getAttribute('data-theme') === 'light'
+    ? 'light'
+    : 'dark';
+}
+
 /**
- * uxiGL Official 3D Ribbon Monogram Logo
- * - Displays the official high-resolution 3D translucent monogram (PNG with transparency) by default.
- * - Supports vector SVG fallback via variant="svg".
- * - Dual-tone cyan & orange glow filters with squircle bounds.
+ * uxiGL Official 3D Glass Squircle Logo
+ * - Automatically adapts between Dark Squircle and Light Squircle based on active theme.
+ * - Supports explicit `surfaceMode` override and SVG fallback via `variant="svg"`.
  */
 export const UXILogo: React.FC<UXILogoProps> = ({
   size = 32,
@@ -28,18 +36,34 @@ export const UXILogo: React.FC<UXILogoProps> = ({
   className = '',
   style,
   variant = 'image',
+  surfaceMode = 'auto',
   src,
   alt = 'uxiGL Logo',
   preserveRatio = false,
 }) => {
   const uid = useId().replace(/:/g, '');
+  const [domMode, setDomMode] = useState<'light' | 'dark'>(readDomTheme);
 
-  const computedWidth =
-    width ?? (preserveRatio ? Math.round(size * (1024 / 582)) : size);
+  useEffect(() => {
+    if (surfaceMode !== 'auto' || typeof document === 'undefined') return;
+    setDomMode(readDomTheme());
+    const observer = new MutationObserver(() => {
+      setDomMode(readDomTheme());
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    return () => observer.disconnect();
+  }, [surfaceMode]);
+
+  const effectiveMode = surfaceMode === 'auto' ? domMode : surfaceMode;
+  const computedWidth = width ?? (preserveRatio ? size : size);
   const computedHeight = height ?? size;
 
   if (variant === 'image') {
-    const imgSrc = src || defaultLogoPng;
+    const imgSrc =
+      src || (effectiveMode === 'light' ? squircleLightPng : squircleDarkPng);
     return (
       <div
         className={`uxu-logo ${className}`.trim()}
@@ -53,7 +77,7 @@ export const UXILogo: React.FC<UXILogoProps> = ({
           flexShrink: 0,
           userSelect: 'none',
           filter: glow
-            ? 'drop-shadow(0 8px 24px rgba(0, 180, 255, 0.35)) drop-shadow(0 3px 12px rgba(255, 107, 26, 0.30))'
+            ? 'drop-shadow(0 8px 24px rgba(0, 180, 255, 0.24)) drop-shadow(0 3px 12px rgba(255, 107, 26, 0.18))'
             : undefined,
           transition: 'transform 0.25s ease, filter 0.25s ease',
           ...style,

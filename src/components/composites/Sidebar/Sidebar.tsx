@@ -614,10 +614,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         uxi
                         <span
                           style={{
-                            background:
-                              'linear-gradient(110deg, #2FF58E 0%, #00C8FF 45%, #818CF8 75%, #C084FC 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
+                            color: 'var(--uxu-text-secondary)',
+                            fontWeight: 600,
                           }}
                         >
                           GL

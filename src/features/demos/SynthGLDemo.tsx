@@ -32,6 +32,7 @@ import { useTheme } from '../../providers/ThemeProvider';
 import { useToast } from '../../providers/ToastProvider';
 import { Avatar, Badge, Button, Input, Switch } from '../../components/primitives';
 import { Modal } from '../../components/composites';
+import { UXILogo } from '../../components/brand/UXILogo';
 import { DemoLoginView } from './DemoLoginView';
 
 export interface SynthGLDemoProps {
@@ -312,23 +313,7 @@ export const SynthGLDemo: React.FC<SynthGLDemoProps> = ({
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Brand */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 8px 6px' }}>
-              <div
-                style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 10,
-                  background: 'linear-gradient(135deg, var(--uxu-secondary) 0%, var(--uxu-primary) 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#fff',
-                  fontWeight: 800,
-                  fontSize: 16,
-                  boxShadow: '0 6px 18px var(--uxu-accent-glow)',
-                }}
-              >
-                S
-              </div>
+              <UXILogo size={34} />
               <div>
                 <div style={{ fontWeight: 800, fontSize: 17, letterSpacing: '-0.02em' }}>
                   SynthGL
