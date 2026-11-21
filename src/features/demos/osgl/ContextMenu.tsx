@@ -1,6 +1,7 @@
-﻿import React from 'react';
-import { Columns2, Grid2x2, Layers, Palette, RotateCcw, Sparkles, Trash2 } from 'lucide-react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { Columns2, Grid2x2, Layers, Palette, Pin, PinOff, RotateCcw, Sparkles, Trash2 } from 'lucide-react';
 import { OS_WALLPAPERS, type OSWallpaperId } from '../OSGLEngine';
+import { ENTERPRISE_APPS } from './types';
 import { ContextMenuItem } from './WindowChrome';
 
 export function ContextMenu({
@@ -9,10 +10,12 @@ export function ContextMenu({
   wallpaper,
   selectedAppIds,
   dockVisible,
+  dockAppIds,
   onOpenApp,
   onArrange,
   onSelectWallpaper,
   onToggleDock,
+  onTogglePinToDock,
   onResetIcons,
   onCloseAll,
   onCloseMenu,
@@ -22,23 +25,64 @@ export function ContextMenu({
   wallpaper: OSWallpaperId;
   selectedAppIds: string[];
   dockVisible: boolean;
+  dockAppIds: string[];
   onOpenApp: (id: string) => void;
   onArrange: (mode: 'cascade' | 'grid' | 'side-by-side') => void;
   onSelectWallpaper: (wp: OSWallpaperId) => void;
   onToggleDock: () => void;
+  onTogglePinToDock: (appId: string) => void;
   onResetIcons: () => void;
   onCloseAll: () => void;
   onCloseMenu: () => void;
 }) {
+  const singleAppId = selectedAppIds.length === 1 ? selectedAppIds[0] : null;
+  const singleApp = singleAppId ? ENTERPRISE_APPS.find((a) => a.id === singleAppId) : null;
+  const isPinned = singleAppId ? dockAppIds.includes(singleAppId) : false;
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [coords, setCoords] = useState<{ left: number; top: number }>({
+    left: position.x,
+    top: position.y,
+  });
+
+  useLayoutEffect(() => {
+    const el = menuRef.current;
+    if (!el || typeof window === 'undefined') return;
+    const margin = 12;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const rect = el.getBoundingClientRect();
+    const w = rect.width || 232;
+    const h = rect.height || 340;
+
+    let left = position.x;
+    if (left + w > vw - margin) {
+      left = Math.max(margin, vw - w - margin);
+    }
+    left = Math.max(margin, left);
+
+    let top = position.y;
+    if (top + h > vh - margin) {
+      // Flip above cursor if it fits better, otherwise clamp to bottom margin
+      const flipped = position.y - h;
+      top = flipped >= margin ? flipped : Math.max(margin, vh - h - margin);
+    }
+    top = Math.max(margin, top);
+
+    setCoords({ left, top });
+  }, [position.x, position.y, selectedAppIds.length]);
+
   return (
     <div
+      ref={menuRef}
       data-macos-context="true"
       onClick={(e) => e.stopPropagation()}
       style={{
         position: 'fixed',
-        left: position.x,
-        top: position.y,
+        left: coords.left,
+        top: coords.top,
         width: 232,
+        maxHeight: 'calc(100vh - 24px)',
+        overflowY: 'auto',
         padding: 6,
         borderRadius: 14,
         backgroundColor: isDark ? 'rgba(15, 23, 42, 0.94)' : 'rgba(255, 255, 255, 0.94)',
@@ -52,6 +96,16 @@ export function ContextMenu({
         zIndex: 2200,
       }}
     >
+      {singleApp && singleAppId && (
+        <ContextMenuItem
+          icon={isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+          label={isPinned ? `${singleApp.shortLabel}: Dock'tan Çıkar` : `${singleApp.shortLabel}: Dock'ta Tut`}
+          onClick={() => {
+            onTogglePinToDock(singleAppId);
+            onCloseMenu();
+          }}
+        />
+      )}
       {selectedAppIds.length > 1 && (
         <ContextMenuItem
           icon={<Sparkles size={14} />}

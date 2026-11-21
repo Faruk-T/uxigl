@@ -107,6 +107,7 @@ export function ContextMenuItem({
   return (
     <button
       type="button"
+      data-menu-item="true"
       onClick={onClick}
       style={{
         display: 'flex',
@@ -115,6 +116,7 @@ export function ContextMenuItem({
         padding: '6px 10px',
         borderRadius: 7,
         border: 'none',
+        outline: 'none',
         background: 'transparent',
         color: 'inherit',
         fontSize: 13,
@@ -128,6 +130,14 @@ export function ContextMenuItem({
         e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.16)';
       }}
       onMouseLeave={(e) => {
+        if (document.activeElement !== e.currentTarget) {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.16)';
+      }}
+      onBlur={(e) => {
         e.currentTarget.style.backgroundColor = 'transparent';
       }}
     >
@@ -150,14 +160,36 @@ export function ContextSubMenu({
 }) {
   const [open, setOpen] = useState(false);
 
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const panelRef = React.useRef<HTMLDivElement | null>(null);
+
   return (
     <div
       style={{ position: 'relative', width: '100%' }}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowRight' && document.activeElement === triggerRef.current) {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(true);
+          requestAnimationFrame(() => {
+            const first = panelRef.current?.querySelector<HTMLButtonElement>('[data-menu-item="true"]');
+            first?.focus();
+          });
+        } else if (e.key === 'ArrowLeft' && panelRef.current?.contains(document.activeElement)) {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(false);
+          triggerRef.current?.focus();
+        }
+      }}
     >
       <button
+        ref={triggerRef}
         type="button"
+        data-menu-item="true"
+        data-submenu-trigger="true"
         onClick={(e) => {
           e.stopPropagation();
           setOpen((v) => !v);
@@ -171,6 +203,7 @@ export function ContextSubMenu({
           padding: '6px 10px',
           borderRadius: 7,
           border: 'none',
+          outline: 'none',
           backgroundColor: open ? 'rgba(59, 130, 246, 0.16)' : 'transparent',
           color: 'inherit',
           fontSize: 13,
@@ -179,6 +212,12 @@ export function ContextSubMenu({
           cursor: 'pointer',
           textAlign: 'left',
           width: '100%',
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.16)';
+        }}
+        onBlur={(e) => {
+          if (!open) e.currentTarget.style.backgroundColor = 'transparent';
         }}
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}>
@@ -190,6 +229,8 @@ export function ContextSubMenu({
 
       {open && (
         <div
+          ref={panelRef}
+          data-submenu-panel="true"
           onClick={(e) => e.stopPropagation()}
           style={{
             position: 'absolute',

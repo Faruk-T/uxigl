@@ -14,16 +14,7 @@ import {
 import { ContextMenuItem, MenuBarClock } from './WindowChrome';
 import type { TopMenuKey } from './TopMenuDropdowns';
 import type { DesktopWidgetId } from './types';
-
-const WIDGET_LABELS: { id: DesktopWidgetId; tr: string; en: string }[] = [
-  { id: 'clock', tr: 'Saat & Takvim', en: 'Clock & Calendar' },
-  { id: 'kpi', tr: 'Dashboard KPI & Grafik', en: 'Dashboard KPI & Chart' },
-  { id: 'timer', tr: 'Odak Sayacı', en: 'Focus Timer' },
-  { id: 'todo', tr: 'Yapılacaklar', en: 'To-Do List' },
-  { id: 'notes', tr: 'Hızlı Notlar', en: 'Quick Notes' },
-  { id: 'system', tr: 'Sistem Özeti', en: 'System Status' },
-  { id: 'timeline', tr: 'Günlük Zaman Akışı', en: 'Daily Time Flow' },
-];
+import { WIDGET_LABELS } from './widgets/renderWidgetCard';
 
 export function TopMenuTray({
   isTR,
@@ -141,93 +132,91 @@ export function TopMenuTray({
       </div>
 
       {/* Widget Settings Trigger Right Next to the Clock */}
-      {!showMobileLayout && (
-        <div style={{ position: 'relative' }}>
-          <button
-            type="button"
-            aria-label={isTR ? 'Widget Ayarları' : 'Widget Settings'}
-            title={isTR ? 'Widget Ayarları' : 'Widget Settings'}
-            onClick={(e) => toggleMenu('widgets', e)}
-            style={trayIconBtnStyle(activeMenu === 'widgets')}
+      <div style={{ position: 'relative' }}>
+        <button
+          type="button"
+          aria-label={isTR ? 'Widget Ayarları' : 'Widget Settings'}
+          title={isTR ? 'Widget Ayarları' : 'Widget Settings'}
+          onClick={(e) => toggleMenu('widgets', e)}
+          style={trayIconBtnStyle(activeMenu === 'widgets')}
+        >
+          <LayoutGrid size={15.5} />
+        </button>
+        {activeMenu === 'widgets' && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              ...dropdownStyle,
+              left: 'auto',
+              right: 0,
+              width: 236,
+            }}
           >
-            <LayoutGrid size={15.5} />
-          </button>
-          {activeMenu === 'widgets' && (
             <div
-              onClick={(e) => e.stopPropagation()}
               style={{
-                ...dropdownStyle,
-                left: 'auto',
-                right: 0,
-                width: 236,
+                padding: '4px 8px 3px',
+                fontSize: 10.5,
+                fontWeight: 700,
+                opacity: 0.58,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
               }}
             >
-              <div
-                style={{
-                  padding: '4px 8px 3px',
-                  fontSize: 10.5,
-                  fontWeight: 700,
-                  opacity: 0.58,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                {isTR ? 'Widget Ayarları' : 'Widget Settings'}
-              </div>
-              {onToggleWidgets && (
-                <ContextMenuItem
-                  icon={widgetsVisible ? <EyeOff size={14} /> : <Eye size={14} />}
-                  label={
-                    widgetsVisible
-                      ? isTR
-                        ? "Tüm Widget'ları Gizle"
-                        : 'Hide All Widgets'
-                      : isTR
-                        ? "Widget'ları Göster"
-                        : 'Show All Widgets'
-                  }
-                  onClick={() => onToggleWidgets()}
-                />
-              )}
-              <div style={{ height: 1, backgroundColor: 'rgba(148,163,184,0.2)', margin: '4px 0' }} />
-              {enabledWidgets &&
-                onToggleWidgetItem &&
-                WIDGET_LABELS.map((w) => (
-                  <ContextMenuItem
-                    key={w.id}
-                    icon={
-                      <span
-                        style={{
-                          width: 14,
-                          display: 'inline-flex',
-                          justifyContent: 'center',
-                          color: enabledWidgets[w.id] ? '#3b82f6' : 'transparent',
-                        }}
-                      >
-                        <Check size={13} />
-                      </span>
-                    }
-                    label={isTR ? w.tr : w.en}
-                    onClick={() => onToggleWidgetItem(w.id)}
-                  />
-                ))}
-              {onResetWidgetPositions && (
-                <>
-                  <div style={{ height: 1, backgroundColor: 'rgba(148,163,184,0.2)', margin: '4px 0' }} />
-                  <ContextMenuItem
-                    icon={<RotateCcw size={14} />}
-                    label={isTR ? 'Izgara Konumlarını Sıfırla' : 'Reset Grid Positions'}
-                    onClick={() => {
-                      onResetWidgetPositions();
-                      closeAllMenus();
-                    }}
-                  />
-                </>
-              )}
+              {isTR ? 'Widget Ayarları' : 'Widget Settings'}
             </div>
-          )}
-        </div>
-      )}
+            {onToggleWidgets && (
+              <ContextMenuItem
+                icon={widgetsVisible ? <EyeOff size={14} /> : <Eye size={14} />}
+                label={
+                  widgetsVisible
+                    ? isTR
+                      ? "Tüm Widget'ları Gizle"
+                      : 'Hide All Widgets'
+                    : isTR
+                      ? "Widget'ları Göster"
+                      : 'Show All Widgets'
+                }
+                onClick={() => onToggleWidgets()}
+              />
+            )}
+            <div style={{ height: 1, backgroundColor: 'rgba(148,163,184,0.2)', margin: '4px 0' }} />
+            {enabledWidgets &&
+              onToggleWidgetItem &&
+              WIDGET_LABELS.map((w) => (
+                <ContextMenuItem
+                  key={w.id}
+                  icon={
+                    <span
+                      style={{
+                        width: 14,
+                        display: 'inline-flex',
+                        justifyContent: 'center',
+                        color: enabledWidgets[w.id] ? '#3b82f6' : 'transparent',
+                      }}
+                    >
+                      <Check size={13} />
+                    </span>
+                  }
+                  label={isTR ? w.tr : w.en}
+                  onClick={() => onToggleWidgetItem(w.id)}
+                />
+              ))}
+            {!showMobileLayout && onResetWidgetPositions && (
+              <>
+                <div style={{ height: 1, backgroundColor: 'rgba(148,163,184,0.2)', margin: '4px 0' }} />
+                <ContextMenuItem
+                  icon={<RotateCcw size={14} />}
+                  label={isTR ? 'Izgara Konumlarını Sıfırla' : 'Reset Grid Positions'}
+                  onClick={() => {
+                    onResetWidgetPositions();
+                    closeAllMenus();
+                  }}
+                />
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
       <MenuBarClock />
     </div>

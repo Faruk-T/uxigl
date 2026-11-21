@@ -2,15 +2,21 @@ import React, { memo, useState } from 'react';
 import { SheetGLGridAdapter } from '../../../components/composites/SheetGLGridAdapter/SheetGLGridAdapter';
 import { FileManGLExplorerAdapter } from '../../../components/composites/FileManGLExplorerAdapter/FileManGLExplorerAdapter';
 import { Calendar } from '../../../components/composites/Calendar';
+import { Messenger } from '../../../components/composites/Messenger';
 import { AnalyticsDashboardView } from '../../showcase/AnalyticsDashboardView';
 import {
   AdminSubViews,
   type ExtendedAdminViewId,
 } from '../../showcase/AdminSubViews';
 import {
-  PageTemplatesShowcaseView,
-  type PageTemplateId,
-} from '../../showcase/PageTemplatesShowcaseView';
+  LoginPage,
+  RegisterPage,
+  PricingPage,
+  ProfilePage,
+  InvoicePage,
+  KanbanPage,
+  StatusPage,
+} from '../../showcase/pages';
 import { EnterpriseSettingsPage } from '../../showcase/EnterpriseSettingsPage';
 import { InteractivePlayground } from '../../playground/InteractivePlayground';
 import { ArchitectureDocsView } from '../../docs/ArchitectureDocsView';
@@ -35,9 +41,6 @@ export const WindowContent = memo(function WindowContent({
   contentWidth?: number;
   renderWindowContent?: (appId: string) => React.ReactNode;
 } & ThemeStudioPanelProps) {
-  const [activePage, setActivePage] = useState<PageTemplateId>(() =>
-    app.id.startsWith('page-') ? (app.id as PageTemplateId) : 'page-login'
-  );
   const [selectedComponentId, setSelectedComponentId] = useState<string>('button');
 
   if (renderWindowContent) {
@@ -82,6 +85,21 @@ export const WindowContent = memo(function WindowContent({
     );
   }
 
+  if (app.id === 'messages') {
+    return (
+      <div className="macosgl-fullbleed">
+        <div style={{ flex: 1, width: '100%', height: '100%', minHeight: 0 }}>
+          <Messenger
+            locale="tr"
+            height="100%"
+            storageKey="uxigl.osgl.messenger.v1"
+            style={{ borderRadius: 0, border: 'none' }}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (ADMIN_VIEW_IDS.has(app.id as ExtendedAdminViewId)) {
     return (
       <AdminSubViews
@@ -110,15 +128,14 @@ export const WindowContent = memo(function WindowContent({
     );
   }
 
-  if (app.id.startsWith('page-')) {
-    return (
-      <PageTemplatesShowcaseView
-        activePageId={activePage}
-        onPageChange={setActivePage}
-        onNavigateHome={() => setActivePage('page-login')}
-      />
-    );
-  }
+  if (app.id === 'page-login') return <LoginPage />;
+  if (app.id === 'page-register') return <RegisterPage />;
+  if (app.id === 'page-pricing') return <PricingPage />;
+  if (app.id === 'page-profile') return <ProfilePage />;
+  if (app.id === 'page-invoice') return <InvoicePage />;
+  if (app.id === 'page-kanban') return <KanbanPage />;
+  if (app.id === 'page-status') return <StatusPage />;
+  if (app.id === 'page-settings') return <EnterpriseSettingsPage />;
 
   if (app.id === 'os-theme-studio') {
     return <ThemeStudioPanel {...studioProps} />;

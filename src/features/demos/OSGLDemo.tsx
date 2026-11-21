@@ -131,6 +131,22 @@ export function OSGLDemo({
           40% { filter: brightness(1.12); }
         }
         .osgl-win-highlight { animation: osglWinPulse 0.45s ease-out; }
+        .osgl-mobile-compact .uxu-card { padding: 8px !important; border-radius: 12px !important; }
+        .osgl-mobile-compact .uxu-card:has(.uxu-sheetgl-wrapper) { padding: 0 !important; border: none !important; background: transparent !important; box-shadow: none !important; }
+        .osgl-mobile-compact .uxu-card__header { padding: 0 0 6px 0 !important; margin-bottom: 6px !important; gap: 6px !important; }
+        .osgl-mobile-compact .uxu-card__header:not(:has(.uxu-card__header-action)) { display: none !important; }
+        .osgl-mobile-compact .uxu-card__eyebrow,
+        .osgl-mobile-compact .uxu-card__subtitle,
+        .osgl-mobile-compact .uxu-card__header-icon { display: none !important; }
+        .osgl-mobile-compact .uxu-card__title { font-size: 13px !important; line-height: 1.2 !important; }
+        .osgl-mobile-compact .uxu-card__body { padding: 0 !important; }
+        .osgl-mobile-compact .uxu-stat-card { padding: 10px 12px !important; }
+        .osgl-mobile-compact .uxu-stat-card__value { font-size: 1.15rem !important; }
+        .osgl-mobile-compact .uxu-stat-card__subtitle { display: none !important; }
+        .osgl-mobile-compact .uxu-sheetgl-toolbar,
+        .osgl-mobile-compact .uxu-sheetgl-statusbar,
+        .osgl-mobile-compact .sg-toolbar,
+        .osgl-mobile-compact .sg-formula-bar { display: none !important; }
       `}</style>
 
       {os.useWebGLAurora && (
@@ -199,6 +215,15 @@ export function OSGLDemo({
           onOpenApp={os.openApp}
           renderWindowContent={renderWindowContent}
           sharedStudioProps={os.sharedStudioProps}
+          locale={os.locale}
+          glassOpacity={os.glassOpacity}
+          qualityMode={os.qualityMode}
+          setQualityMode={os.sharedStudioProps.setQualityMode}
+          openWindowCount={os.windows.length}
+          widgetsVisible={os.widgetsVisible}
+          onToggleWidgets={() => os.setWidgetsVisible((v) => !v)}
+          enabledWidgets={os.enabledWidgets}
+          onToggleWidgetItem={os.toggleWidgetItem}
         />
       ) : (
         <DesktopGrid
@@ -212,6 +237,7 @@ export function OSGLDemo({
           iconGradColor2={os.iconGradColor2}
           iconColor={os.iconColor}
           iconSizePx={os.iconSizePx}
+          iconLabelScale={os.iconLabelScale}
           viewportSize={os.viewportSize}
           iconSlots={os.iconSlots}
           setIconSlots={os.setIconSlots}
@@ -266,6 +292,7 @@ export function OSGLDemo({
               wallpaper={os.wallpaper}
               selectedAppIds={os.selectedAppIds}
               dockVisible={os.dockVisible}
+              dockAppIds={os.dockAppIds}
               onOpenApp={os.openApp}
               onArrange={os.arrangeWindows}
               onSelectWallpaper={(wpId) => {
@@ -273,6 +300,7 @@ export function OSGLDemo({
                 os.setWallpaper(wpId);
               }}
               onToggleDock={() => os.setDockVisible((v) => !v)}
+              onTogglePinToDock={os.togglePinToDock}
               onResetIcons={() => {
                 const reset: Record<string, number> = {};
                 ENTERPRISE_APPS.forEach((app, idx) => { reset[app.id] = idx; });
@@ -288,6 +316,10 @@ export function OSGLDemo({
               isDark={os.isDark}
               glassBlur={os.glassBlur}
               windows={os.windows}
+              dockAppIds={os.dockAppIds}
+              onTogglePinToDock={os.togglePinToDock}
+              onReorderDockApps={os.reorderDockApps}
+              locale={os.locale}
               iconBgStyle={os.iconBgStyle}
               iconBgColor={os.iconBgColor}
               iconGradColor1={os.iconGradColor1}
@@ -295,6 +327,10 @@ export function OSGLDemo({
               iconColor={os.iconColor}
               primaryColor={os.paletteTokens.primary}
               onOpenApp={os.openApp}
+              onCloseApp={(appId) => {
+                const win = os.windows.find((w) => w.appId === appId);
+                if (win) os.closeWindow(win.id);
+              }}
               onArrangeGrid={() => os.arrangeWindows('grid')}
               onResetWindows={() =>
                 os.setWindows([

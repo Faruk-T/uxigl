@@ -69,10 +69,10 @@ export function FocusTimerWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
                   outline: 'none',
                   backgroundColor: isActive
                     ? isDark
-                      ? 'rgba(255,255,255,0.16)'
+                      ? 'rgba(59, 130, 246, 0.24)'
                       : '#ffffff'
                     : 'transparent',
-                  color: isActive ? primaryColor : 'inherit',
+                  color: isActive ? (isDark ? '#93c5fd' : primaryColor) : 'inherit',
                   opacity: isActive ? 1 : 0.72,
                   boxShadow: isActive ? '0 1px 3px rgba(15,23,42,0.12)' : 'none',
                   fontSize: Math.round(10 * Math.min(1.25, s)),

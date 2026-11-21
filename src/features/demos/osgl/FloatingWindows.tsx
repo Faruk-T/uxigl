@@ -267,7 +267,7 @@ export function FloatingWindows({
                   minHeight: 0,
                   display: 'flex',
                   flexDirection: 'column',
-                  padding: isFullBleed ? 0 : 16,
+                  padding: isFullBleed ? 0 : 20,
                   overflowY: isFullBleed ? 'hidden' : 'auto',
                 }}
               >

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ENTERPRISE_APPS,
   type EnterpriseOSApp,
@@ -19,6 +19,7 @@ export function DesktopGrid({
   iconGradColor2,
   iconColor,
   iconSizePx,
+  iconLabelScale = 100,
   viewportSize,
   iconSlots,
   setIconSlots,
@@ -38,6 +39,7 @@ export function DesktopGrid({
   iconGradColor2: string;
   iconColor: string;
   iconSizePx: number;
+  iconLabelScale?: number;
   viewportSize: { w: number; h: number };
   iconSlots: Record<string, number>;
   setIconSlots: React.Dispatch<React.SetStateAction<Record<string, number>>>;
@@ -49,6 +51,7 @@ export function DesktopGrid({
 }) {
   const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
   const [dragOverSlot, setDragOverSlot] = useState<number | null>(null);
+  const [dropInsertSide, setDropInsertSide] = useState<'before' | 'after' | null>(null);
   const [selectionBox, setSelectionBox] = useState<{
     left: number;
     top: number;
@@ -89,14 +92,133 @@ export function DesktopGrid({
     return map;
   }, [iconSlots, totalGridSlots]);
 
-  const handleDropOnSlot = (targetSlot: number) => {
+  // Arrow-key icon selection & Enter-to-open across the column-major desktop grid
+  const keyNavRef = useRef({
+    slotToApp,
+    selectedAppIds,
+    rowsPerColumn,
+    totalGridSlots,
+    setSelectedAppIds,
+    onOpenApp,
+  });
+  keyNavRef.current = {
+    slotToApp,
+    selectedAppIds,
+    rowsPerColumn,
+    totalGridSlots,
+    setSelectedAppIds,
+    onOpenApp,
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      const active = document.activeElement as HTMLElement | null;
+      if (
+        active?.closest('input, textarea, select, [contenteditable="true"], [role="dialog"], [data-menu-dropdown], [data-submenu-panel], nav[aria-label="OSGL Menu Bar"], [data-macos-window="true"]')
+      ) {
+        return;
+      }
+      if (document.querySelector('[role="dialog"][aria-modal="true"], [data-menu-dropdown]')) {
+        return;
+      }
+
+      const {
+        slotToApp: sMap,
+        selectedAppIds: sel,
+        rowsPerColumn: rPerCol,
+        totalGridSlots: total,
+        setSelectedAppIds: setSel,
+        onOpenApp: openFn,
+      } = keyNavRef.current;
+
+      if (e.key === 'Enter' && sel.length > 0 && !active?.closest('button:not(.macosgl-app-btn)')) {
+        e.preventDefault();
+        openFn(sel[0]);
+        return;
+      }
+
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+      e.preventDefault();
+
+      const occupiedSlots = Array.from(sMap.keys()).sort((a, b) => a - b);
+      if (occupiedSlots.length === 0) return;
+
+      const currentAppId = sel[0];
+      let currentSlot = -1;
+      if (currentAppId) {
+        for (const [slot, app] of sMap.entries()) {
+          if (app.id === currentAppId) {
+            currentSlot = slot;
+            break;
+          }
+        }
+      }
+
+      if (currentSlot === -1) {
+        const firstApp = sMap.get(occupiedSlots[0]);
+        if (firstApp) {
+          setSel([firstApp.id]);
+          desktopIconRefs.current[firstApp.id]?.focus();
+        }
+        return;
+      }
+
+      const curCol = Math.floor(currentSlot / rPerCol);
+      const curRow = currentSlot % rPerCol;
+      const cols = Math.max(1, Math.ceil(total / rPerCol));
+
+      let nextApp: EnterpriseOSApp | undefined;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        const idx = occupiedSlots.indexOf(currentSlot);
+        const nextIdx =
+          e.key === 'ArrowDown'
+            ? (idx + 1) % occupiedSlots.length
+            : (idx - 1 + occupiedSlots.length) % occupiedSlots.length;
+        nextApp = sMap.get(occupiedSlots[nextIdx]);
+      } else {
+        const colStep = e.key === 'ArrowRight' ? 1 : -1;
+        for (let step = 1; step <= cols; step++) {
+          const targetCol = (curCol + colStep * step + cols) % cols;
+          const candidateSlot = targetCol * rPerCol + curRow;
+          const found = sMap.get(candidateSlot);
+          if (found) {
+            nextApp = found;
+            break;
+          }
+          // Fallback: any occupied slot in targetCol nearest to curRow
+          const inCol = occupiedSlots.filter((s) => Math.floor(s / rPerCol) === targetCol);
+          if (inCol.length > 0) {
+            inCol.sort((a, b) => Math.abs((a % rPerCol) - curRow) - Math.abs((b % rPerCol) - curRow));
+            nextApp = sMap.get(inCol[0]);
+            break;
+          }
+        }
+      }
+
+      if (nextApp) {
+        setSel([nextApp.id]);
+        desktopIconRefs.current[nextApp.id]?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  const handleDropOnSlot = (targetSlot: number, side: 'before' | 'after' | null = null) => {
     if (!draggedAppId) {
       setDragOverSlot(null);
+      setDropInsertSide(null);
       return;
     }
-    setIconSlots((prev) => reorderIconSlotsOnDrop(prev, draggedAppId, targetSlot, selectedAppIds));
+    const resolvedTarget =
+      side === 'after' ? Math.min(totalGridSlots - 1, targetSlot + 1) : targetSlot;
+    setIconSlots((prev) => reorderIconSlotsOnDrop(prev, draggedAppId, resolvedTarget, selectedAppIds));
     setDraggedAppId(null);
     setDragOverSlot(null);
+    setDropInsertSide(null);
   };
 
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -213,8 +335,12 @@ export function DesktopGrid({
               isSelected={selectedAppIds.includes(app.id)}
               isDragged={draggedAppId === app.id}
               isDropHighlight={isDropHighlight && draggedAppId !== app.id}
+              dropInsertSide={
+                isDropHighlight && draggedAppId !== app.id ? dropInsertSide : null
+              }
               iconBoxSize={iconBoxSize}
               iconGlyphSize={iconGlyphSize}
+              iconLabelScale={iconLabelScale}
               barTextColor={barTextColor}
               effectiveIsLightBg={effectiveIsLightBg}
               isDark={isDark}
@@ -230,18 +356,31 @@ export function DesktopGrid({
               }}
               onDragOver={(e) => {
                 e.preventDefault();
+                const rect = e.currentTarget.getBoundingClientRect();
+                const side: 'before' | 'after' =
+                  e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
                 if (dragOverSlot !== slotIdx) setDragOverSlot(slotIdx);
+                if (dropInsertSide !== side) setDropInsertSide(side);
               }}
               onDragLeave={() => {
-                if (dragOverSlot === slotIdx) setDragOverSlot(null);
+                if (dragOverSlot === slotIdx) {
+                  setDragOverSlot(null);
+                  setDropInsertSide(null);
+                }
               }}
               onDrop={(e) => {
                 e.preventDefault();
-                handleDropOnSlot(slotIdx);
+                handleDropOnSlot(slotIdx, dropInsertSide);
               }}
               onDragEnd={() => {
                 setDraggedAppId(null);
                 setDragOverSlot(null);
+                setDropInsertSide(null);
+              }}
+              onContextMenu={() => {
+                if (!selectedAppIds.includes(app.id)) {
+                  setSelectedAppIds([app.id]);
+                }
               }}
               onClick={(e) => {
                 if (e.ctrlKey || e.metaKey || e.shiftKey) {

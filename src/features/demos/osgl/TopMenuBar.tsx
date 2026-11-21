@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UXILogo } from '../../../components/brand/UXILogo';
 import uxiNoBgPng from '../../../assets/logo/uxi_no_bg.png';
 import type { ThemeStudioPanelProps } from './ThemeStudioPanel';
@@ -65,9 +65,33 @@ export function TopMenuBar({
   glassBlur?: number;
 }) {
   const [openMenu, setOpenMenu] = useState<TopMenuKey>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
 
   const isTR = locale === 'tr';
   const activeMenu: TopMenuKey = arrangeMenuOpen ? 'window' : openMenu;
+
+  useEffect(() => {
+    if (!activeMenu) return;
+    const handleOutside = (e: MouseEvent | PointerEvent) => {
+      if (headerRef.current && headerRef.current.contains(e.target as Node)) {
+        return;
+      }
+      setOpenMenu(null);
+      setArrangeMenuOpen(false);
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpenMenu(null);
+        setArrangeMenuOpen(false);
+      }
+    };
+    window.addEventListener('pointerdown', handleOutside);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('pointerdown', handleOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeMenu, setArrangeMenuOpen]);
 
   const topTextColor = effectiveIsLightBg ? '#0f172a' : '#ffffff';
   const topPillBg = effectiveIsLightBg ? 'rgba(15, 23, 42, 0.12)' : 'rgba(255, 255, 255, 0.16)';
@@ -135,6 +159,7 @@ export function TopMenuBar({
 
   return (
     <header
+      ref={headerRef}
       onClick={() => closeAllMenus()}
       style={{
         position: 'relative',

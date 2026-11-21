@@ -754,9 +754,9 @@ export function DashboardKpiWidgetCard({
                 style={{
                   width: '100%',
                   height: `${bar.h}%`,
-                  borderRadius: 4,
-                  backgroundColor: i === 4 ? primaryColor : subtleBg,
-                  border: i === 4 ? 'none' : `1px solid ${subtleBorder}`,
+                  borderRadius: 5,
+                  backgroundColor: i === 4 ? primaryColor : isDark ? 'rgba(255,255,255,0.11)' : subtleBg,
+                  border: 'none',
                   transition: 'height 150ms ease',
                 }}
               />

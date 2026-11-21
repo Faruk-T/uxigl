@@ -10,8 +10,10 @@ export function DesktopIconTile({
   isSelected,
   isDragged,
   isDropHighlight,
+  dropInsertSide,
   iconBoxSize,
   iconGlyphSize,
+  iconLabelScale = 100,
   barTextColor,
   effectiveIsLightBg,
   isDark,
@@ -27,6 +29,7 @@ export function DesktopIconTile({
   onDrop,
   onDragEnd,
   onClick,
+  onContextMenu,
 }: {
   app: EnterpriseOSApp;
   slotIdx: number;
@@ -35,8 +38,10 @@ export function DesktopIconTile({
   isSelected: boolean;
   isDragged: boolean;
   isDropHighlight: boolean;
+  dropInsertSide?: 'before' | 'after' | null;
   iconBoxSize: number;
   iconGlyphSize: number;
+  iconLabelScale?: number;
   barTextColor: string;
   effectiveIsLightBg: boolean;
   isDark: boolean;
@@ -52,6 +57,7 @@ export function DesktopIconTile({
   onDrop: (e: React.DragEvent) => void;
   onDragEnd: () => void;
   onClick: (e: React.MouseEvent) => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
 }) {
   const isNumericBadge = Boolean(app.badge && /^\d+$/.test(app.badge));
   const iconSurf = resolveIconSurface(
@@ -78,18 +84,20 @@ export function DesktopIconTile({
       onDragEnd={onDragEnd}
       className="macosgl-app-btn"
       onClick={onClick}
+      onContextMenu={onContextMenu}
       style={{
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
         gap: 6,
-        border: isDropHighlight
+        border: isDropHighlight && !dropInsertSide
           ? '1.5px dashed rgba(255,255,255,0.75)'
           : isSelected
           ? '1.5px solid rgba(96, 165, 250, 0.85)'
           : '1.5px solid transparent',
-        background: isDropHighlight
+        background: isDropHighlight && !dropInsertSide
           ? 'rgba(255,255,255,0.14)'
           : isSelected
           ? 'rgba(59, 130, 246, 0.24)'
@@ -100,6 +108,24 @@ export function DesktopIconTile({
         opacity: isDragged ? 0.45 : 1,
       }}
     >
+      {dropInsertSide && (
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 8,
+            right: 8,
+            top: dropInsertSide === 'before' ? -5 : 'auto',
+            bottom: dropInsertSide === 'after' ? -5 : 'auto',
+            height: 3,
+            borderRadius: 999,
+            backgroundColor: primaryColor,
+            boxShadow: `0 0 10px ${primaryColor}`,
+            pointerEvents: 'none',
+            zIndex: 10,
+          }}
+        />
+      )}
       <div
         className="macosgl-app-icon-box"
         style={{
@@ -146,7 +172,7 @@ export function DesktopIconTile({
       </div>
       <span
         style={{
-          fontSize: 12,
+          fontSize: Math.round(((12 * iconLabelScale) / 100) * 10) / 10,
           fontWeight: 500,
           letterSpacing: '-0.01em',
           color: barTextColor,

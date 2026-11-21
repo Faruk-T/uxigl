@@ -8,6 +8,7 @@ export const FULLBLEED_APP_IDS = new Set([
   'crm-orders',
   'filemangl-explorer',
   'file-manager',
+  'messages',
 ]);
 
 const DESKTOP_PADDING_X = 12;

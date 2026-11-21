@@ -9,6 +9,7 @@ import {
 import {
   DEFAULT_ENABLED_WIDGETS,
   DEFAULT_WIDGET_SIZES,
+  DOCK_APP_IDS,
   ENTERPRISE_APPS,
   getDefaultWidgetPositions,
   loadOSGLState,
@@ -70,6 +71,50 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     savedState?.qualityMode ?? 'quality'
   );
   const [dockVisible, setDockVisible] = useState<boolean>(savedState?.dockVisible ?? true);
+  const [dockAppIds, setDockAppIds] = useState<string[]>(() =>
+    Array.isArray(savedState?.dockAppIds) && savedState.dockAppIds.length > 0
+      ? savedState.dockAppIds
+      : [...DOCK_APP_IDS]
+  );
+  const togglePinToDock = (appId: string) => {
+    const appLabel = ENTERPRISE_APPS.find((a) => a.id === appId)?.shortLabel ?? appId;
+    setDockAppIds((prev) => {
+      const exists = prev.includes(appId);
+      const next = exists ? prev.filter((id) => id !== appId) : [...prev, appId];
+      notify({
+        title: exists
+          ? locale === 'tr'
+            ? "Dock'tan Çıkarıldı"
+            : 'Removed from Dock'
+          : locale === 'tr'
+          ? "Dock'ta Tutuldu"
+          : 'Kept in Dock',
+        description: appLabel,
+        tone: 'info',
+      });
+      return next;
+    });
+  };
+  const reorderDockApps = (
+    fromId: string,
+    toId: string,
+    position: 'before' | 'after' = 'before'
+  ) => {
+    if (fromId === toId) return;
+    setDockAppIds((prev) => {
+      const next = [...prev];
+      if (!next.includes(fromId)) next.push(fromId);
+      if (!next.includes(toId)) next.push(toId);
+      const fromIdx = next.indexOf(fromId);
+      if (fromIdx === -1) return prev;
+      next.splice(fromIdx, 1);
+      const toIdx = next.indexOf(toId);
+      if (toIdx === -1) return prev;
+      const insertIdx = position === 'after' ? toIdx + 1 : toIdx;
+      next.splice(insertIdx, 0, fromId);
+      return next;
+    });
+  };
   const [widgetsVisible, setWidgetsVisible] = useState<boolean>(savedState?.widgetsVisible ?? true);
   const [enabledWidgets, setEnabledWidgets] = useState<Record<DesktopWidgetId, boolean>>(() => ({
     ...DEFAULT_ENABLED_WIDGETS,
@@ -117,6 +162,7 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
   );
   const [iconColor, setIconColor] = useState<string>(savedState?.iconColor ?? '');
   const [iconSizePx, setIconSizePx] = useState<number>(savedState?.iconSizePx ?? 62);
+  const [iconLabelScale, setIconLabelScale] = useState<number>(savedState?.iconLabelScale ?? 100);
   const [iconSlots, setIconSlots] = useState<Record<string, number>>(() => {
     if (savedState?.iconSlots && Object.keys(savedState.iconSlots).length > 0) {
       return savedState.iconSlots;
@@ -189,6 +235,7 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     uploadedBgDataUrl,
     qualityMode,
     dockVisible,
+    dockAppIds,
     widgetsVisible,
     enabledWidgets,
     widgetPositions,
@@ -200,6 +247,7 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     iconGradColor2,
     iconColor,
     iconSizePx,
+    iconLabelScale,
     iconSlots,
     windows: windowMgr.windows,
     windowBoundsByApp: windowMgr.windowBoundsByApp,
@@ -264,6 +312,8 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     setIconColor,
     iconSizePx,
     setIconSizePx,
+    iconLabelScale,
+    setIconLabelScale,
     preferences,
     availablePalettes,
     availableFontPresets,
@@ -298,6 +348,9 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     qualityMode,
     dockVisible,
     setDockVisible,
+    dockAppIds,
+    togglePinToDock,
+    reorderDockApps,
     widgetsVisible,
     setWidgetsVisible,
     enabledWidgets,
@@ -314,6 +367,7 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     iconGradColor2,
     iconColor,
     iconSizePx,
+    iconLabelScale,
     iconSlots,
     setIconSlots,
     selectedAppIds,

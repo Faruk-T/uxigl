@@ -76,14 +76,122 @@ export function TopMenuDropdowns({
   menuBtnStyle: (active: boolean) => React.CSSProperties;
   dropdownStyle: React.CSSProperties;
 }) {
+  const navRef = React.useRef<HTMLElement | null>(null);
+  const TOP_BAR_KEYS = ['apps', 'components', 'window', 'view', 'tools', 'docs'] as const;
+
+  const getDropdownItems = (container: Element | null): HTMLButtonElement[] => {
+    if (!container) return [];
+    return Array.from(container.querySelectorAll<HTMLButtonElement>('[data-menu-item="true"]')).filter(
+      (btn) => {
+        const sub = btn.closest('[data-submenu-panel="true"]');
+        return !sub || sub === container;
+      }
+    );
+  };
+
+  const handleMenuKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    if (e.key === 'Escape' && activeMenu) {
+      e.preventDefault();
+      e.stopPropagation();
+      const key = activeMenu;
+      closeAllMenus();
+      requestAnimationFrame(() => {
+        nav.querySelector<HTMLButtonElement>(`[data-top-menu="${key}"]`)?.focus();
+      });
+      return;
+    }
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const activeEl = document.activeElement as HTMLElement | null;
+      const inSubmenu = activeEl?.closest('[data-submenu-panel="true"]');
+      const activeDropdown = activeMenu
+        ? nav.querySelector(`[data-menu-dropdown="${activeMenu}"]`)
+        : null;
+
+      if (!activeDropdown) {
+        const focusedTop = activeEl?.getAttribute('data-top-menu') as Exclude<TopMenuKey, null> | null;
+        if (focusedTop && focusedTop !== 'docs') {
+          toggleMenu(focusedTop, e as unknown as React.MouseEvent);
+          requestAnimationFrame(() => {
+            const panel = nav.querySelector(`[data-menu-dropdown="${focusedTop}"]`);
+            const items = getDropdownItems(panel);
+            (e.key === 'ArrowUp' ? items[items.length - 1] : items[0])?.focus();
+          });
+        }
+        return;
+      }
+
+      const container = inSubmenu ?? activeDropdown;
+      const items = getDropdownItems(container);
+      if (items.length === 0) return;
+      const curIdx = items.findIndex((el) => el === activeEl);
+      const nextIdx =
+        curIdx === -1
+          ? e.key === 'ArrowDown'
+            ? 0
+            : items.length - 1
+          : e.key === 'ArrowDown'
+          ? (curIdx + 1) % items.length
+          : (curIdx - 1 + items.length) % items.length;
+      items[nextIdx]?.focus();
+      return;
+    }
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      const activeEl = document.activeElement as HTMLElement | null;
+      const focusedTop = activeEl?.getAttribute('data-top-menu');
+      const currentKey =
+        (activeMenu as (typeof TOP_BAR_KEYS)[number] | null) ??
+        (focusedTop as (typeof TOP_BAR_KEYS)[number] | undefined) ??
+        null;
+      if (!currentKey) return;
+
+      const curIdx = TOP_BAR_KEYS.indexOf(currentKey);
+      if (curIdx === -1) return;
+      e.preventDefault();
+      const delta = e.key === 'ArrowRight' ? 1 : -1;
+      const nextKey = TOP_BAR_KEYS[(curIdx + delta + TOP_BAR_KEYS.length) % TOP_BAR_KEYS.length];
+
+      if (nextKey === 'docs') {
+        closeAllMenus();
+        nav.querySelector<HTMLButtonElement>('[data-top-menu="docs"]')?.focus();
+        return;
+      }
+
+      if (activeMenu) {
+        toggleMenu(nextKey, e as unknown as React.MouseEvent);
+        requestAnimationFrame(() => {
+          const panel = nav.querySelector(`[data-menu-dropdown="${nextKey}"]`);
+          const items = getDropdownItems(panel);
+          if (items.length > 0) {
+            items[0].focus();
+          } else {
+            nav.querySelector<HTMLButtonElement>(`[data-top-menu="${nextKey}"]`)?.focus();
+          }
+        });
+      } else {
+        nav.querySelector<HTMLButtonElement>(`[data-top-menu="${nextKey}"]`)?.focus();
+      }
+    }
+  };
+
   return (
-    <>
+    <nav
+      ref={navRef}
+      aria-label="OSGL Menu Bar"
+      onKeyDown={handleMenuKeyDown}
+      style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+    >
       <div style={{ position: 'relative' }}>
-        <button type="button" onClick={(e) => toggleMenu('apps', e)} style={menuBtnStyle(activeMenu === 'apps')}>
+        <button type="button" data-top-menu="apps" onClick={(e) => toggleMenu('apps', e)} style={menuBtnStyle(activeMenu === 'apps')}>
           {isTR ? 'Uygulamalar' : 'Apps'}
         </button>
         {activeMenu === 'apps' && (
-          <div onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
+          <div data-menu-dropdown="apps" onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
             <ContextMenuItem icon={<LayoutDashboard size={14} />} label="Dashboard" onClick={() => { onOpenApp('overview'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Sparkles size={14} />} label="Analytics" onClick={() => { onOpenApp('analytics'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Layers size={14} />} label="Kanban" onClick={() => { onOpenApp('page-kanban'); closeAllMenus(); }} />
@@ -93,11 +201,11 @@ export function TopMenuDropdowns({
       </div>
 
       <div style={{ position: 'relative' }}>
-        <button type="button" onClick={(e) => toggleMenu('components', e)} style={menuBtnStyle(activeMenu === 'components')}>
+        <button type="button" data-top-menu="components" onClick={(e) => toggleMenu('components', e)} style={menuBtnStyle(activeMenu === 'components')}>
           {isTR ? 'Bileşenler' : 'Components'}
         </button>
         {activeMenu === 'components' && (
-          <div onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
+          <div data-menu-dropdown="components" onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
             <ContextMenuItem icon={<Table2 size={14} />} label="SheetGL Grid" onClick={() => { onOpenApp('datatable-statcard'); closeAllMenus(); }} />
             <ContextMenuItem icon={<FolderOpen size={14} />} label="FileManGL Explorer" onClick={() => { onOpenApp('filemangl-explorer'); closeAllMenus(); }} />
             <ContextMenuItem icon={<FileText size={14} />} label="Forms & Inputs" onClick={() => { onOpenApp('forms'); closeAllMenus(); }} />
@@ -114,11 +222,11 @@ export function TopMenuDropdowns({
       </div>
 
       <div style={{ position: 'relative' }}>
-        <button type="button" onClick={(e) => toggleMenu('window', e)} style={menuBtnStyle(activeMenu === 'window')}>
+        <button type="button" data-top-menu="window" onClick={(e) => toggleMenu('window', e)} style={menuBtnStyle(activeMenu === 'window')}>
           {isTR ? 'Pencere' : 'Window'}
         </button>
         {activeMenu === 'window' && (
-          <div onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
+          <div data-menu-dropdown="window" onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
             <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? 'Izgara Dizilimi (Grid)' : 'Tile Grid'} onClick={() => { arrangeWindows('grid'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Layers size={14} />} label={isTR ? 'Kademeli Dizilim (Cascade)' : 'Cascade'} onClick={() => { arrangeWindows('cascade'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Columns2 size={14} />} label={isTR ? 'Yan Yana Diz' : 'Side by Side'} onClick={() => { arrangeWindows('side-by-side'); closeAllMenus(); }} />
@@ -134,11 +242,11 @@ export function TopMenuDropdowns({
       </div>
 
       <div style={{ position: 'relative' }}>
-        <button type="button" onClick={(e) => toggleMenu('view', e)} style={menuBtnStyle(activeMenu === 'view')}>
+        <button type="button" data-top-menu="view" onClick={(e) => toggleMenu('view', e)} style={menuBtnStyle(activeMenu === 'view')}>
           {isTR ? 'Görünüm' : 'View'}
         </button>
         {activeMenu === 'view' && (
-          <div onClick={(e) => e.stopPropagation()} style={{ ...dropdownStyle, width: 245 }}>
+          <div data-menu-dropdown="view" onClick={(e) => e.stopPropagation()} style={{ ...dropdownStyle, width: 245 }}>
             <ContextMenuItem
               icon={isDark ? <Sun size={14} /> : <Moon size={14} />}
               label={isDark ? (isTR ? 'Aydınlık Moda Geç' : 'Switch to Light Mode') : isTR ? 'Karanlık Moda Geç' : 'Switch to Dark Mode'}
@@ -208,11 +316,11 @@ export function TopMenuDropdowns({
       </div>
 
       <div style={{ position: 'relative' }}>
-        <button type="button" onClick={(e) => toggleMenu('tools', e)} style={menuBtnStyle(activeMenu === 'tools')}>
+        <button type="button" data-top-menu="tools" onClick={(e) => toggleMenu('tools', e)} style={menuBtnStyle(activeMenu === 'tools')}>
           {isTR ? 'Araçlar' : 'Tools'}
         </button>
         {activeMenu === 'tools' && (
-          <div onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
+          <div data-menu-dropdown="tools" onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
             <ContextMenuItem icon={<RotateCcw size={14} />} label={isTR ? 'Simge Sıralamasını Sıfırla' : 'Reset Icon Layout'} onClick={() => { onResetIcons(); closeAllMenus(); }} />
             <ContextMenuItem icon={<Trash2 size={14} />} label={isTR ? 'Masaüstünü Temizle' : 'Clear Desktop'} onClick={() => { closeAllWindows(); closeAllMenus(); }} />
           </div>
@@ -221,13 +329,14 @@ export function TopMenuDropdowns({
 
       <button
         type="button"
+        data-top-menu="docs"
         onClick={() => { closeAllMenus(); onOpenApp('docs'); }}
         style={{ ...menuBtnStyle(false), display: 'inline-flex', alignItems: 'center', gap: 5 }}
       >
         <BookOpen size={13} />
         <span>{isTR ? 'Dokümantasyon' : 'Docs'}</span>
       </button>
-    </>
+    </nav>
   );
 }
 

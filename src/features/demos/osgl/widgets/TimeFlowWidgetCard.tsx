@@ -136,17 +136,39 @@ export function TimeFlowWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
       ? slots[activeIdx + 1] ?? null
       : slots.find((sl) => toMinutes(sl.start) * 60 > nowSec) ?? null;
 
-  const progressPct = activeSlot
+  const slotProgress = activeSlot
     ? Math.max(
         0,
         Math.min(
-          100,
-          ((nowSec - toMinutes(activeSlot.start) * 60) /
-            Math.max(60, (toMinutes(activeSlot.end) - toMinutes(activeSlot.start)) * 60)) *
-            100
+          1,
+          (nowSec - toMinutes(activeSlot.start) * 60) /
+            Math.max(60, (toMinutes(activeSlot.end) - toMinutes(activeSlot.start)) * 60)
         )
       )
     : 0;
+  const progressPct = slotProgress * 100;
+
+  // Compute continuous 0..100% position along the day's straight timeline line
+  const firstStartSec = slots.length > 0 ? toMinutes(slots[0].start) * 60 : 0;
+  const lastEndSec = slots.length > 0 ? toMinutes(slots[slots.length - 1].end) * 60 : 86400;
+  const dayLinearPct =
+    lastEndSec > firstStartSec
+      ? Math.max(0, Math.min(100, ((nowSec - firstStartSec) / (lastEndSec - firstStartSec)) * 100))
+      : 0;
+
+  let verticalMarkerPct = 2;
+  if (slots.length > 0) {
+    if (activeIdx >= 0) {
+      verticalMarkerPct = ((activeIdx + 0.15 + slotProgress * 0.7) / slots.length) * 100;
+    } else if (nowSec <= firstStartSec) {
+      verticalMarkerPct = 2;
+    } else if (nowSec >= lastEndSec) {
+      verticalMarkerPct = 98;
+    } else {
+      const nextIdx = slots.findIndex((sl) => toMinutes(sl.start) * 60 > nowSec);
+      verticalMarkerPct = nextIdx > 0 ? (nextIdx / slots.length) * 100 : 98;
+    }
+  }
 
   const remainingSec = activeSlot
     ? toMinutes(activeSlot.end) * 60 - nowSec
@@ -218,8 +240,12 @@ export function TimeFlowWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
                     fontSize: Math.round(10 * Math.min(1.2, s)),
                     fontWeight: 700,
                     cursor: 'pointer',
-                    backgroundColor: isAct ? (isDark ? 'rgba(255,255,255,0.16)' : '#ffffff') : 'transparent',
-                    color: isAct ? primaryColor : 'inherit',
+                    backgroundColor: isAct
+                      ? isDark
+                        ? 'rgba(59, 130, 246, 0.24)'
+                        : '#ffffff'
+                      : 'transparent',
+                    color: isAct ? (isDark ? '#93c5fd' : primaryColor) : 'inherit',
                     opacity: isAct ? 1 : 0.7,
                   }}
                 >
@@ -400,14 +426,30 @@ export function TimeFlowWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
               </span>
             </div>
 
-            <div style={{ height: 5, borderRadius: 999, backgroundColor: subtleBorder, overflow: 'hidden' }}>
+            <div style={{ position: 'relative', height: 6, borderRadius: 999, backgroundColor: subtleBorder, margin: '2px 0' }}>
               <div
                 style={{
                   width: `${progressPct}%`,
                   height: '100%',
                   borderRadius: 999,
                   backgroundColor: kindColor(activeSlot.kind),
-                  transition: 'width 0.5s ease',
+                  transition: 'width 1s linear',
+                }}
+              />
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: `${Math.max(2, Math.min(98, progressPct))}%`,
+                  transform: 'translate(-50%, -50%)',
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  backgroundColor: '#ffffff',
+                  border: `2.5px solid ${kindColor(activeSlot.kind)}`,
+                  boxShadow: `0 0 0 3px ${isDark ? 'rgba(59,130,246,0.28)' : 'rgba(37,99,235,0.22)'}`,
+                  transition: 'left 1s linear',
                 }}
               />
             </div>
@@ -444,47 +486,110 @@ export function TimeFlowWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
         )}
       </div>
 
-      {/* Scrollable Timeline List when resized taller */}
+      {/* Scrollable Vertical Timeline with Straight Line & Smoothly Moving Marker */}
       {showFullList && (
         <div
           style={{
             flex: 1,
             minHeight: 0,
             overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
+            paddingRight: 2,
           }}
         >
-          {slots.map((sl) => {
-            const st = toMinutes(sl.start) * 60;
-            const en = toMinutes(sl.end) * 60;
-            const isPast = nowSec >= en;
-            const isCurrent = nowSec >= st && nowSec < en;
-            return (
-              <div
-                key={sl.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: 8,
-                  padding: '5px 8px',
-                  borderRadius: 8,
-                  backgroundColor: isCurrent ? subtleBg : 'transparent',
-                  border: isCurrent ? `1px solid ${kindColor(sl.kind)}` : '1px solid transparent',
-                  opacity: isPast ? 0.45 : 1,
-                  fontSize: Math.round(11 * Math.min(1.25, s)),
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+          <div
+            style={{
+              position: 'relative',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
+              paddingLeft: 20,
+            }}
+          >
+            {/* Straight background timeline rail */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 8,
+                top: 10,
+                bottom: 10,
+                width: 2,
+                borderRadius: 999,
+                backgroundColor: subtleBorder,
+              }}
+            />
+
+            {/* Filled timeline progress rail */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 8,
+                top: 10,
+                height: `calc((100% - 20px) * ${Math.max(0, Math.min(100, verticalMarkerPct)) / 100})`,
+                width: 2,
+                borderRadius: 999,
+                backgroundColor: activeSlot ? kindColor(activeSlot.kind) : primaryColor,
+                transition: 'height 1s linear',
+              }}
+            />
+
+            {/* Smoothly gliding live playhead dot on the straight line */}
+            <div
+              aria-hidden="true"
+              title={`${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} (${Math.round(dayLinearPct)}%)`}
+              style={{
+                position: 'absolute',
+                left: 9,
+                top: `calc(10px + (100% - 20px) * ${Math.max(0, Math.min(100, verticalMarkerPct)) / 100})`,
+                transform: 'translate(-50%, -50%)',
+                width: 11,
+                height: 11,
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                border: `3px solid ${activeSlot ? kindColor(activeSlot.kind) : primaryColor}`,
+                boxShadow: `0 0 0 4px ${isDark ? 'rgba(59,130,246,0.28)' : 'rgba(37,99,235,0.20)'}`,
+                zIndex: 2,
+                transition: 'top 1s linear',
+                pointerEvents: 'none',
+              }}
+            />
+
+            {slots.map((sl) => {
+              const st = toMinutes(sl.start) * 60;
+              const en = toMinutes(sl.end) * 60;
+              const isPast = nowSec >= en;
+              const isCurrent = nowSec >= st && nowSec < en;
+              return (
+                <div
+                  key={sl.id}
+                  style={{
+                    position: 'relative',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                    padding: '5px 8px',
+                    borderRadius: 8,
+                    backgroundColor: isCurrent ? subtleBg : 'transparent',
+                    border: isCurrent ? `1px solid ${kindColor(sl.kind)}` : '1px solid transparent',
+                    opacity: isPast ? 0.45 : 1,
+                    fontSize: Math.round(11 * Math.min(1.25, s)),
+                  }}
+                >
+                  {/* Node tick on the straight timeline rail */}
                   <span
+                    aria-hidden="true"
                     style={{
+                      position: 'absolute',
+                      left: -15,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
                       width: 6,
                       height: 6,
                       borderRadius: '50%',
-                      backgroundColor: kindColor(sl.kind),
-                      flexShrink: 0,
+                      backgroundColor: isPast || isCurrent ? kindColor(sl.kind) : subtleBorder,
+                      opacity: isCurrent ? 0 : 1,
                     }}
                   />
                   <span
@@ -493,17 +598,18 @@ export function TimeFlowWidgetCard({ theme }: { theme: WidgetThemeStyle }) {
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
+                      minWidth: 0,
                     }}
                   >
                     {isTR ? sl.titleTr : sl.titleEn}
                   </span>
+                  <span style={{ fontSize: 10, opacity: 0.65, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                    {sl.start}–{sl.end}
+                  </span>
                 </div>
-                <span style={{ fontSize: 10, opacity: 0.65, fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
-                  {sl.start}–{sl.end}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

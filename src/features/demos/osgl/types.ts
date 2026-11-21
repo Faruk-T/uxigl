@@ -118,6 +118,7 @@ export interface PersistedOSGLState {
   uploadedBgDataUrl?: string;
   qualityMode?: QualityMode;
   dockVisible?: boolean;
+  dockAppIds?: string[];
   widgetsVisible?: boolean;
   enabledWidgets?: Record<DesktopWidgetId, boolean>;
   widgetPositions?: Partial<Record<DesktopWidgetId, WidgetPosition>>;
@@ -129,6 +130,7 @@ export interface PersistedOSGLState {
   iconGradColor2?: string;
   iconColor?: string;
   iconSizePx?: number;
+  iconLabelScale?: number;
   iconSlots?: Record<string, number>;
   windows?: FloatingWindowState[];
   windowBoundsByApp?: Record<string, WindowBounds>;

@@ -13,17 +13,11 @@ import {
   type WidgetSize,
 } from './types';
 import {
-  ClockWidgetCard,
-  DashboardKpiWidgetCard,
-  SystemStatusWidgetCard,
-  type WidgetThemeStyle,
-} from './widgets/widgetCards';
-import {
-  FocusTimerWidgetCard,
-  QuickNotesWidgetCard,
-} from './widgets/widgetProductivityCards';
-import { TodoWidgetCard } from './widgets/TodoWidgetCard';
-import { TimeFlowWidgetCard } from './widgets/TimeFlowWidgetCard';
+  createWidgetBaseTheme,
+  DESKTOP_WIDGET_ORDER,
+  renderWidgetCard,
+} from './widgets/renderWidgetCard';
+import type { WidgetThemeStyle } from './widgets/widgetCards';
 
 function snapToGrid(val: number): number {
   return Math.round(val / WIDGET_GRID_STEP) * WIDGET_GRID_STEP;
@@ -86,34 +80,13 @@ export function DesktopWidgets({
     posY: number;
   } | null>(null);
 
-  const baseCardStyle: React.CSSProperties = {
-    width: '100%',
-    height: '100%',
-    boxSizing: 'border-box',
-    overflow: 'hidden',
-    borderRadius: 16,
-    padding: 13,
-    backgroundColor: isDark
-      ? `rgba(15, 23, 42, ${glassOpacity})`
-      : `rgba(255, 255, 255, ${glassOpacity})`,
-    color: isDark ? '#f8fafc' : '#0f172a',
-    backdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
-    WebkitBackdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
-    border: isDark ? '1px solid rgba(255, 255, 255, 0.14)' : '1px solid rgba(255, 255, 255, 0.65)',
-    boxShadow: isDark ? '0 14px 34px rgba(0, 0, 0, 0.34)' : '0 14px 34px rgba(15, 23, 42, 0.14)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-  };
-
-  const baseTheme = {
-    isTR: locale === 'tr',
+  const baseTheme = createWidgetBaseTheme({
+    locale,
     isDark,
+    glassOpacity,
+    glassBlur,
     primaryColor,
-    subtleBorder: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.10)',
-    subtleBg: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.05)',
-    cardStyle: baseCardStyle,
-  };
+  });
 
   const clampSize = (rawW: number, rawH: number, posX: number, posY: number): WidgetSize => {
     const availW = Math.max(WIDGET_MIN_WIDTH, Math.min(WIDGET_MAX_WIDTH, viewportSize.w - posX - 12));
@@ -229,34 +202,7 @@ export function DesktopWidgets({
     setResizePreviewSize(null);
   };
 
-  const renderWidgetNode = (id: DesktopWidgetId, theme: WidgetThemeStyle): React.ReactNode => {
-    switch (id) {
-      case 'clock':
-        return <ClockWidgetCard theme={theme} onOpenCalendar={() => onOpenApp('calendar')} />;
-      case 'kpi':
-        return <DashboardKpiWidgetCard theme={theme} onOpenApp={onOpenApp} />;
-      case 'timer':
-        return <FocusTimerWidgetCard theme={theme} />;
-      case 'todo':
-        return <TodoWidgetCard theme={theme} />;
-      case 'notes':
-        return <QuickNotesWidgetCard theme={theme} />;
-      case 'system':
-        return (
-          <SystemStatusWidgetCard
-            theme={theme}
-            qualityMode={qualityMode}
-            setQualityMode={setQualityMode}
-            openWindowCount={openWindowCount}
-            glassBlur={glassBlur}
-          />
-        );
-      case 'timeline':
-        return <TimeFlowWidgetCard theme={theme} />;
-    }
-  };
-
-  const widgetIds: DesktopWidgetId[] = ['clock', 'kpi', 'timer', 'todo', 'notes', 'system', 'timeline'];
+  const widgetIds = DESKTOP_WIDGET_ORDER;
 
   return (
     <div
@@ -401,7 +347,13 @@ export function DesktopWidgets({
               <GripHorizontal size={12} />
             </div>
 
-            {renderWidgetNode(id, widgetTheme)}
+            {renderWidgetCard(id, widgetTheme, {
+              qualityMode,
+              setQualityMode,
+              openWindowCount,
+              glassBlur,
+              onOpenApp,
+            })}
 
             {/* Bottom-right corner resize handle */}
             <div
