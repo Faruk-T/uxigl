@@ -1119,8 +1119,23 @@ export const SheetGLGridAdapter: React.FC<SheetGLGridAdapterProps> = ({
 
   const scaleRatio = (preferences.fontScale || 100) / 100;
 
+  const isFillHeight = height === '100%';
+
   return (
-    <div className="uxu-sheetgl-wrapper">
+    <div
+      className="uxu-sheetgl-wrapper"
+      style={
+        isFillHeight
+          ? {
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+              height: '100%',
+            }
+          : undefined
+      }
+    >
       {showControlBar && (
         <div className="uxu-sheetgl-toolbar">
           <div className="uxu-sheetgl-toolbar__left">
@@ -1248,9 +1263,17 @@ export const SheetGLGridAdapter: React.FC<SheetGLGridAdapterProps> = ({
 
       <div
         className="uxu-sheetgl-canvas-host"
-        style={{
-          height: typeof height === 'number' ? `${height}px` : height,
-        }}
+        style={
+          isFillHeight
+            ? {
+                flex: 1,
+                minHeight: 380,
+                height: '100%',
+              }
+            : {
+                height: typeof height === 'number' ? `${height}px` : height,
+              }
+        }
       >
         <SheetGL
           key={activePreset}
