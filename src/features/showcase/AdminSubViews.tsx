@@ -51,6 +51,7 @@ import {
   Messenger,
   Modal,
   Pagination,
+  Reports,
   SegmentedControl,
   SheetGLGridAdapter,
   Stepper,
@@ -453,11 +454,13 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
               />
             </div>
           ) : (
-            <SheetGLGridAdapter
-              datasetPreset="hr-payroll"
-              initialRowCount={150}
-              height={480}
-            />
+            <div style={{ flex: 1, minHeight: 480, display: 'flex', flexDirection: 'column' }}>
+              <SheetGLGridAdapter
+                datasetPreset="hr-payroll"
+                initialRowCount={150}
+                height="100%"
+              />
+            </div>
           )}
         </Card>
 
@@ -557,7 +560,7 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
   // 2. PRODUCTS VIEW
   if (viewId === 'products') {
     return (
-      <div className="uxu-stack-md">
+      <div className="uxu-stack-md" style={{ flex: 1, minHeight: 0, height: '100%' }}>
         <Card
           variant="glass"
           padding="md"
@@ -565,11 +568,12 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
           title="Product Catalog & Hardware Inventory"
           subtitle="Tüm ürünlerin, donanım düğümlerinin ve depo stoklarının canlı SheetGL tablosu"
           headerIcon={<Package size={18} />}
+          style={{ flex: 1, minHeight: 520 }}
         >
           <SheetGLGridAdapter
             datasetPreset="inventory-supply"
             initialRowCount={200}
-            height={580}
+            height="100%"
           />
         </Card>
       </div>
@@ -1051,105 +1055,38 @@ export const AdminSubViews: React.FC<AdminSubViewsProps> = ({
 
   // 5. REPORTS VIEW
   if (viewId === 'reports') {
-    const reportsList = [
-      {
-        id: 'rep-1',
-        title: 'Q3/Q4 Kurumsal Gelir & Büyüme Raporu',
-        period: 'Ekim 2026',
-        format: 'PDF + XLSX',
-        size: '4.8 MB',
-        status: 'Hazır',
-      },
-      {
-        id: 'rep-2',
-        title: 'Küresel Trafik Kaynakları & Dönüşüm Hunisi Analizi',
-        period: 'Son 30 Gün',
-        format: 'PDF',
-        size: '2.4 MB',
-        status: 'Hazır',
-      },
-      {
-        id: 'rep-3',
-        title: 'Zero-Trust Güvenlik, SLA (%99.98) ve Uptime Denetimi',
-        period: '2026 Yıllık',
-        format: 'CSV + JSON',
-        size: '8.1 MB',
-        status: 'İmzalı',
-      },
-    ];
-
     return (
-      <div className="uxu-stack-md">
-        <Card
-          variant="glass"
-          eyebrow="REPORTS CENTER • YÖNETİCİ RAPORLARI"
-          title="Executive Reports & Audit Exports"
-          subtitle="Finansal özetleri, analitik grafik çıktılarını ve SLA denetim kayıtlarını indirin"
-          headerIcon={<BarChart2 size={18} />}
-        >
-          <div className="uxu-stack-sm">
-            {reportsList.map((rep) => (
-              <div
-                key={rep.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: 12,
-                  padding: '14px 16px',
-                  borderRadius: 'var(--uxu-radius-md)',
-                  background: 'var(--uxu-surface-tonal)',
-                  border: '1px solid var(--uxu-border-subtle)',
-                }}
-              >
-                <div>
-                  <strong style={{ fontSize: '0.9rem' }}>{rep.title}</strong>
-                  <div
-                    style={{
-                      fontSize: '0.76rem',
-                      color: 'var(--uxu-text-secondary)',
-                      marginTop: 2,
-                    }}
-                  >
-                    Dönem: {rep.period} • Format: {rep.format} • Boyut: {rep.size}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <Badge tone="success" size="xs">
-                    {rep.status}
-                  </Badge>
-                  <Button
-                    variant="tonal"
-                    size="xs"
-                    leadingIcon={<Download size={13} />}
-                    onClick={() =>
-                      notify({
-                        title: 'Rapor İndiriliyor',
-                        description: `${rep.title} (${rep.format})`,
-                        tone: 'info',
-                      })
-                    }
-                  >
-                    İndir
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
+      <Reports
+        locale="tr"
+        storageKey="uxigl.admin.reports.v1"
+        onDownload={(rep, format) =>
+          notify({
+            title: 'Rapor İndiriliyor',
+            description: `${rep.title} (${format})`,
+            tone: 'info',
+          })
+        }
+        onGenerateReport={(rep) =>
+          notify({
+            title: 'Yeni Rapor Oluşturuldu',
+            description: `${rep.title} (${rep.formats.join(', ')})`,
+            tone: 'success',
+          })
+        }
+      />
     );
   }
 
   // 6. MESSAGES VIEW
   if (viewId === 'messages') {
     return (
-      <Messenger
-        locale="tr"
-        height={560}
-        storageKey="uxigl.admin.messenger.v1"
-      />
+      <div style={{ flex: 1, minHeight: 520, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Messenger
+          locale="tr"
+          height="100%"
+          storageKey="uxigl.admin.messenger.v1"
+        />
+      </div>
     );
   }
 

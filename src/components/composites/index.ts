@@ -16,3 +16,7 @@ export * from './FileManGLExplorerAdapter/FileManGLExplorerAdapter';
 export * from './Clock/AnalogDigitalClock';
 export * from './Calendar';
 export * from './Messenger';
+export * from './Kanban';
+export * from './Profile';
+export * from './Reports';
+export * from './Analytics';
