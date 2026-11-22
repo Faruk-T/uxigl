@@ -3,6 +3,7 @@ import { SheetGLGridAdapter } from '../../../components/composites/SheetGLGridAd
 import { FileManGLExplorerAdapter } from '../../../components/composites/FileManGLExplorerAdapter/FileManGLExplorerAdapter';
 import { Calendar } from '../../../components/composites/Calendar';
 import { Messenger } from '../../../components/composites/Messenger';
+import { Reports } from '../../../components/composites/Reports';
 import { AnalyticsDashboardView } from '../../showcase/AnalyticsDashboardView';
 import {
   AdminSubViews,
@@ -48,8 +49,12 @@ export const WindowContent = memo(function WindowContent({
     if (custom) return <>{custom}</>;
   }
 
-  if (app.id === 'overview' || app.id === 'analytics' || app.id === 'reports') {
+  if (app.id === 'overview' || app.id === 'analytics') {
     return <AnalyticsDashboardView />;
+  }
+
+  if (app.id === 'reports') {
+    return <Reports locale="tr" storageKey="uxigl.osgl.reports.v1" />;
   }
 
   if (app.id === 'analytics-telemetry' || app.id === 'datatable-statcard' || app.id === 'crm-orders') {

@@ -114,7 +114,7 @@ export function TopMenuDropdowns({
 
       if (!activeDropdown) {
         const focusedTop = activeEl?.getAttribute('data-top-menu') as Exclude<TopMenuKey, null> | null;
-        if (focusedTop && focusedTop !== 'docs') {
+        if (focusedTop) {
           toggleMenu(focusedTop, e as unknown as React.MouseEvent);
           requestAnimationFrame(() => {
             const panel = nav.querySelector(`[data-menu-dropdown="${focusedTop}"]`);

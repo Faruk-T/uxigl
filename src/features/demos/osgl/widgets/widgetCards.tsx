@@ -215,25 +215,6 @@ export function ClockWidgetCard({
         >
           <button
             type="button"
-            onClick={() => openCreateModal(selectedIso)}
-            title={theme.isTR ? 'Yeni Etkinlik Ekle' : 'Add Event'}
-            style={{
-              width: Math.round(28 * Math.min(1.2, theme.scale)),
-              height: Math.round(28 * Math.min(1.2, theme.scale)),
-              borderRadius: 8,
-              border: 'none',
-              backgroundColor: theme.primaryColor,
-              color: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <Plus size={Math.round(14 * Math.min(1.2, theme.scale))} />
-          </button>
-          <button
-            type="button"
             onClick={onOpenCalendar}
             title={theme.isTR ? 'Takvimi Aç' : 'Open Calendar'}
             style={{
@@ -292,8 +273,8 @@ export function ClockWidgetCard({
               border: 'none',
               boxShadow: 'none',
               padding: 0,
-              gap: Math.round(7 * Math.min(1.3, theme.scale)),
-              justifyContent: 'center',
+              gap: Math.round((isCompact ? 14 : 7) * Math.min(1.3, theme.scale)),
+              justifyContent: isCompact ? 'space-evenly' : 'center',
             }}
           />
         </div>

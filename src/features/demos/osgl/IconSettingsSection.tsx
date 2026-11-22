@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../../components/primitives';
+import { Button, Slider } from '../../../components/primitives';
 import type { GoogleIconStyle } from '../../../core/contracts/ThemeContract';
 import type { IconBgStyle } from './types';
 
@@ -14,6 +14,10 @@ export function IconSettingsSection({
   setIconGradColor2,
   iconColor,
   setIconColor,
+  iconSizePx,
+  setIconSizePx,
+  iconLabelScale,
+  setIconLabelScale,
   iconStyle,
   setIconStyle,
   iconFilled,
@@ -29,6 +33,10 @@ export function IconSettingsSection({
   setIconGradColor2: (c: string) => void;
   iconColor: string;
   setIconColor: (c: string) => void;
+  iconSizePx: number;
+  setIconSizePx: (px: number) => void;
+  iconLabelScale: number;
+  setIconLabelScale: (scale: number) => void;
   iconStyle?: GoogleIconStyle;
   setIconStyle: (s: GoogleIconStyle) => void;
   iconFilled?: boolean;
@@ -155,6 +163,20 @@ export function IconSettingsSection({
             Otomatik
           </Button>
         </div>
+      </div>
+
+      <div>
+        <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 6 }}>
+          Simge Büyüklüğü ({iconSizePx}px)
+        </div>
+        <Slider min={44} max={84} value={iconSizePx} onChange={setIconSizePx} />
+      </div>
+
+      <div>
+        <div style={{ fontSize: 12.5, fontWeight: 700, marginBottom: 6 }}>
+          Simge Yazı Boyutu Ölçeği ({iconLabelScale}%)
+        </div>
+        <Slider min={75} max={140} value={iconLabelScale} onChange={setIconLabelScale} />
       </div>
 
       <div>

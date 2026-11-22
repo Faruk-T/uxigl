@@ -102,7 +102,7 @@ const SETTINGS_CATEGORIES: Array<{
   {
     id: 'icons',
     label: 'Simgeler',
-    subtitle: 'Simge arka plan stili, renkler ve ikon dolgu tipi',
+    subtitle: 'Simge boyutu, etiket ölçeği, arka plan stili, renkler ve ikon dolgu tipi',
     icon: 'apps',
     color: '#ec4899',
   },
@@ -229,8 +229,9 @@ export function ThemeStudioPanel(props: ThemeStudioPanelProps) {
         style={{
           flex: 1,
           minWidth: 0,
-          paddingLeft: 20,
+          padding: '0 12px 0 20px',
           overflowY: 'auto',
+          overflowX: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           gap: 18,
