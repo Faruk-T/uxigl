@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { osWasmEngine } from '../OSGLEngine';
-import type { FloatingWindowState, PersistedOSGLState, QualityMode, WindowBounds } from './types';
+import type {
+  FloatingWindowState,
+  PersistedOSGLState,
+  QualityMode,
+  WindowArrangeMode,
+  WindowBounds,
+} from './types';
 
 export const FULLBLEED_APP_IDS = new Set([
   'analytics-telemetry',
@@ -222,7 +228,7 @@ export function useWindowManager({
     );
   };
 
-  const arrangeWindows = (mode: 'cascade' | 'grid' | 'side-by-side') => {
+  const arrangeWindows = (mode: WindowArrangeMode) => {
     const visible = windows.filter((w) => !w.minimized);
     if (visible.length === 0) return;
     const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
@@ -245,6 +251,8 @@ export function useWindowManager({
       description:
         mode === 'grid'
           ? 'Izgara (Grid) dizilimi uygulandı.'
+          : mode === 'quadrants'
+          ? '4 Köşe Kadran dizilimi uygulandı.'
           : mode === 'side-by-side'
           ? 'Yan yana dizilim uygulandı.'
           : 'Kademeli (Cascade) dizilim uygulandı.',
