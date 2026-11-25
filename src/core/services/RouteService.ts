@@ -60,6 +60,7 @@ const DOCS_TOPIC_IDS = new Set([
   'page-templates',
   'theming-tokens',
   'cli-shortcuts',
+  'osgl-workspace',
 ]);
 
 export const DASHBOARD_VIEW_IDS = new Set([

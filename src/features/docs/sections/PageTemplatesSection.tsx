@@ -54,11 +54,11 @@ const FULL_APP_TEMPLATES = [
     descEn: 'Dark glass creative control and waveform workspace.',
   },
   {
-    name: 'OSGLTemplate (MacOSGL)',
+    name: 'OSGLTemplate / OSWorkspaceShell',
     subtitleTr: 'Tam Masaüstü İşletim Sistemi Kabuğu',
     subtitleEn: 'Full Desktop OS Shell',
-    descTr: 'Pencere yöneticisi, Dock, TimeFlow/Todo widget’ları ve duvar kağıtları.',
-    descEn: 'Window manager, Dock, TimeFlow/Todo widgets, and wallpapers.',
+    descTr: 'WASM pencere yöneticisi, Dock, klasörler, FocusTimer widget’ı, 7 WebGL duvar kağıdı ve OS Tema Stüdyosu (Bölüm 9’da detaylı).',
+    descEn: 'WASM window manager, Dock, folders, FocusTimer widget, 7 WebGL wallpapers, and OS Theme Studio (detailed in Chapter 9).',
   },
   {
     name: 'TesseraGLTemplate',

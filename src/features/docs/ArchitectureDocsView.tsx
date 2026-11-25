@@ -15,6 +15,7 @@ import {
 import { CliShortcutsSection } from './sections/CliShortcutsSection';
 import { GettingStartedSection } from './sections/GettingStartedSection';
 import { LayoutShellSection } from './sections/LayoutShellSection';
+import { OSGLWorkspaceSection } from './sections/OSGLWorkspaceSection';
 import { PageTemplatesSection } from './sections/PageTemplatesSection';
 import { ThemingDesignTypesSection } from './sections/ThemingDesignTypesSection';
 import { ThemingTokensFontsSection } from './sections/ThemingTokensFontsSection';
@@ -48,6 +49,7 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
     'data-feedback-webgl': true,
     'page-templates': true,
     'theming-tokens': true,
+    'osgl-workspace': true,
   });
   const [docsPageTemplate, setDocsPageTemplate] =
     useState<PageTemplateId>('page-login');
@@ -223,6 +225,10 @@ export const ArchitectureDocsView: React.FC<ArchitectureDocsViewProps> = ({
               isTR={isTR}
               onOpenCommandPalette={onOpenCommandPalette}
             />
+          )}
+
+          {currentTopic === 'osgl-workspace' && (
+            <OSGLWorkspaceSection isTR={isTR} />
           )}
 
           <DocsChapterFooter

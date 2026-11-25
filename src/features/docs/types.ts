@@ -8,7 +8,8 @@ export type DocsTopicId =
   | 'layout-shell'
   | 'page-templates'
   | 'theming-tokens'
-  | 'cli-shortcuts';
+  | 'cli-shortcuts'
+  | 'osgl-workspace';
 
 export interface ArchitectureDocsViewProps {
   activeTopic?: DocsTopicId;

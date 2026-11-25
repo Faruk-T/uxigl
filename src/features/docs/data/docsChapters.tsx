@@ -5,6 +5,7 @@ import {
   FormInput,
   Layers,
   Layout,
+  Monitor,
   Palette,
   Rocket,
   Table2,
@@ -172,6 +173,26 @@ export function buildDocsChapters(
         { id: 'doc-sec-toast-live', labelTr: 'Bildirim Önizleme', labelEn: 'Toast Preview' },
         { id: 'doc-sec-services-table', labelTr: 'Kancalar & Yardımcılar', labelEn: 'Hooks & Helpers' },
         { id: 'doc-sec-all-catalog', labelTr: 'Tüm Bileşenler', labelEn: 'All Components' },
+      ],
+    },
+    {
+      id: 'osgl-workspace',
+      step: '9',
+      badgeTr: 'BÖLÜM 9 • OSGL MASAÜSTÜ MOTORU',
+      badgeEn: 'CHAPTER 9 • OSGL DESKTOP ENGINE',
+      titleTr: '9. OSGL Masaüstü Çalışma Alanı',
+      titleEn: '9. OSGL Desktop Workspace Engine',
+      subtitleTr:
+        'OSWorkspaceShell ile yeni uygulamalara WASM pencere yöneticisi, klasörler, Dock, widget’lar, WebGL duvar kağıtları ve Tema Stüdyosu ekleyin.',
+      subtitleEn:
+        'Add WASM window manager, desktop folders, Dock, widgets, WebGL wallpapers, and Theme Studio to new apps via OSWorkspaceShell.',
+      icon: <Monitor size={15} />,
+      subItems: [
+        { id: 'doc-sec-osgl-overview', labelTr: 'OSWorkspaceShell Kurulumu', labelEn: 'OSWorkspaceShell Setup' },
+        { id: 'doc-sec-osgl-props', labelTr: 'Props & Uygulama Sözleşmesi', labelEn: 'Props & App Contracts' },
+        { id: 'doc-sec-osgl-features-matrix', labelTr: '6 Ana OSGL Özelliği', labelEn: '6 Core OSGL Pillars' },
+        { id: 'doc-sec-osgl-theming', labelTr: 'Duvar Kağıdı & Simge Stilleri', labelEn: 'Wallpapers & Icon Styles' },
+        { id: 'doc-sec-osgl-storage', labelTr: 'Kalıcılık & Widget API', labelEn: 'Persistence & Widget API' },
       ],
     },
   ];

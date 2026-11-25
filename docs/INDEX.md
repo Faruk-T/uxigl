@@ -29,6 +29,14 @@ Welcome to the official documentation for **`truncgil-uxigl` (`uxiGL`)** — the
    - `page-kanban` (4-Column Agile Sprint & Task Management Board)
    - `page-status` (404 Not Found, 500 Planned Cluster Maintenance & 90-Day Live Uptime SLA Monitor)
 
+4. [**OSGL Desktop Workspace Engine Guide (`OSGL_GUIDE.md`)**](./OSGL_GUIDE.md)
+   Complete TR/EN specification for integrating **`OSWorkspaceShell`** in new applications:
+   - WASM Window Manager (`osWasmEngine`), 8-way resize, 7 snap zones, and 4 arrange modes.
+   - Desktop Grid, Marquee Multi-Selection, Desktop Folders, and Context Menus.
+   - Smart Dock with magnification, drag-to-pin, and `DockCustomizerPopover`.
+   - 20px-snapped Desktop Widgets, `WidgetCustomizePopover`, and `FocusTimerWidget`.
+   - 7 WebGL Aurora Wallpapers, 6 Icon Styles, built-in `os-theme-studio`, Spotlight (`⌘K`), `MobileLauncher`, and scoped `localStorage` persistence.
+
 ---
 
 ## 🌐 Live Interactive Documentation Portal Routes
@@ -45,4 +53,5 @@ When running the application (`npm run dev` or at `https://uxigl.truncgil.com`),
 | `/docs/page-templates` | **6. 7 Hazır Kurumsal Sayfa Şablonu** (Interactive Login, 2FA, Pricing, Profile, Invoice, Kanban, Status) |
 | `/docs/theming-tokens` | **7. Tema Motoru, Yüzey Materyalleri & CSS Tokenları** (Live Palette, Radius, Font & Token Lab) |
 | `/docs/cli-shortcuts` | **8. 5 Yönlü Toast Bildirim Motoru, Kısayollar & Servisler** (`useToast`, `⌘K`, `RouteService`) |
+| `/docs/osgl-workspace` | **9. OSGL Masaüstü Motoru** (`OSWorkspaceShell`, WASM Window Manager, Folders, Dock, Widgets, WebGL Wallpapers) |
 

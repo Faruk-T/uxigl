@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   BorderContrastPreset,
   ConcreteWorkspaceShellId,
   SeedPaletteId,
