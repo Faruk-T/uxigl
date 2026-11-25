@@ -1,5 +1,8 @@
 import type { OSWallpaperId } from '../OSGLEngine';
+import type { DesktopFolder } from '../../osgl/types';
 import type { WidgetUserPrefs } from './widgets/widgetCustomization';
+
+export type { DesktopFolder };
 
 export type IconBgStyle = 'vivid' | 'gradient' | 'soft' | 'glass' | 'sun' | 'mono';
 export type BgMode = 'aurora' | 'gradient' | 'solid' | 'image';
@@ -137,6 +140,7 @@ export interface PersistedOSGLState {
   iconSizePx?: number;
   iconLabelScale?: number;
   iconSlots?: Record<string, number>;
+  folders?: DesktopFolder[];
   windows?: FloatingWindowState[];
   windowBoundsByApp?: Record<string, WindowBounds>;
   topZ?: number;
