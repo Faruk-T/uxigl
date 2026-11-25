@@ -18,6 +18,8 @@
     "src/components/**/*",
     "src/core/**/*",
     "src/hooks/**/*",
-    "src/providers/**/*"
+    "src/providers/**/*",
+    "src/features/osgl/**/*",
+    "src/features/theme-studio/**/*"
   ]
 }

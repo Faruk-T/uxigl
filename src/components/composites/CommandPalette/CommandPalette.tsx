@@ -1,5 +1,6 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { Search, CornerDownLeft, Sparkles, X } from 'lucide-react';
+﻿import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { Search, CornerDownLeft, Sparkles } from 'lucide-react';
 import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 
 /**
@@ -19,6 +20,9 @@ export interface CommandActionItem {
   onSelect: () => void;
 }
 
+/** Backwards-compatible alias for CommandActionItem */
+export type CommandPaletteAction = CommandActionItem;
+
 export interface CommandPaletteProps {
   open: boolean;
   onClose: () => void;
@@ -34,29 +38,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const mouseDownOnBackdropRef = useRef(false);
 
-  const handleClose = () => {
-    setQuery('');
-    setSelectedIndex(0);
-    onClose();
-  };
-
-  useKeyboardShortcut('Escape', handleClose, { enabled: open });
-
-  // Whenever the palette opens, clear query, reset index, and auto-focus
-  useEffect(() => {
-    if (open) {
-      setQuery('');
-      setSelectedIndex(0);
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 10);
-      return () => clearTimeout(timer);
-    }
-  }, [open]);
+  useKeyboardShortcut('Escape', onClose, { enabled: open });
 
   const filteredActions = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -71,13 +55,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   useEffect(() => {
     setSelectedIndex(0);
-  }, [query]);
-
-  useEffect(() => {
-    if (!open || !listRef.current) return;
-    const item = listRef.current.children[selectedIndex] as HTMLElement | undefined;
-    item?.scrollIntoView?.({ block: 'nearest' });
-  }, [open, selectedIndex]);
+  }, [query, open]);
 
   if (!open) return null;
 
@@ -94,23 +72,26 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           ? (prev - 1 + filteredActions.length) % filteredActions.length
           : 0
       );
-    } else if (e.key === 'Home') {
-      e.preventDefault();
-      setSelectedIndex(0);
-    } else if (e.key === 'End') {
-      e.preventDefault();
-      setSelectedIndex(Math.max(0, filteredActions.length - 1));
     } else if (e.key === 'Enter' && filteredActions[selectedIndex]) {
       e.preventDefault();
       filteredActions[selectedIndex].onSelect();
-      handleClose();
+      onClose();
     }
   };
 
-  return (
+  const content = (
     <div
       className="uxu-modal-backdrop uxu-cmd-backdrop"
-      onClick={handleClose}
+      style={{ zIndex: 9999 }}
+      onMouseDown={(e) => {
+        mouseDownOnBackdropRef.current = e.target === e.currentTarget;
+      }}
+      onClick={(e) => {
+        if (mouseDownOnBackdropRef.current && e.target === e.currentTarget) {
+          onClose();
+        }
+        mouseDownOnBackdropRef.current = false;
+      }}
       role="presentation"
     >
       <div
@@ -118,55 +99,28 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         role="dialog"
         aria-modal="true"
         aria-label="Komut Paleti"
+        onMouseDown={() => {
+          mouseDownOnBackdropRef.current = false;
+        }}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
         <div className="uxu-cmd-palette__search">
           <Search size={19} className="uxu-cmd-palette__search-icon" />
           <input
-            ref={inputRef}
             type="text"
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={(e) => e.target.select()}
             placeholder={placeholder}
             className="uxu-cmd-palette__input"
           />
-          {query.trim().length > 0 && (
-            <button
-              type="button"
-              className="uxu-cmd-palette__clear"
-              onClick={() => {
-                setQuery('');
-                setSelectedIndex(0);
-                inputRef.current?.focus();
-              }}
-              title="Aramayı Temizle"
-              aria-label="Aramayı Temizle"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--uxu-text-tertiary, #94a3b8)',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '4px',
-                marginRight: '6px',
-                borderRadius: '50%',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <X size={15} />
-            </button>
-          )}
-          <kbd className="uxu-cmd-palette__esc" onClick={handleClose}>
+          <kbd className="uxu-cmd-palette__esc" onClick={onClose}>
             ESC
           </kbd>
         </div>
 
-        <div ref={listRef} className="uxu-cmd-palette__list">
+        <div className="uxu-cmd-palette__list">
           {filteredActions.length === 0 ? (
             <div className="uxu-cmd-palette__empty">
               <Sparkles size={22} />
@@ -182,7 +136,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   onMouseEnter={() => setSelectedIndex(idx)}
                   onClick={() => {
                     item.onSelect();
-                    handleClose();
+                    onClose();
                   }}
                   className={`uxu-cmd-palette__item ${
                     isSelected ? 'uxu-cmd-palette__item--selected' : ''
@@ -241,4 +195,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(content, document.body);
+  }
+  return content;
 };
+

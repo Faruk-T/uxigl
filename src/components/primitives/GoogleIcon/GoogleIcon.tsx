@@ -1,22 +1,11 @@
-import React from 'react';
+﻿import React from 'react';
 import type {
   ComponentSize,
   IdentifiableProps,
   SemanticTone,
 } from '../../../core/contracts/ComponentContracts';
 import type { GoogleIconStyle } from '../../../core/contracts/ThemeContract';
-
-/**
- * ============================================================================
- * uxiGL PRIMITIVE — GOOGLE MATERIAL SYMBOLS VARIABLE FONT ICON (<GoogleIcon />)
- * ============================================================================
- * Renders Google's official Material Symbols variable font icons ('Rounded',
- * 'Outlined', 'Sharp') with live support for all 4 variable font axes:
- * - `FILL`: 0 (outline) to 1 (filled)
- * - `wght`: 100 to 700 stroke weight
- * - `GRAD`: -25 (dark mode optical compensation) to 200 (emphasized)
- * - `opsz`: 20 to 48 optical size
- */
+import { renderGoogleIconFallback } from './googleIconSvgFallback';
 
 export interface GoogleIconProps extends IdentifiableProps {
   /** Official Google Material Symbol ligature name (e.g. 'auto_awesome', 'dashboard', 'palette', 'bolt') */
@@ -37,28 +26,76 @@ export interface GoogleIconProps extends IdentifiableProps {
   title?: string;
 }
 
-// Global font loading detection to prevent ligature text flash (FOUT) before web font is ready
-let isFontLoadedGlobal =
-  typeof document !== 'undefined' && 'fonts' in document
-    ? document.fonts.check('20px "Material Symbols Rounded"')
-    : true;
+const MATERIAL_SYMBOLS_HREF =
+  'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap';
 
+let stylesheetInjected = false;
+let isFontLoadedGlobal = false;
 const fontLoadSubscribers = new Set<() => void>();
 
-if (typeof document !== 'undefined' && 'fonts' in document && !isFontLoadedGlobal) {
-  const markReady = () => {
-    if (!isFontLoadedGlobal) {
-      isFontLoadedGlobal = true;
-      document.documentElement.classList.remove('uxu-icon-fonts-loading');
-      document.documentElement.classList.add('uxu-icon-fonts-loaded');
-      fontLoadSubscribers.forEach((cb) => cb());
-      fontLoadSubscribers.clear();
-    }
-  };
+function checkMaterialFontActuallyReady(iconStyle?: GoogleIconStyle): boolean {
+  if (typeof document === 'undefined' || !('fonts' in document) || !document.fonts) {
+    return false;
+  }
+  try {
+    const wantedFamily =
+      iconStyle === 'outlined'
+        ? 'Material Symbols Outlined'
+        : iconStyle === 'sharp'
+          ? 'Material Symbols Sharp'
+          : 'Material Symbols Rounded';
 
-  document.fonts.ready.then(markReady).catch(markReady);
-  // Failsafe timeout so icons are never stuck hidden permanently
-  setTimeout(markReady, 1800);
+    for (const face of Array.from(document.fonts)) {
+      const cleanFamily = String(face.family || '').replace(/['"]/g, '').trim();
+      if (cleanFamily === wantedFamily && face.status === 'loaded') {
+        return true;
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function ensureMaterialSymbolsStylesheet(): void {
+  if (typeof document === 'undefined') return;
+
+  if (checkMaterialFontActuallyReady()) {
+    isFontLoadedGlobal = true;
+    return;
+  }
+
+  if (stylesheetInjected) return;
+  stylesheetInjected = true;
+
+  const existing = document.querySelector(
+    'link[href*="Material+Symbols+Outlined"], link[href*="Material+Symbols+Rounded"]'
+  );
+  if (!existing && document.head) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = MATERIAL_SYMBOLS_HREF;
+    document.head.appendChild(link);
+  }
+
+  if ('fonts' in document && typeof document.fonts.load === 'function') {
+    const notifyIfLoaded = () => {
+      if (!isFontLoadedGlobal && checkMaterialFontActuallyReady()) {
+        isFontLoadedGlobal = true;
+        document.documentElement.classList.remove('uxu-icon-fonts-loading');
+        document.documentElement.classList.add('uxu-icon-fonts-loaded');
+        fontLoadSubscribers.forEach((cb) => cb());
+        fontLoadSubscribers.clear();
+      }
+    };
+
+    document.fonts
+      .load('20px "Material Symbols Rounded"')
+      .then(notifyIfLoaded)
+      .catch(() => {});
+
+    document.fonts.addEventListener?.('loadingdone', notifyIfLoaded);
+  }
 }
 
 export const GoogleIcon: React.FC<GoogleIconProps> = ({
@@ -74,16 +111,27 @@ export const GoogleIcon: React.FC<GoogleIconProps> = ({
   tone = 'inherit',
   title,
 }) => {
-  const [fontReady, setFontReady] = React.useState(isFontLoadedGlobal);
+  const [fontReady, setFontReady] = React.useState<boolean>(() =>
+    checkMaterialFontActuallyReady(iconStyle)
+  );
 
   React.useEffect(() => {
-    if (fontReady || isFontLoadedGlobal) return;
-    const onReady = () => setFontReady(true);
+    ensureMaterialSymbolsStylesheet();
+    if (checkMaterialFontActuallyReady(iconStyle)) {
+      isFontLoadedGlobal = true;
+      setFontReady(true);
+      return;
+    }
+    const onReady = () => {
+      if (checkMaterialFontActuallyReady(iconStyle)) {
+        setFontReady(true);
+      }
+    };
     fontLoadSubscribers.add(onReady);
     return () => {
       fontLoadSubscribers.delete(onReady);
     };
-  }, [fontReady]);
+  }, [iconStyle]);
 
   const pxSize =
     typeof size === 'number'
@@ -98,6 +146,39 @@ export const GoogleIcon: React.FC<GoogleIconProps> = ({
 
   const opticalSize = Math.max(20, Math.min(48, Math.round(pxSize)));
 
+  if (!fontReady) {
+    const fallbackClasses = [
+      'uxu-google-icon-svg-fallback',
+      tone !== 'inherit' ? `uxu-google-icon--${tone}` : '',
+      className,
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    return (
+      <span
+        id={id}
+        className={fallbackClasses}
+        role={title ? 'img' : undefined}
+        aria-label={title}
+        aria-hidden={title ? undefined : 'true'}
+        title={title}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: `${pxSize}px`,
+          height: `${pxSize}px`,
+          lineHeight: 1,
+          flexShrink: 0,
+          ...style,
+        }}
+      >
+        {renderGoogleIconFallback(name, pxSize)}
+      </span>
+    );
+  }
+
   const fontFamilyOverride =
     iconStyle === 'outlined'
       ? "'Material Symbols Outlined'"
@@ -109,7 +190,7 @@ export const GoogleIcon: React.FC<GoogleIconProps> = ({
 
   const classes = [
     'uxu-google-icon',
-    fontReady ? 'uxu-google-icon--ready' : 'uxu-google-icon--loading',
+    'uxu-google-icon--ready',
     tone !== 'inherit' ? `uxu-google-icon--${tone}` : '',
     className,
   ]
@@ -129,7 +210,6 @@ export const GoogleIcon: React.FC<GoogleIconProps> = ({
           fontSize: `${pxSize}px`,
           width: `${pxSize}px`,
           height: `${pxSize}px`,
-          ...(!fontReady ? { visibility: 'hidden', opacity: 0 } : {}),
           ...(fontFamilyOverride
             ? { '--uxu-icon-font-family': fontFamilyOverride }
             : {}),

@@ -8038,3 +8038,78 @@ html.uxu-icon-fonts-loading .uxu-google-icon,
 
 
 
+
+
+/* ============================================================================
+ * Apple HIG Capsule Checkbox Variant (.uxu-checkbox-capsule)
+ * ============================================================================ */
+.uxu-checkbox-capsule {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 22px;
+  padding: 2px;
+  border-radius: 9999px;
+  border: 1px solid var(--uxu-border-strong);
+  background: rgba(120, 120, 128, 0.28);
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+:root[data-theme='dark'] .uxu-checkbox-capsule {
+  background: rgba(120, 120, 128, 0.38);
+}
+.uxu-checkbox-capsule--sm {
+  width: 32px;
+  height: 18px;
+}
+.uxu-checkbox-capsule--lg {
+  width: 44px;
+  height: 26px;
+}
+.uxu-checkbox-capsule__thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.24);
+  transform: translateX(0);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.uxu-checkbox-capsule--sm .uxu-checkbox-capsule__thumb {
+  width: 12px;
+  height: 12px;
+}
+.uxu-checkbox-capsule--lg .uxu-checkbox-capsule__thumb {
+  width: 20px;
+  height: 20px;
+}
+.uxu-checkbox-capsule--checked {
+  background: #34c759;
+  border-color: #34c759;
+}
+:root[data-theme='dark'] .uxu-checkbox-capsule--checked {
+  background: #30d158;
+  border-color: #30d158;
+}
+.uxu-checkbox-capsule--primary.uxu-checkbox-capsule--checked {
+  background: var(--uxu-primary);
+  border-color: var(--uxu-primary);
+}
+.uxu-checkbox-capsule--checked .uxu-checkbox-capsule__thumb {
+  transform: translateX(16px);
+}
+.uxu-checkbox-capsule--sm.uxu-checkbox-capsule--checked .uxu-checkbox-capsule__thumb {
+  transform: translateX(14px);
+}
+.uxu-checkbox-capsule--lg.uxu-checkbox-capsule--checked .uxu-checkbox-capsule__thumb {
+  transform: translateX(18px);
+}
+.uxu-checkbox-capsule--indeterminate {
+  background: var(--uxu-primary);
+  border-color: var(--uxu-primary);
+}
+.uxu-checkbox-capsule--indeterminate .uxu-checkbox-capsule__thumb {
+  transform: translateX(8px);
+}

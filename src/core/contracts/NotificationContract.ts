@@ -34,6 +34,8 @@ export interface INotificationService {
   defaultPlacement: ToastPlacement;
   setDefaultPlacement: (placement: ToastPlacement) => void;
   notify: (input: CreateToastInput) => string;
+  /** Convenience alias for `notify` */
+  toast: (input: CreateToastInput) => string;
   dismiss: (id: string) => void;
   clearAll: () => void;
 }

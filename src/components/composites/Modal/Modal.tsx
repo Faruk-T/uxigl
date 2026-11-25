@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   CheckCircle2,
@@ -7,11 +8,11 @@ import {
   Info,
   Sparkles,
 } from 'lucide-react';
+import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 import type {
   IdentifiableProps,
   SemanticTone,
 } from '../../../core/contracts/ComponentContracts';
-import { useKeyboardShortcut } from '../../../hooks/useKeyboardShortcut';
 
 /**
  * ============================================================================
@@ -64,6 +65,7 @@ export const Modal: React.FC<ModalProps> = ({
   children,
 }) => {
   useKeyboardShortcut('Escape', onClose, { enabled: open });
+  const mouseDownOnBackdropRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -97,12 +99,21 @@ export const Modal: React.FC<ModalProps> = ({
 
   const modalIcon = getDefaultModalIcon();
 
-  return (
+  const modalNode = (
     <div
       className={`uxu-modal-backdrop ${
         variant === 'sheet' ? 'uxu-modal-backdrop--sheet' : ''
       }`}
-      onClick={onClose}
+      style={{ zIndex: 9999 }}
+      onMouseDown={(e) => {
+        mouseDownOnBackdropRef.current = e.target === e.currentTarget;
+      }}
+      onClick={(e) => {
+        if (mouseDownOnBackdropRef.current && e.target === e.currentTarget) {
+          onClose();
+        }
+        mouseDownOnBackdropRef.current = false;
+      }}
       role="presentation"
     >
       <div
@@ -111,6 +122,9 @@ export const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         className={`uxu-modal uxu-modal--${size} uxu-modal--variant-${variant} uxu-modal--tone-${resolvedTone} ${className}`}
         style={style}
+        onMouseDown={() => {
+          mouseDownOnBackdropRef.current = false;
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="uxu-modal__header">
@@ -154,4 +168,10 @@ export const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined' && document.body) {
+    return createPortal(modalNode, document.body);
+  }
+
+  return modalNode;
 };

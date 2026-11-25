@@ -7,26 +7,32 @@ import React, {
   useState,
 } from 'react';
 import type {
+  BorderContrastPreset,
   FontFamilyPreset,
   GoogleIconStyle,
   IThemeEngine,
   IThemeStorageAdapter,
   RadiusScale,
   ResolvedThemeMode,
+  SeedPaletteDefinition,
   SeedPaletteId,
+  SidebarLayoutVariant,
   ThemeContextContract,
   ThemeMode,
   ThemePreferences,
   UIDensity,
   WebGLShaderPreset,
+  WorkspaceShellPreset,
 } from '../core/contracts/ThemeContract';
 import {
   DEFAULT_THEME_PREFERENCES,
   FONT_FAMILY_PRESETS,
   SEED_PALETTES,
 } from '../core/tokens/designTokens';
+import { applyWorkspaceShellPresetToPreferences } from '../core/tokens/workspaceShellPresets';
 import { defaultThemeStorageAdapter } from '../core/services/StorageService';
 import {
+  CssVariableThemeEngine,
   defaultThemeEngine,
   resolveEffectiveModeTokens,
 } from '../core/services/ThemeEngineService';
@@ -44,6 +50,10 @@ export interface ThemeProviderProps {
   storageAdapter?: IThemeStorageAdapter;
   themeEngine?: IThemeEngine;
   initialPreferences?: Partial<ThemePreferences>;
+  /** Optional custom palettes registered by the host application */
+  extraPalettes?: SeedPaletteDefinition[];
+  /** Optional initial per-user storage scope key */
+  initialUserScopeKey?: string;
 }
 
 function getSystemColorScheme(): ResolvedThemeMode {
@@ -60,13 +70,35 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   storageAdapter = defaultThemeStorageAdapter,
   themeEngine = defaultThemeEngine,
   initialPreferences,
+  extraPalettes,
+  initialUserScopeKey,
 }) => {
   const [systemMode, setSystemMode] = useState<ResolvedThemeMode>(() =>
     getSystemColorScheme()
   );
+  const [userScopeKey, setUserScopeKeyState] = useState<string | undefined>(
+    initialUserScopeKey
+  );
+
+  const extraPalettesMap = useMemo<Record<string, SeedPaletteDefinition>>(() => {
+    const map: Record<string, SeedPaletteDefinition> = {};
+    if (extraPalettes) {
+      for (const p of extraPalettes) {
+        map[p.id] = p;
+      }
+    }
+    return map;
+  }, [extraPalettes]);
+
+  const activeEngine = useMemo(() => {
+    if (extraPalettes?.length && themeEngine === defaultThemeEngine) {
+      return new CssVariableThemeEngine({ extraPalettes });
+    }
+    return themeEngine;
+  }, [extraPalettes, themeEngine]);
 
   const [preferences, setPreferences] = useState<ThemePreferences>(() => {
-    const stored = storageAdapter.loadPreferences();
+    const stored = storageAdapter.loadPreferences(initialUserScopeKey);
     const merged: ThemePreferences = {
       ...DEFAULT_THEME_PREFERENCES,
       ...initialPreferences,
@@ -74,26 +106,43 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     };
     const initialResolved: ResolvedThemeMode =
       merged.mode === 'system' ? getSystemColorScheme() : merged.mode;
-    themeEngine.applyTheme(merged, initialResolved);
+    activeEngine.applyTheme(merged, initialResolved);
     return merged;
   });
 
-  // Helper that updates state AND persists immediately to localStorage (survives instant F5)
   const updatePrefs = useCallback(
     (updater: (prev: ThemePreferences) => ThemePreferences) => {
       setPreferences((prev) => {
         const next = updater(prev);
         const nextResolved: ResolvedThemeMode =
           next.mode === 'system' ? systemMode : next.mode;
-        themeEngine.applyTheme(next, nextResolved);
-        storageAdapter.savePreferences(next);
+        activeEngine.applyTheme(next, nextResolved);
+        storageAdapter.savePreferences(next, userScopeKey);
         return next;
       });
     },
-    [storageAdapter, themeEngine, systemMode]
+    [storageAdapter, activeEngine, systemMode, userScopeKey]
   );
 
-  // Listen to OS dark/light mode changes
+  const setUserScopeKey = useCallback(
+    (scopeKey?: string) => {
+      setUserScopeKeyState(scopeKey);
+      const stored = storageAdapter.loadPreferences(scopeKey);
+      if (stored) {
+        const merged: ThemePreferences = {
+          ...DEFAULT_THEME_PREFERENCES,
+          ...initialPreferences,
+          ...stored,
+        };
+        setPreferences(merged);
+        const nextResolved: ResolvedThemeMode =
+          merged.mode === 'system' ? systemMode : merged.mode;
+        activeEngine.applyTheme(merged, nextResolved);
+      }
+    },
+    [storageAdapter, initialPreferences, systemMode, activeEngine]
+  );
+
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -107,11 +156,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   const resolvedMode: ResolvedThemeMode =
     preferences.mode === 'system' ? systemMode : preferences.mode;
 
-  // Apply tokens via injected ThemeEngine & persist via StorageAdapter
   useEffect(() => {
-    themeEngine.applyTheme(preferences, resolvedMode);
-    storageAdapter.savePreferences(preferences);
-  }, [preferences, resolvedMode, themeEngine, storageAdapter]);
+    activeEngine.applyTheme(preferences, resolvedMode);
+    storageAdapter.savePreferences(preferences, userScopeKey);
+  }, [preferences, resolvedMode, activeEngine, storageAdapter, userScopeKey]);
 
   const setMode = useCallback(
     (mode: ThemeMode) => {
@@ -136,6 +184,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         ...prev,
         seedPalette,
         customPrimaryHex: undefined,
+        tenantBrandHex: null,
       }));
     },
     [updatePrefs]
@@ -146,6 +195,16 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       updatePrefs((prev) => ({
         ...prev,
         customPrimaryHex,
+      }));
+    },
+    [updatePrefs]
+  );
+
+  const setTenantBrandHex = useCallback(
+    (tenantBrandHex: string | null) => {
+      updatePrefs((prev) => ({
+        ...prev,
+        tenantBrandHex,
       }));
     },
     [updatePrefs]
@@ -174,6 +233,21 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         customRadiusPx: clamped,
         radiusScale: inferredScale,
       }));
+    },
+    [updatePrefs]
+  );
+
+  const setBorderContrast = useCallback(
+    (borderContrast: BorderContrastPreset) => {
+      updatePrefs((prev) => ({ ...prev, borderContrast }));
+    },
+    [updatePrefs]
+  );
+
+  const setBorderWidthPx = useCallback(
+    (px: number) => {
+      const clamped = Math.max(0, Math.min(2.5, Number(px.toFixed(1))));
+      updatePrefs((prev) => ({ ...prev, borderWidthPx: clamped }));
     },
     [updatePrefs]
   );
@@ -256,6 +330,27 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     [updatePrefs]
   );
 
+  const setSidebarVariant = useCallback(
+    (sidebarVariant: SidebarLayoutVariant) => {
+      updatePrefs((prev) => ({ ...prev, sidebarVariant }));
+    },
+    [updatePrefs]
+  );
+
+  const setWorkspaceShell = useCallback(
+    (workspaceShell: WorkspaceShellPreset) => {
+      updatePrefs((prev) => applyWorkspaceShellPresetToPreferences(prev, workspaceShell));
+    },
+    [updatePrefs]
+  );
+
+  const setSidebarAccent = useCallback(
+    (sidebarAccent?: string) => {
+      updatePrefs((prev) => ({ ...prev, sidebarAccent }));
+    },
+    [updatePrefs]
+  );
+
   const setReducedMotion = useCallback(
     (reducedMotion: boolean) => {
       updatePrefs((prev) => ({ ...prev, reducedMotion }));
@@ -298,33 +393,43 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   );
 
   const resetPreferences = useCallback(() => {
-    storageAdapter.clearPreferences();
-    setPreferences(DEFAULT_THEME_PREFERENCES);
+    storageAdapter.clearPreferences(userScopeKey);
+    const nextPrefs: ThemePreferences = {
+      ...DEFAULT_THEME_PREFERENCES,
+      ...initialPreferences,
+    };
+    setPreferences(nextPrefs);
     const nextResolved: ResolvedThemeMode =
-      DEFAULT_THEME_PREFERENCES.mode === 'system'
-        ? systemMode
-        : DEFAULT_THEME_PREFERENCES.mode;
-    themeEngine.applyTheme(DEFAULT_THEME_PREFERENCES, nextResolved);
-    storageAdapter.savePreferences(DEFAULT_THEME_PREFERENCES);
-  }, [storageAdapter, systemMode, themeEngine]);
+      nextPrefs.mode === 'system' ? systemMode : nextPrefs.mode;
+    themeEngine.applyTheme(nextPrefs, nextResolved);
+    storageAdapter.savePreferences(nextPrefs, userScopeKey);
+  }, [storageAdapter, userScopeKey, initialPreferences, systemMode, themeEngine]);
 
-  const availablePalettes = useMemo(() => Object.values(SEED_PALETTES), []);
+  const availablePalettes = useMemo(() => {
+    const extras = extraPalettes ?? [];
+    const extraIds = new Set(extras.map((p) => p.id));
+    const builtins = Object.values(SEED_PALETTES).filter((p) => !extraIds.has(p.id));
+    return [...extras, ...builtins];
+  }, [extraPalettes]);
+
   const availableFontPresets = useMemo(
     () => Object.values(FONT_FAMILY_PRESETS),
     []
   );
+
   const activePalette = useMemo(() => {
     const basePalette =
-      SEED_PALETTES[preferences.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
-    if (!preferences.customPrimaryHex) {
+      availablePalettes.find((p) => p.id === preferences.seedPalette) ??
+      SEED_PALETTES['cupertino-blue'];
+    if (!preferences.customPrimaryHex && !preferences.tenantBrandHex) {
       return basePalette;
     }
     return {
       ...basePalette,
-      light: resolveEffectiveModeTokens(preferences, 'light'),
-      dark: resolveEffectiveModeTokens(preferences, 'dark'),
+      light: resolveEffectiveModeTokens(preferences, 'light', extraPalettes),
+      dark: resolveEffectiveModeTokens(preferences, 'dark', extraPalettes),
     };
-  }, [preferences]);
+  }, [availablePalettes, extraPalettes, preferences]);
 
   const value = useMemo<ThemeContextContract>(
     () => ({
@@ -333,12 +438,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       activePalette,
       availablePalettes,
       availableFontPresets,
+      userScopeKey,
+      setUserScopeKey,
       setMode,
       toggleMode,
       setSeedPalette,
       setCustomPrimaryHex,
+      setTenantBrandHex,
       setRadiusScale,
       setCustomRadiusPx,
+      setBorderContrast,
+      setBorderWidthPx,
       setDensity,
       setFontScale,
       setFontFamilyPreset,
@@ -348,6 +458,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       setGlassIntensity,
       setSidebarWidth,
       setSidebarStackedWidth,
+      setSidebarVariant,
+      setWorkspaceShell,
+      setSidebarAccent,
       setReducedMotion,
       setWebglEnabled,
       setWebglPreset,
@@ -361,12 +474,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       activePalette,
       availablePalettes,
       availableFontPresets,
+      userScopeKey,
+      setUserScopeKey,
       setMode,
       toggleMode,
       setSeedPalette,
       setCustomPrimaryHex,
+      setTenantBrandHex,
       setRadiusScale,
       setCustomRadiusPx,
+      setBorderContrast,
+      setBorderWidthPx,
       setDensity,
       setFontScale,
       setFontFamilyPreset,
@@ -376,6 +494,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       setGlassIntensity,
       setSidebarWidth,
       setSidebarStackedWidth,
+      setSidebarVariant,
+      setWorkspaceShell,
+      setSidebarAccent,
       setReducedMotion,
       setWebglEnabled,
       setWebglPreset,

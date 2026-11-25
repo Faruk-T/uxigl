@@ -1,9 +1,9 @@
-import type { IThemeStorageAdapter, ThemePreferences } from '../contracts/ThemeContract';
+﻿import type { IThemeStorageAdapter, ThemePreferences } from '../contracts/ThemeContract';
 import { DEFAULT_THEME_PREFERENCES } from '../tokens/designTokens';
 
 /**
  * ============================================================================
- * uxiGL DESIGN SYSTEM — PERSISTENT STORAGE ADAPTER SERVICE (DIP & SRP)
+ * uxiGL DESIGN SYSTEM â€” PERSISTENT STORAGE ADAPTER SERVICE (DIP & SRP)
  * ============================================================================
  * [SRP] Responsible for reliably persisting and restoring user theme & layout
  * preferences across browser refreshes (F5).
@@ -27,16 +27,22 @@ export interface PersistedNavState {
 }
 
 export class LocalStorageThemeAdapter implements IThemeStorageAdapter {
-  public loadPreferences(): ThemePreferences | null {
+  private resolveStorageKey(userScopeKey?: string): string {
+    const cleaned = userScopeKey?.trim();
+    return cleaned ? `${STORAGE_KEY}.${cleaned}` : STORAGE_KEY;
+  }
+
+  public loadPreferences(userScopeKey?: string): ThemePreferences | null {
     try {
       if (typeof window === 'undefined' || !window.localStorage) {
         return null;
       }
 
-      let raw = window.localStorage.getItem(STORAGE_KEY);
+      const key = this.resolveStorageKey(userScopeKey);
+      let raw = window.localStorage.getItem(key);
 
       // Migrate from any previous version key if primary key is not yet populated
-      if (!raw) {
+      if (!raw && !userScopeKey) {
         for (const legacyKey of LEGACY_KEYS) {
           const legacyRaw = window.localStorage.getItem(legacyKey);
           if (legacyRaw) {
@@ -58,25 +64,28 @@ export class LocalStorageThemeAdapter implements IThemeStorageAdapter {
     }
   }
 
-  public savePreferences(prefs: ThemePreferences): void {
+  public savePreferences(prefs: ThemePreferences, userScopeKey?: string): void {
     try {
       if (typeof window === 'undefined' || !window.localStorage) {
         return;
       }
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+      window.localStorage.setItem(this.resolveStorageKey(userScopeKey), JSON.stringify(prefs));
     } catch {
       // Fail gracefully in private browsing / quota exceeded
     }
   }
 
-  public clearPreferences(): void {
+  public clearPreferences(userScopeKey?: string): void {
     try {
       if (typeof window === 'undefined' || !window.localStorage) {
         return;
       }
-      window.localStorage.removeItem(STORAGE_KEY);
-      for (const legacyKey of LEGACY_KEYS) {
-        window.localStorage.removeItem(legacyKey);
+      const key = this.resolveStorageKey(userScopeKey);
+      window.localStorage.removeItem(key);
+      if (!userScopeKey) {
+        for (const legacyKey of LEGACY_KEYS) {
+          window.localStorage.removeItem(legacyKey);
+        }
       }
     } catch {
       // Ignore

@@ -1,7 +1,10 @@
 import { ThemeEngine as SheetGLThemeEngine, type IGridThemeTokens } from 'sheetgl';
 import type {
+  BorderContrastPreset,
+  BrandTokenResolver,
   IThemeEngine,
   ResolvedThemeMode,
+  SeedPaletteDefinition,
   SeedPaletteModeTokens,
   ThemePreferences,
 } from '../contracts/ThemeContract';
@@ -122,8 +125,10 @@ export function getLogoFilterByTheme(targetHex: string, baseHue = 203): string {
 export function resolveEffectiveModeTokens(
   prefs: ThemePreferences,
   resolvedMode: ResolvedThemeMode,
+  extraPalettes?: SeedPaletteDefinition[],
 ): SeedPaletteModeTokens {
-  const palette = SEED_PALETTES[prefs.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
+  const customPalette = extraPalettes?.find((p) => p.id === prefs.seedPalette);
+  const palette = customPalette ?? SEED_PALETTES[prefs.seedPalette] ?? SEED_PALETTES['cupertino-blue'];
   const baseTokens: SeedPaletteModeTokens =
     resolvedMode === 'dark' ? palette.dark : palette.light;
 
@@ -347,18 +352,101 @@ export function buildInheritedSheetGLTheme(
   };
 }
 
+function resolveBorderTokens(
+  modeTokens: SeedPaletteModeTokens,
+  resolvedMode: ResolvedThemeMode,
+  contrast: BorderContrastPreset,
+  customWidthPx?: number,
+): { borderSubtle: string; borderStrong: string; widthPx: number } {
+  const isDark = resolvedMode === 'dark';
+  const defaultWidth =
+    contrast === 'none' ? 0 : contrast === 'strong' ? 1.25 : contrast === 'crisp' ? 1.5 : 1;
+  const widthPx =
+    typeof customWidthPx === 'number'
+      ? Math.max(0, Math.min(2.5, customWidthPx))
+      : defaultWidth;
+
+  if (contrast === 'none') {
+    return { borderSubtle: 'transparent', borderStrong: 'transparent', widthPx: 0 };
+  }
+  if (contrast === 'subtle') {
+    return {
+      borderSubtle: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.06)',
+      borderStrong: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.12)',
+      widthPx,
+    };
+  }
+  if (contrast === 'strong') {
+    return {
+      borderSubtle: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(15,23,42,0.18)',
+      borderStrong: isDark ? 'rgba(255,255,255,0.32)' : 'rgba(15,23,42,0.30)',
+      widthPx,
+    };
+  }
+  if (contrast === 'crisp') {
+    return {
+      borderSubtle: isDark ? 'rgba(255,255,255,0.28)' : 'rgba(15,23,42,0.28)',
+      borderStrong: isDark ? 'rgba(255,255,255,0.46)' : 'rgba(15,23,42,0.44)',
+      widthPx,
+    };
+  }
+  return {
+    borderSubtle: modeTokens.borderSubtle,
+    borderStrong: modeTokens.borderStrong,
+    widthPx,
+  };
+}
+
+export interface CssVariableThemeEngineOptions {
+  brandResolver?: BrandTokenResolver;
+  extraPalettes?: SeedPaletteDefinition[];
+  /** Optional host callback invoked after `--uxu-*` variables are applied */
+  onApplyTokens?: (
+    root: HTMLElement,
+    modeTokens: SeedPaletteModeTokens,
+    resolvedMode: ResolvedThemeMode,
+    prefs: ThemePreferences,
+    borderTokens: { borderSubtle: string; borderStrong: string; widthPx: number },
+  ) => void;
+}
+
 export class CssVariableThemeEngine implements IThemeEngine {
+  private readonly brandResolver?: BrandTokenResolver;
+  private extraPalettes?: SeedPaletteDefinition[];
+
+  public setExtraPalettes(palettes: SeedPaletteDefinition[]): void {
+    this.extraPalettes = palettes;
+  }
+  private readonly onApplyTokens?: CssVariableThemeEngineOptions['onApplyTokens'];
+
+  constructor(optionsOrResolver?: BrandTokenResolver | CssVariableThemeEngineOptions) {
+    if (typeof optionsOrResolver === 'function') {
+      this.brandResolver = optionsOrResolver;
+    } else if (optionsOrResolver) {
+      this.brandResolver = optionsOrResolver.brandResolver;
+      this.extraPalettes = optionsOrResolver.extraPalettes;
+      this.onApplyTokens = optionsOrResolver.onApplyTokens;
+    }
+  }
+
   public applyTheme(prefs: ThemePreferences, resolvedMode: ResolvedThemeMode): void {
     if (typeof document === 'undefined') return;
 
     const root = document.documentElement;
-    const modeTokens = resolveEffectiveModeTokens(prefs, resolvedMode);
+    const modeTokens = resolveEffectiveModeTokens(prefs, resolvedMode, this.extraPalettes);
+    const borderTokens = resolveBorderTokens(
+      modeTokens,
+      resolvedMode,
+      prefs.borderContrast ?? 'standard',
+      prefs.borderWidthPx,
+    );
     const radiusTokens = RADIUS_SCALE_TOKENS[prefs.radiusScale] ?? RADIUS_SCALE_TOKENS.squircle;
     const densityTokens = DENSITY_SCALE_TOKENS[prefs.density] ?? DENSITY_SCALE_TOKENS.comfortable;
 
     root.setAttribute('data-theme', resolvedMode);
     root.setAttribute('data-seed', prefs.seedPalette);
     root.setAttribute('data-density', prefs.density);
+    root.setAttribute('data-border-contrast', prefs.borderContrast ?? 'standard');
     root.setAttribute('data-reduced-motion', String(prefs.reducedMotion));
     root.setAttribute('data-webgl', String(Boolean(prefs.webglEnabled)));
     root.style.colorScheme = resolvedMode;
@@ -375,16 +463,30 @@ export class CssVariableThemeEngine implements IThemeEngine {
     // 2. Palette-Inherited Surface, Background, Border & Text Tokens
     root.style.setProperty('--uxu-bg-canvas', modeTokens.bgCanvas);
     root.style.setProperty('--uxu-bg-elevated', modeTokens.bgElevated);
+    root.style.setProperty('--uxu-bg-surface', modeTokens.surfaceTonal);
     root.style.setProperty('--uxu-surface-glass', modeTokens.surfaceGlass);
     root.style.setProperty('--uxu-surface-glass-hover', modeTokens.surfaceGlassHover);
     root.style.setProperty('--uxu-surface-tonal', modeTokens.surfaceTonal);
     root.style.setProperty('--uxu-surface-tonal-high', modeTokens.surfaceTonalHigh);
     root.style.setProperty('--uxu-surface-elevated', modeTokens.surfaceElevated);
-    root.style.setProperty('--uxu-border-subtle', modeTokens.borderSubtle);
-    root.style.setProperty('--uxu-border-strong', modeTokens.borderStrong);
+    root.style.setProperty('--uxu-border-subtle', borderTokens.borderSubtle);
+    root.style.setProperty('--uxu-border-strong', borderTokens.borderStrong);
+    root.style.setProperty('--uxu-border-width', `${borderTokens.widthPx}px`);
     root.style.setProperty('--uxu-text-primary', modeTokens.textPrimary);
     root.style.setProperty('--uxu-text-secondary', modeTokens.textSecondary);
     root.style.setProperty('--uxu-text-muted', modeTokens.textMuted);
+    root.style.setProperty('--uxu-text-tertiary', modeTokens.textMuted);
+
+    // 2b. Optional tenant/organization brand resolver overrides
+    if (prefs.tenantBrandHex && !prefs.customPrimaryHex && this.brandResolver) {
+      const overrides = this.brandResolver(prefs.tenantBrandHex, resolvedMode);
+      Object.entries(overrides).forEach(([name, value]) => {
+        root.style.setProperty(name, value);
+      });
+      root.setAttribute('data-tenant-brand', prefs.tenantBrandHex);
+    } else {
+      root.removeAttribute('data-tenant-brand');
+    }
 
     // Synchronize Apple HIG Material Layers with active palette surfaces
     root.style.setProperty('--uxu-mat-ultrathin-bg', hexToRgba(modeTokens.bgElevated, resolvedMode === 'dark' ? 0.42 : 0.55));
@@ -480,6 +582,11 @@ export class CssVariableThemeEngine implements IThemeEngine {
     const sidebarStackedWidth = Math.max(80, Math.min(180, prefs.sidebarStackedWidth ?? 88));
     root.style.setProperty('--uxu-sidebar-width', `${sidebarWidth}px`);
     root.style.setProperty('--uxu-sidebar-stacked-width', `${sidebarStackedWidth}px`);
+
+    // 10. Optional Host Token Sync Hook
+    if (this.onApplyTokens) {
+      this.onApplyTokens(root, modeTokens, resolvedMode, prefs, borderTokens);
+    }
   }
 }
 

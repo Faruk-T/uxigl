@@ -88,6 +88,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
       defaultPlacement,
       setDefaultPlacement,
       notify,
+      toast: notify,
       dismiss,
       clearAll,
     }),

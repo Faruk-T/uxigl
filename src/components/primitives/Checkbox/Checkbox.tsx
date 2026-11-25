@@ -18,6 +18,8 @@ export interface CheckboxProps
     TonalProps {
   indeterminate?: boolean;
   description?: React.ReactNode;
+  /** Visual presentation: classic `'box'` (default) or Apple HIG `'capsule'` toggle */
+  variant?: 'box' | 'capsule';
 }
 
 export const Checkbox: React.FC<CheckboxProps> = ({
@@ -33,11 +35,13 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   disabled = false,
   size = 'md',
   tone = 'primary',
+  variant = 'box',
 }) => {
   const generatedId = useId();
   const checkboxId = id ?? generatedId;
 
   const isActive = value || indeterminate;
+  const isChecked = Boolean(value) && !indeterminate;
 
   return (
     <label
@@ -47,23 +51,39 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       } ${className}`}
       style={style}
     >
-      <button
-        id={checkboxId}
-        type="button"
-        role="checkbox"
-        aria-checked={indeterminate ? 'mixed' : value}
-        disabled={disabled}
-        onClick={() => !disabled && onChange(!value)}
-        className={`uxu-checkbox-box uxu-checkbox-box--${size} uxu-checkbox-box--${tone} ${
-          isActive ? 'uxu-checkbox-box--checked' : ''
-        }`}
-      >
-        {indeterminate ? (
-          <Minus size={size === 'sm' ? 11 : 13} strokeWidth={3} />
-        ) : value ? (
-          <Check size={size === 'sm' ? 11 : 13} strokeWidth={3} />
-        ) : null}
-      </button>
+      {variant === 'capsule' ? (
+        <button
+          id={checkboxId}
+          type="button"
+          role="checkbox"
+          aria-checked={indeterminate ? 'mixed' : isChecked}
+          disabled={disabled}
+          onClick={() => !disabled && onChange(!value)}
+          className={`uxu-checkbox-capsule uxu-checkbox-capsule--${size} uxu-checkbox-capsule--${tone} ${
+            isChecked ? 'uxu-checkbox-capsule--checked' : ''
+          } ${indeterminate ? 'uxu-checkbox-capsule--indeterminate' : ''}`}
+        >
+          <span className="uxu-checkbox-capsule__thumb" aria-hidden="true" />
+        </button>
+      ) : (
+        <button
+          id={checkboxId}
+          type="button"
+          role="checkbox"
+          aria-checked={indeterminate ? 'mixed' : value}
+          disabled={disabled}
+          onClick={() => !disabled && onChange(!value)}
+          className={`uxu-checkbox-box uxu-checkbox-box--${size} uxu-checkbox-box--${tone} ${
+            isActive ? 'uxu-checkbox-box--checked' : ''
+          }`}
+        >
+          {indeterminate ? (
+            <Minus size={size === 'sm' ? 11 : 13} strokeWidth={3} />
+          ) : value ? (
+            <Check size={size === 'sm' ? 11 : 13} strokeWidth={3} />
+          ) : null}
+        </button>
+      )}
 
       {(label || description || helperText) && (
         <span className="uxu-checkbox-row__content">

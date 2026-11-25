@@ -1,12 +1,25 @@
 import type {
+  BorderContrastPreset,
   SeedPaletteDefinition,
-  SeedPaletteId,
   ThemePreferences,
   RadiusScale,
   UIDensity,
   FontFamilyPreset,
   FontFamilyPresetDefinition,
 } from '../contracts/ThemeContract';
+
+export const BORDER_CONTRAST_PRESETS: ReadonlyArray<{
+  id: BorderContrastPreset;
+  label: string;
+  desc: string;
+  defaultWidthPx: number;
+}> = [
+  { id: 'none', label: 'Çizgisiz', desc: 'Tamamen gölge & yüzey ayrımı', defaultWidthPx: 0 },
+  { id: 'subtle', label: 'Çok İnce', desc: 'Yumuşak minimal cam hatları', defaultWidthPx: 1 },
+  { id: 'standard', label: 'Standart', desc: 'Dengeli kurumsal kontrast', defaultWidthPx: 1 },
+  { id: 'strong', label: 'Belirgin', desc: 'Net kenarlık ve tablo çizgileri', defaultWidthPx: 1.25 },
+  { id: 'crisp', label: 'Keskin', desc: 'Yüksek kontrastlı çerçeveler', defaultWidthPx: 1.5 },
+];
 
 /**
  * ============================================================================
@@ -35,7 +48,7 @@ export const DEFAULT_THEME_PREFERENCES: ThemePreferences = {
   webglIntensity: 38,
 };
 
-export const SEED_PALETTES: Record<SeedPaletteId, SeedPaletteDefinition> = {
+export const SEED_PALETTES: Record<string, SeedPaletteDefinition> = {
   'cupertino-blue': {
     id: 'cupertino-blue',
     name: 'Sapphire Blue',
@@ -419,6 +432,28 @@ export const FONT_FAMILY_PRESETS: Record<
       "'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, Roboto, sans-serif",
     displayStack:
       "'Outfit', 'Plus Jakarta Sans', -apple-system, sans-serif",
+    monoStack: "'JetBrains Mono', 'Fira Code', monospace",
+  },
+  manrope: {
+    id: 'manrope',
+    name: 'Manrope (Modern Sans)',
+    badge: 'Sayısal Netlik',
+    description: 'Tablolar, finansal metrikler ve yoğun ekranlar için yüksek kontrastlı geometrik sans.',
+    sansStack:
+      "'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    displayStack:
+      "'Manrope', 'Plus Jakarta Sans', -apple-system, sans-serif",
+    monoStack: "'JetBrains Mono', 'Fira Code', monospace",
+  },
+  sora: {
+    id: 'sora',
+    name: 'Sora (Keskin Geometrik)',
+    badge: 'Modern SaaS',
+    description: 'Keskin ve dengeli harf oranlarıyla yüksek ekran netliği sunan modern UI yazı tipi.',
+    sansStack:
+      "'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    displayStack:
+      "'Sora', 'Plus Jakarta Sans', -apple-system, sans-serif",
     monoStack: "'JetBrains Mono', 'Fira Code', monospace",
   },
   'dm-sans': {

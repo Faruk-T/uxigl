@@ -1,4 +1,5 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react';
+﻿import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Check,
   ChevronDown,
@@ -8,55 +9,16 @@ import {
   AlertTriangle,
   AlertCircle,
 } from 'lucide-react';
-import type {
-  ComponentSize,
-  DisableableProps,
-  IdentifiableProps,
-  SemanticTone,
-  SizableProps,
-} from '../../../core/contracts/ComponentContracts';
-import type { InputSurfaceStyle, InputValidationState } from '../Input/Input';
+import type { ComponentSize } from '../../../core/contracts/ComponentContracts';
+import type { InputValidationState } from '../Input/Input';
+import {
+  foldTrSearch,
+  useSelectPortalPosition,
+  type SelectOptionItem,
+  type SelectProps,
+} from './selectHelpers';
 
-/**
- * ============================================================================
- * uxiGL PRIMITIVE — SEARCHABLE SELECT / COMBOBOX
- * ============================================================================
- * Enterprise dropdown selector with optional instant search, grouped options,
- * descriptions, semantic badges, keyboard navigation, and validation states.
- */
-
-export interface SelectOptionItem {
-  value: string;
-  label: string;
-  description?: string;
-  group?: string;
-  icon?: React.ReactNode;
-  badge?: string;
-  badgeTone?: SemanticTone;
-  disabled?: boolean;
-}
-
-export interface SelectProps
-  extends IdentifiableProps,
-    DisableableProps,
-    SizableProps {
-  label?: React.ReactNode;
-  value: string;
-  onChange: (nextValue: string) => void;
-  options: SelectOptionItem[];
-  placeholder?: string;
-  searchable?: boolean;
-  searchPlaceholder?: string;
-  clearable?: boolean;
-  surface?: InputSurfaceStyle;
-  validationState?: InputValidationState;
-  helperText?: React.ReactNode;
-  errorText?: React.ReactNode;
-  successText?: React.ReactNode;
-  warningText?: React.ReactNode;
-  leadingIcon?: React.ReactNode;
-  required?: boolean;
-}
+export type { SelectOptionItem, SelectProps };
 
 export const Select: React.FC<SelectProps> = ({
   id,
@@ -84,11 +46,21 @@ export const Select: React.FC<SelectProps> = ({
   const autoId = useId();
   const selectId = id ?? autoId;
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [highlightedIndex, setHighlightedIndex] = useState<number>(0);
+
+  const { popoverPos, optionsMaxHeight, updatePopoverPosition } = useSelectPortalPosition(
+    open,
+    setOpen,
+    searchable,
+    triggerRef,
+    popoverRef
+  );
 
   const selectedOption = useMemo(
     () => options.find((opt) => opt.value === value),
@@ -96,27 +68,33 @@ export const Select: React.FC<SelectProps> = ({
   );
 
   const filteredOptions = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return options;
-    return options.filter(
-      (opt) =>
-        opt.label.toLowerCase().includes(q) ||
-        (opt.description && opt.description.toLowerCase().includes(q)) ||
-        (opt.group && opt.group.toLowerCase().includes(q)) ||
-        opt.value.toLowerCase().includes(q)
-    );
+    const raw = query.trim();
+    if (!raw) return options;
+    const qTr = raw.toLocaleLowerCase('tr-TR');
+    const qEn = raw.toLowerCase();
+    const qFolded = foldTrSearch(raw);
+    return options.filter((opt) => {
+      const match = (str?: string) =>
+        Boolean(
+          str &&
+            (str.toLowerCase().includes(qEn) ||
+              str.toLocaleLowerCase('tr-TR').includes(qTr) ||
+              foldTrSearch(str).includes(qFolded))
+        );
+      return match(opt.label) || match(opt.description) || match(opt.group) || match(opt.value);
+    });
   }, [options, query]);
 
-  const resolvedValidation: InputValidationState = errorText
-    ? 'error'
-    : validationState;
+  const resolvedValidation: InputValidationState = errorText ? 'error' : validationState;
 
   useEffect(() => {
     if (!open) return;
     const handleOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
       if (
         containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
+        !containerRef.current.contains(target) &&
+        (!popoverRef.current || !popoverRef.current.contains(target))
       ) {
         setOpen(false);
         setQuery('');
@@ -127,12 +105,17 @@ export const Select: React.FC<SelectProps> = ({
   }, [open]);
 
   useEffect(() => {
-    if (open && searchable) {
-      window.setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 15);
-    }
+    if (!open || !searchable) return;
+    const timer = window.setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 15);
+    return () => window.clearTimeout(timer);
   }, [open, searchable]);
+
+  const openPopover = useCallback(() => {
+    updatePopoverPosition();
+    setOpen(true);
+  }, [updatePopoverPosition]);
 
   const handleSelect = (opt: SelectOptionItem) => {
     if (opt.disabled) return;
@@ -145,13 +128,14 @@ export const Select: React.FC<SelectProps> = ({
     if (disabled) return;
     if (!open && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown')) {
       e.preventDefault();
-      setOpen(true);
+      openPopover();
       return;
     }
     if (!open) return;
 
     if (e.key === 'Escape') {
       e.preventDefault();
+      e.stopPropagation();
       setOpen(false);
       setQuery('');
     } else if (e.key === 'ArrowDown') {
@@ -184,6 +168,107 @@ export const Select: React.FC<SelectProps> = ({
       : undefined) ??
     helperText;
 
+  const popoverNode = open ? (
+    <div
+      ref={popoverRef}
+      className="uxu-select-popover uxu-select-popover--portal"
+      role="listbox"
+      style={popoverPos}
+      onKeyDown={handleKeyDown}
+    >
+      {searchable && (
+        <div className="uxu-select-search">
+          <Search size={14} className="uxu-select-search__icon" />
+          <input
+            ref={searchInputRef}
+            type="text"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setHighlightedIndex(0);
+            }}
+            placeholder={searchPlaceholder}
+            className="uxu-select-search__input"
+          />
+          {query && (
+            <button
+              type="button"
+              className="uxu-select-search__clear"
+              onClick={() => setQuery('')}
+              aria-label="Aramayı temizle"
+            >
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      )}
+
+      <div className="uxu-select-options" style={{ maxHeight: optionsMaxHeight, overflowY: 'auto' }}>
+        {filteredOptions.length === 0 ? (
+          <div className="uxu-select-empty">Eşleşen sonuç bulunamadı.</div>
+        ) : (
+          filteredOptions.map((opt, idx) => {
+            const isSelected = opt.value === value;
+            const isHighlighted = idx === highlightedIndex;
+            const prevGroup = idx > 0 ? filteredOptions[idx - 1].group : undefined;
+            const showGroupHeader = opt.group && opt.group !== prevGroup;
+
+            return (
+              <React.Fragment key={opt.value}>
+                {showGroupHeader && (
+                  <div className="uxu-select-group-header">{opt.group}</div>
+                )}
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  disabled={opt.disabled}
+                  onMouseEnter={() => setHighlightedIndex(idx)}
+                  onClick={() => handleSelect(opt)}
+                  className={[
+                    'uxu-select-option',
+                    isSelected ? 'uxu-select-option--selected' : '',
+                    isHighlighted ? 'uxu-select-option--highlighted' : '',
+                    opt.disabled ? 'uxu-select-option--disabled' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  <div className="uxu-select-option__left">
+                    {opt.icon && (
+                      <span className="uxu-select-option__icon">{opt.icon}</span>
+                    )}
+                    <div className="uxu-select-option__texts">
+                      <span className="uxu-select-option__label">{opt.label}</span>
+                      {opt.description && (
+                        <span className="uxu-select-option__desc">{opt.description}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="uxu-select-option__right">
+                    {opt.badge && (
+                      <span
+                        className={`uxu-select-option__badge uxu-select-option__badge--${
+                          opt.badgeTone ?? 'primary'
+                        }`}
+                      >
+                        {opt.badge}
+                      </span>
+                    )}
+                    {isSelected && (
+                      <Check size={15} className="uxu-select-option__check" />
+                    )}
+                  </div>
+                </button>
+              </React.Fragment>
+            );
+          })
+        )}
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div
       ref={containerRef}
@@ -202,15 +287,22 @@ export const Select: React.FC<SelectProps> = ({
         </div>
       )}
 
-      <div className="uxu-select-anchor">
+      <div className="uxu-select-anchor uxu-select-container" style={{ position: 'relative', width: '100%' }}>
         <button
+          ref={triggerRef}
           id={selectId}
           type="button"
           disabled={disabled}
           aria-haspopup="listbox"
           aria-expanded={open}
           onClick={() => {
-            if (!disabled) setOpen((prev) => !prev);
+            if (disabled) return;
+            if (open) {
+              setOpen(false);
+              setQuery('');
+            } else {
+              openPopover();
+            }
           }}
           className={[
             'uxu-input-box',
@@ -274,115 +366,9 @@ export const Select: React.FC<SelectProps> = ({
           </span>
         </button>
 
-        {open && (
-          <div className="uxu-select-popover" role="listbox">
-            {searchable && (
-              <div className="uxu-select-search">
-                <Search size={14} className="uxu-select-search__icon" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setHighlightedIndex(0);
-                  }}
-                  placeholder={searchPlaceholder}
-                  className="uxu-select-search__input"
-                />
-                {query && (
-                  <button
-                    type="button"
-                    className="uxu-select-search__clear"
-                    onClick={() => setQuery('')}
-                    aria-label="Aramayı temizle"
-                  >
-                    <X size={12} />
-                  </button>
-                )}
-              </div>
-            )}
-
-            <div className="uxu-select-options">
-              {filteredOptions.length === 0 ? (
-                <div className="uxu-select-empty">
-                  Eşleşen sonuç bulunamadı.
-                </div>
-              ) : (
-                filteredOptions.map((opt, idx) => {
-                  const isSelected = opt.value === value;
-                  const isHighlighted = idx === highlightedIndex;
-                  const prevGroup =
-                    idx > 0 ? filteredOptions[idx - 1].group : undefined;
-                  const showGroupHeader =
-                    opt.group && opt.group !== prevGroup;
-
-                  return (
-                    <React.Fragment key={opt.value}>
-                      {showGroupHeader && (
-                        <div className="uxu-select-group-header">
-                          {opt.group}
-                        </div>
-                      )}
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        disabled={opt.disabled}
-                        onMouseEnter={() => setHighlightedIndex(idx)}
-                        onClick={() => handleSelect(opt)}
-                        className={[
-                          'uxu-select-option',
-                          isSelected ? 'uxu-select-option--selected' : '',
-                          isHighlighted ? 'uxu-select-option--highlighted' : '',
-                          opt.disabled ? 'uxu-select-option--disabled' : '',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                      >
-                        <div className="uxu-select-option__left">
-                          {opt.icon && (
-                            <span className="uxu-select-option__icon">
-                              {opt.icon}
-                            </span>
-                          )}
-                          <div className="uxu-select-option__texts">
-                            <span className="uxu-select-option__label">
-                              {opt.label}
-                            </span>
-                            {opt.description && (
-                              <span className="uxu-select-option__desc">
-                                {opt.description}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="uxu-select-option__right">
-                          {opt.badge && (
-                            <span
-                              className={`uxu-select-option__badge uxu-select-option__badge--${
-                                opt.badgeTone ?? 'primary'
-                              }`}
-                            >
-                              {opt.badge}
-                            </span>
-                          )}
-                          {isSelected && (
-                            <Check
-                              size={15}
-                              className="uxu-select-option__check"
-                            />
-                          )}
-                        </div>
-                      </button>
-                    </React.Fragment>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        )}
+        {popoverNode && typeof document !== 'undefined'
+          ? createPortal(popoverNode, document.body)
+          : popoverNode}
       </div>
 
       {statusMessage && (
@@ -402,4 +388,3 @@ export const Select: React.FC<SelectProps> = ({
     </div>
   );
 };
-
