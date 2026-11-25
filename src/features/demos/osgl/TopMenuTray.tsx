@@ -159,15 +159,14 @@ export function TopMenuTray({
           >
             <div
               style={{
-                padding: '4px 8px 3px',
-                fontSize: 10.5,
+                padding: '5px 8px 3px',
+                fontSize: 11,
                 fontWeight: 700,
-                opacity: 0.58,
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
+                opacity: 0.65,
+                letterSpacing: '0.02em',
               }}
             >
-              {isTR ? 'Widget Ayarları' : 'Widget Settings'}
+              {isTR ? 'Masaüstü Widget Ayarları' : 'Desktop Widget Settings'}
             </div>
             {onToggleWidgets && (
               <ContextMenuItem

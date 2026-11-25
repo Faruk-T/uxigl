@@ -155,6 +155,7 @@ export function useWindowManager({
       FULLBLEED_APP_IDS.has(appId) ||
       appId === 'overview' ||
       appId === 'analytics' ||
+      appId === 'forms' ||
       appId === 'docs' ||
       appId.startsWith('page-');
     const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
@@ -165,8 +166,8 @@ export function useWindowManager({
         appId,
         x: savedBounds?.x ?? 240 + offset,
         y: savedBounds?.y ?? 20 + offset,
-        width: savedBounds?.width ?? (isLargeApp ? 720 : appId === 'os-theme-studio' ? 430 : 580),
-        height: savedBounds?.height ?? (isLargeApp ? 500 : appId === 'os-theme-studio' ? 540 : 440),
+        width: savedBounds?.width ?? (isLargeApp ? 740 : appId === 'os-theme-studio' ? 760 : 620),
+        height: savedBounds?.height ?? (isLargeApp ? 520 : appId === 'os-theme-studio' ? 560 : 460),
         zIndex: nextZ,
         minimized: false,
         maximized: appId === 'docs',

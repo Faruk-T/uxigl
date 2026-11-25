@@ -19,6 +19,8 @@ import { FloatingWindows } from './osgl/FloatingWindows';
 import { ContextMenu } from './osgl/ContextMenu';
 import { DesktopWidgets } from './osgl/DesktopWidgets';
 import { Dock } from './osgl/Dock';
+import { DesktopFolderPopoverModal } from '../osgl/DesktopFolderPopoverModal';
+import { DockCustomizerPopover } from '../osgl/DockCustomizerPopover';
 import { WIDGET_LABELS } from './osgl/widgets/renderWidgetCard';
 import { DEMO_WIDGET_CUSTOM_FIELDS } from './osgl/widgets/widgetCustomization';
 import { WidgetCustomizePopover } from './osgl/widgets/WidgetCustomizePopover';
@@ -47,6 +49,10 @@ export function OSGLDemo({
   const activeCustomWidgetLabel = customizingWidget
     ? WIDGET_LABELS.find((w) => w.id === customizingWidget.id) ?? null
     : null;
+  const activeOpenFolder = useMemo(
+    () => os.folders.find((f) => f.id === os.openFolderId) ?? null,
+    [os.folders, os.openFolderId]
+  );
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -64,7 +70,7 @@ export function OSGLDemo({
     const appActions: CommandActionItem[] = ENTERPRISE_APPS.map((app) => ({
       id: `os-app-${app.id}`,
       title: app.label,
-      subtitle: os.locale === 'tr' ? `${app.category} penceresini aç` : `Open ${app.category} window`,
+      subtitle: os.locale === 'tr' ? 'Uygulama penceresini aç' : 'Open application window',
       category: app.category,
       icon: <GoogleIcon name={app.googleIcon} size={18} />,
       onSelect: () => os.openApp(app.id),
@@ -136,7 +142,11 @@ export function OSGLDemo({
           height: 100% !important; width: 100% !important; flex: 1 1 auto !important;
           min-height: 0 !important; display: flex !important; flex-direction: column !important;
         }
-        .osgl-win-container { container-type: inline-size; }
+        .osgl-win-container { container-type: inline-size; container-name: osgl-win; }
+        @container osgl-win (max-width: 620px) {
+          .osgl-demo-studio-root { flex-direction: column !important; }
+          .osgl-demo-studio-aside { width: 100% !important; flex-direction: row !important; overflow-x: auto !important; border-right: none !important; border-bottom: 1px solid var(--uxu-border-subtle) !important; padding-bottom: 8px !important; }
+        }
         @keyframes macosglWinOpen {
           from { opacity: 0; filter: brightness(0.92); }
           to { opacity: 1; filter: brightness(1); }
@@ -267,6 +277,11 @@ export function OSGLDemo({
           setSelectedAppIds={os.setSelectedAppIds}
           windows={os.windows}
           onOpenApp={os.openApp}
+          folders={os.folders}
+          renamingFolderId={os.renamingFolderId}
+          onOpenFolder={(folderId) => os.setOpenFolderId(folderId)}
+          onCommitRenameFolder={os.renameFolder}
+          onDropAppsIntoFolder={os.moveAppsToFolder}
         >
           {os.widgetsVisible && (
             <DesktopWidgets
@@ -319,6 +334,11 @@ export function OSGLDemo({
               dockVisible={os.dockVisible}
               dockAppIds={os.dockAppIds}
               onOpenApp={os.openApp}
+              onCreateFolder={(ids) => {
+                os.createFolder({ initialAppIds: ids });
+                os.setSelectedAppIds([]);
+              }}
+              onOpenDockCustomizer={() => os.setDockCustomizerOpen(true)}
               onArrange={os.arrangeWindows}
               onSelectWallpaper={(wpId) => {
                 os.setCustomBgUrl('');
@@ -356,6 +376,7 @@ export function OSGLDemo({
                 const win = os.windows.find((w) => w.appId === appId);
                 if (win) os.closeWindow(win.id);
               }}
+              onOpenDockCustomizer={() => os.setDockCustomizerOpen(true)}
               onArrangeGrid={() => os.arrangeWindows('grid')}
               onResetWindows={() =>
                 os.setWindows([
@@ -377,6 +398,42 @@ export function OSGLDemo({
           )}
         </DesktopGrid>
       )}
+
+      <DesktopFolderPopoverModal
+        folder={activeOpenFolder}
+        allDesktopApps={ENTERPRISE_APPS}
+        isDark={os.isDark}
+        primaryColor={os.paletteTokens.primary}
+        iconBgStyle={os.iconBgStyle}
+        iconBgColor={os.iconBgColor}
+        iconGradColor1={os.iconGradColor1}
+        iconGradColor2={os.iconGradColor2}
+        iconColor={os.iconColor}
+        onClose={() => os.setOpenFolderId(null)}
+        onOpenApp={os.openApp}
+        onRenameFolder={os.renameFolder}
+        onRecolorFolder={os.recolorFolder}
+        onSetFolderApps={os.setFolderApps}
+        onRemoveAppFromFolder={os.removeAppFromFolder}
+        onDissolveFolder={os.dissolveFolder}
+      />
+
+      <DockCustomizerPopover
+        open={os.dockCustomizerOpen}
+        allDesktopApps={ENTERPRISE_APPS}
+        effectiveDockIds={os.dockAppIds}
+        isDark={os.isDark}
+        primaryColor={os.paletteTokens.primary}
+        iconBgStyle={os.iconBgStyle}
+        iconBgColor={os.iconBgColor}
+        iconGradColor1={os.iconGradColor1}
+        iconGradColor2={os.iconGradColor2}
+        iconColor={os.iconColor}
+        onTogglePinToDock={os.togglePinToDock}
+        onReorderDock={(fromId, toId) => os.reorderDockApps(fromId, toId, 'before')}
+        onResetDockToDefault={os.resetDockToDefault}
+        onClose={() => os.setDockCustomizerOpen(false)}
+      />
 
       {customizingWidget && activeCustomWidgetLabel && (
         <WidgetCustomizePopover
