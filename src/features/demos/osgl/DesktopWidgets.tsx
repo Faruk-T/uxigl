@@ -18,6 +18,11 @@ import {
   renderWidgetCard,
 } from './widgets/renderWidgetCard';
 import type { WidgetThemeStyle } from './widgets/widgetCards';
+import {
+  resolveCustomizedWidgetCardStyle,
+  type WidgetUserPrefs,
+} from './widgets/widgetCustomization';
+import { resolveWidgetOverlaps } from './widgets/widgetLayoutSolver';
 
 function snapToGrid(val: number): number {
   return Math.round(val / WIDGET_GRID_STEP) * WIDGET_GRID_STEP;
@@ -37,6 +42,8 @@ export function DesktopWidgets({
   onMoveWidget,
   widgetSizes,
   onResizeWidget,
+  widgetUserPrefs = {},
+  onOpenCustomize,
   viewportSize,
   onOpenApp,
 }: {
@@ -53,6 +60,8 @@ export function DesktopWidgets({
   onMoveWidget: (id: DesktopWidgetId, pos: WidgetPosition) => void;
   widgetSizes: Record<DesktopWidgetId, WidgetSize>;
   onResizeWidget: (id: DesktopWidgetId, size: WidgetSize) => void;
+  widgetUserPrefs?: Partial<Record<DesktopWidgetId, WidgetUserPrefs>>;
+  onOpenCustomize?: (id: DesktopWidgetId, anchorX: number, anchorY: number) => void;
   viewportSize: { w: number; h: number };
   onOpenApp: (id: string) => void;
 }) {
@@ -202,7 +211,33 @@ export function DesktopWidgets({
     setResizePreviewSize(null);
   };
 
-  const widgetIds = DESKTOP_WIDGET_ORDER;
+  const visibleItems = DESKTOP_WIDGET_ORDER.filter((id) => enabledWidgets[id]).map((id) => {
+    const isDragging = draggingId === id;
+    const isResizing = resizingId === id;
+    const defSize = DEFAULT_WIDGET_SIZES[id];
+    const rawSize = isResizing && resizePreviewSize ? resizePreviewSize : (widgetSizes[id] ?? defSize);
+    const pos =
+      isDragging && dragPreviewPos
+        ? dragPreviewPos
+        : clampPos(
+            widgetPositions[id]?.x ?? 20,
+            widgetPositions[id]?.y ?? 20,
+            rawSize.width,
+            rawSize.height
+          );
+    const size = clampSize(rawSize.width, rawSize.height, pos.x, pos.y);
+    return { id, isDragging, isResizing, defSize, rawSize, pos, size };
+  });
+
+  const resolvedPositions = resolveWidgetOverlaps(
+    visibleItems.map((item) => ({
+      id: item.id,
+      pos: item.pos,
+      size: item.size,
+      locked: item.isDragging || item.isResizing,
+    })),
+    viewportSize.h
+  );
 
   return (
     <div
@@ -278,28 +313,24 @@ export function DesktopWidgets({
         );
       })()}
 
-      {widgetIds.map((id) => {
-        if (!enabledWidgets[id]) return null;
-        const isDragging = draggingId === id;
-        const isResizing = resizingId === id;
-        const defSize = DEFAULT_WIDGET_SIZES[id];
-        const rawSize = isResizing && resizePreviewSize ? resizePreviewSize : (widgetSizes[id] ?? defSize);
-        const basePos =
-          isDragging && dragPreviewPos
-            ? dragPreviewPos
-            : clampPos(
-                widgetPositions[id]?.x ?? 20,
-                widgetPositions[id]?.y ?? 20,
-                rawSize.width,
-                rawSize.height
-              );
+      {visibleItems.map(({ id, isDragging, isResizing, defSize, rawSize }) => {
+        const basePos = resolvedPositions[id] ?? { x: 20, y: 20 };
         const size = clampSize(rawSize.width, rawSize.height, basePos.x, basePos.y);
         const scale = Math.max(
           0.85,
           Math.min(2.1, Math.min(size.width / defSize.width, size.height / defSize.height))
         );
+        const prefs = widgetUserPrefs[id];
+        const effectiveAccent = prefs?.accentHex || primaryColor;
         const widgetTheme: WidgetThemeStyle = {
           ...baseTheme,
+          primaryColor: effectiveAccent,
+          cardStyle: resolveCustomizedWidgetCardStyle({
+            baseCardStyle: baseTheme.cardStyle,
+            isDark,
+            effectiveAccent,
+            prefs,
+          }),
           width: size.width,
           height: size.height,
           scale,
@@ -310,7 +341,11 @@ export function DesktopWidgets({
             key={id}
             data-desktop-widget={id}
             onMouseDown={(e) => e.stopPropagation()}
-            onContextMenu={(e) => e.stopPropagation()}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onOpenCustomize?.(id, e.clientX, e.clientY);
+            }}
             onPointerDown={(e) => handlePointerDown(e, id)}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -353,6 +388,7 @@ export function DesktopWidgets({
               openWindowCount,
               glassBlur,
               onOpenApp,
+              prefs,
             })}
 
             {/* Bottom-right corner resize handle */}
