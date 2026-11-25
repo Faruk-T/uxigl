@@ -3,11 +3,13 @@ import { ChevronRight } from 'lucide-react';
 
 export function TrafficLights({
   maximized,
+  controlsSide = 'left',
   onClose,
   onMinimize,
   onMaximize,
 }: {
   maximized: boolean;
+  controlsSide?: 'left' | 'right';
   onClose: () => void;
   onMinimize: () => void;
   onMaximize: () => void;
@@ -35,7 +37,12 @@ export function TrafficLights({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onPointerDown={(e) => e.stopPropagation()}
-      style={{ display: 'flex', alignItems: 'center', gap: 7 }}
+      style={{
+        display: 'flex',
+        flexDirection: controlsSide === 'right' ? 'row-reverse' : 'row',
+        alignItems: 'center',
+        gap: 7,
+      }}
     >
       <button
         type="button"

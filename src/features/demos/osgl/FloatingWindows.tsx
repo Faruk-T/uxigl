@@ -1,7 +1,12 @@
 import React, { useRef } from 'react';
 import { Badge, GoogleIcon } from '../../../components/primitives';
 import { osWasmEngine } from '../OSGLEngine';
-import { ENTERPRISE_APPS, type FloatingWindowState, type QualityMode } from './types';
+import {
+  ENTERPRISE_APPS,
+  type FloatingWindowState,
+  type QualityMode,
+  type WindowControlsSide,
+} from './types';
 import { TrafficLights } from './WindowChrome';
 import { WindowContent } from './WindowContent';
 import { FULLBLEED_APP_IDS } from './useDesktopState';
@@ -12,6 +17,7 @@ export function FloatingWindows({
   closingWindowIds,
   highlightedWindowId,
   windowAnimation,
+  windowControlsSide = 'left',
   qualityMode,
   glassOpacity,
   glassBlur,
@@ -29,6 +35,7 @@ export function FloatingWindows({
   closingWindowIds: string[];
   highlightedWindowId: string | null;
   windowAnimation: boolean;
+  windowControlsSide?: WindowControlsSide;
   qualityMode: QualityMode;
   glassOpacity: number;
   glassBlur: number;
@@ -198,34 +205,38 @@ export function FloatingWindows({
               className={winAnimClass}
               ref={(el) => { windowRefs.current[win.id] = el; }}
               onMouseDown={() => onFocus(win.id)}
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                transform: win.maximized ? 'translate3d(14px, 12px, 0)' : `translate3d(${win.x}px, ${win.y}px, 0)`,
-                willChange: 'transform',
-                contain: 'layout style',
-                width: win.maximized ? 'calc(100% - 28px)' : win.width,
-                height: win.maximized ? 'calc(100% - 104px)' : win.height,
-                maxWidth: 'calc(100% - 24px)',
-                maxHeight: 'calc(100% - 104px)',
-                zIndex: win.zIndex,
-                borderRadius: customRadiusPx ? customRadiusPx + 6 : 18,
-                backgroundColor: `color-mix(in srgb, ${paletteTokens.bgElevated} ${Math.round(glassOpacity * 100)}%, transparent)`,
-                backdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
-                WebkitBackdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
-                border: isHighlighted
-                  ? `2px solid ${paletteTokens.primary}`
-                  : `1px solid ${paletteTokens.borderStrong}`,
-                boxShadow: isHighlighted
-                  ? `0 0 0 4px color-mix(in srgb, ${paletteTokens.primary} 32%, transparent), 0 28px 80px color-mix(in srgb, ${paletteTokens.primary} 45%, rgba(0,0,0,0.45))`
-                  : `0 28px 70px rgba(0, 0, 0, 0.34), inset 0 1px 0 ${paletteTokens.surfaceTonal}`,
-                transition: 'border-color 0.18s ease, box-shadow 0.22s ease',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
-                color: paletteTokens.textPrimary,
-              }}
+              style={
+                {
+                  '--osgl-win-w': `${win.width}px`,
+                  '--osgl-win-body-h': `${Math.max(180, win.height - 44)}px`,
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  transform: win.maximized ? 'translate3d(14px, 12px, 0)' : `translate3d(${win.x}px, ${win.y}px, 0)`,
+                  willChange: 'transform',
+                  contain: 'layout style',
+                  width: win.maximized ? 'calc(100% - 28px)' : win.width,
+                  height: win.maximized ? 'calc(100% - 104px)' : win.height,
+                  maxWidth: 'calc(100% - 24px)',
+                  maxHeight: 'calc(100% - 104px)',
+                  zIndex: win.zIndex,
+                  borderRadius: customRadiusPx ? customRadiusPx + 6 : 18,
+                  backgroundColor: `color-mix(in srgb, ${paletteTokens.bgElevated} ${Math.round(glassOpacity * 100)}%, transparent)`,
+                  backdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
+                  WebkitBackdropFilter: glassBlur > 0 ? `blur(${glassBlur}px) saturate(160%)` : undefined,
+                  border: isHighlighted
+                    ? `2px solid ${paletteTokens.primary}`
+                    : `1px solid ${paletteTokens.borderStrong}`,
+                  boxShadow: isHighlighted
+                    ? `0 0 0 4px color-mix(in srgb, ${paletteTokens.primary} 32%, transparent), 0 28px 80px color-mix(in srgb, ${paletteTokens.primary} 45%, rgba(0,0,0,0.45))`
+                    : `0 28px 70px rgba(0, 0, 0, 0.34), inset 0 1px 0 ${paletteTokens.surfaceTonal}`,
+                  transition: 'border-color 0.18s ease, box-shadow 0.22s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  overflow: 'hidden',
+                  color: paletteTokens.textPrimary,
+                } as React.CSSProperties
+              }
             >
               <div
                 onPointerDown={(e) => handlePointerDownTitle(e, win)}
@@ -236,6 +247,7 @@ export function FloatingWindows({
                   height: 44,
                   padding: '0 14px',
                   display: 'flex',
+                  flexDirection: windowControlsSide === 'right' ? 'row-reverse' : 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   backgroundColor: `color-mix(in srgb, ${paletteTokens.surfaceTonal} 42%, transparent)`,
@@ -245,14 +257,22 @@ export function FloatingWindows({
                   flexShrink: 0,
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: windowControlsSide === 'right' ? 'row-reverse' : 'row',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
                   <TrafficLights
                     maximized={win.maximized}
+                    controlsSide={windowControlsSide}
                     onClose={() => onClose(win.id)}
                     onMinimize={() => onMinimize(win.id)}
                     onMaximize={() => onMaximize(win.id)}
                   />
-                  <div style={{ marginLeft: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.85 }}>
+                  <div style={{ margin: '0 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.85 }}>
                     <GoogleIcon name={app.googleIcon} size={16} />
                   </div>
                   <span style={{ fontSize: 13.5, fontWeight: 800 }}>{app.label}</span>
@@ -261,7 +281,7 @@ export function FloatingWindows({
               </div>
 
               <div
-                className="macosgl-scroll"
+                className="macosgl-scroll osgl-win-container"
                 style={{
                   flex: 1,
                   minHeight: 0,
