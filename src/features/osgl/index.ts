@@ -1,4 +1,4 @@
-﻿export * from './osglEngine';
+export * from './osglEngine';
 export * from './types';
 export * from './widgetCustomization';
 export * from './desktopGridUtils';
