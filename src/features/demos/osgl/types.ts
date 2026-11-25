@@ -1,8 +1,11 @@
 import type { OSWallpaperId } from '../OSGLEngine';
+import type { WidgetUserPrefs } from './widgets/widgetCustomization';
 
 export type IconBgStyle = 'vivid' | 'gradient' | 'soft' | 'glass' | 'sun' | 'mono';
 export type BgMode = 'aurora' | 'gradient' | 'solid' | 'image';
 export type QualityMode = 'quality' | 'performance';
+export type WindowArrangeMode = 'cascade' | 'grid' | 'side-by-side' | 'quadrants';
+export type WindowControlsSide = 'left' | 'right';
 export type DesktopWidgetId =
   | 'clock'
   | 'kpi'
@@ -123,7 +126,9 @@ export interface PersistedOSGLState {
   enabledWidgets?: Record<DesktopWidgetId, boolean>;
   widgetPositions?: Partial<Record<DesktopWidgetId, WidgetPosition>>;
   widgetSizes?: Partial<Record<DesktopWidgetId, WidgetSize>>;
+  widgetUserPrefs?: Partial<Record<DesktopWidgetId, WidgetUserPrefs>>;
   windowAnimation?: boolean;
+  windowControlsSide?: WindowControlsSide;
   iconBgStyle?: IconBgStyle;
   iconBgColor?: string;
   iconGradColor1?: string;
