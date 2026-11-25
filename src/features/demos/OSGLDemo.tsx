@@ -5,7 +5,12 @@ import {
 } from '../../components/composites/CommandPalette/CommandPalette';
 import { GoogleIcon } from '../../components/primitives';
 import type { OSWallpaperId } from './OSGLEngine';
-import { ENTERPRISE_APPS, type IconBgStyle } from './osgl/types';
+import {
+  DEFAULT_WIDGET_SIZES,
+  ENTERPRISE_APPS,
+  type DesktopWidgetId,
+  type IconBgStyle,
+} from './osgl/types';
 import { useDesktopState } from './osgl/useDesktopState';
 import { TopMenuBar } from './osgl/TopMenuBar';
 import { MobileLauncher } from './osgl/MobileLauncher';
@@ -14,6 +19,9 @@ import { FloatingWindows } from './osgl/FloatingWindows';
 import { ContextMenu } from './osgl/ContextMenu';
 import { DesktopWidgets } from './osgl/DesktopWidgets';
 import { Dock } from './osgl/Dock';
+import { WIDGET_LABELS } from './osgl/widgets/renderWidgetCard';
+import { DEMO_WIDGET_CUSTOM_FIELDS } from './osgl/widgets/widgetCustomization';
+import { WidgetCustomizePopover } from './osgl/widgets/WidgetCustomizePopover';
 
 export type { IconBgStyle, OSWallpaperId };
 
@@ -31,6 +39,14 @@ export function OSGLDemo({
 }: OSGLDemoProps) {
   const os = useDesktopState(initialWallpaper);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
+  const [customizingWidget, setCustomizingWidget] = useState<{
+    id: DesktopWidgetId;
+    x: number;
+    y: number;
+  } | null>(null);
+  const activeCustomWidgetLabel = customizingWidget
+    ? WIDGET_LABELS.find((w) => w.id === customizingWidget.id) ?? null
+    : null;
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -120,6 +136,7 @@ export function OSGLDemo({
           height: 100% !important; width: 100% !important; flex: 1 1 auto !important;
           min-height: 0 !important; display: flex !important; flex-direction: column !important;
         }
+        .osgl-win-container { container-type: inline-size; }
         @keyframes macosglWinOpen {
           from { opacity: 0; filter: brightness(0.92); }
           to { opacity: 1; filter: brightness(1); }
@@ -175,6 +192,11 @@ export function OSGLDemo({
         onToggleWidgets={() => os.setWidgetsVisible((v) => !v)}
         enabledWidgets={os.enabledWidgets}
         onToggleWidgetItem={os.toggleWidgetItem}
+        onCustomizeWidget={(id, x, y) => {
+          if (!os.enabledWidgets[id]) os.toggleWidgetItem(id);
+          if (!os.widgetsVisible) os.setWidgetsVisible(true);
+          setCustomizingWidget({ id, x, y });
+        }}
         onResetWidgetPositions={os.resetWidgetPositions}
         onResetIcons={() => {
           const reset: Record<string, number> = {};
@@ -261,6 +283,8 @@ export function OSGLDemo({
               onMoveWidget={os.updateWidgetPosition}
               widgetSizes={os.widgetSizes}
               onResizeWidget={os.updateWidgetSize}
+              widgetUserPrefs={os.widgetUserPrefs}
+              onOpenCustomize={(id, x, y) => setCustomizingWidget({ id, x, y })}
               viewportSize={os.viewportSize}
               onOpenApp={os.openApp}
             />
@@ -272,6 +296,7 @@ export function OSGLDemo({
             closingWindowIds={os.closingWindowIds}
             highlightedWindowId={os.highlightedWindowId}
             windowAnimation={os.windowAnimation}
+            windowControlsSide={os.windowControlsSide}
             qualityMode={os.qualityMode}
             glassOpacity={os.glassOpacity}
             glassBlur={os.glassBlur}
@@ -351,6 +376,25 @@ export function OSGLDemo({
             />
           )}
         </DesktopGrid>
+      )}
+
+      {customizingWidget && activeCustomWidgetLabel && (
+        <WidgetCustomizePopover
+          target={{ x: customizingWidget.x, y: customizingWidget.y }}
+          title={os.locale === 'tr' ? activeCustomWidgetLabel.tr : activeCustomWidgetLabel.en}
+          defaultSize={DEFAULT_WIDGET_SIZES[customizingWidget.id]}
+          customFields={DEMO_WIDGET_CUSTOM_FIELDS[customizingWidget.id]}
+          currentSize={os.widgetSizes[customizingWidget.id] ?? DEFAULT_WIDGET_SIZES[customizingWidget.id]}
+          prefs={os.widgetUserPrefs[customizingWidget.id] ?? {}}
+          locale={os.locale}
+          isDark={os.isDark}
+          primaryColor={os.paletteTokens.primary}
+          onUpdatePrefs={(patch) => os.updateWidgetUserPrefs(customizingWidget.id, patch)}
+          onResize={(sz) => os.updateWidgetSize(customizingWidget.id, sz)}
+          onHideWidget={() => os.toggleWidgetItem(customizingWidget.id)}
+          onResetWidget={() => os.resetSingleWidgetPrefs(customizingWidget.id)}
+          onClose={() => setCustomizingWidget(null)}
+        />
       )}
 
       <CommandPalette
