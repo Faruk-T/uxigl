@@ -10,7 +10,7 @@ import type {
   ThemePreferences,
 } from '../../../core/contracts/ThemeContract';
 import type { OSWallpaperId } from '../OSGLEngine';
-import type { BgMode, IconBgStyle, QualityMode } from './types';
+import type { BgMode, IconBgStyle, QualityMode, WindowControlsSide } from './types';
 import { BackgroundSettingsSection } from './BackgroundSettingsSection';
 import { IconSettingsSection } from './IconSettingsSection';
 
@@ -35,6 +35,8 @@ export interface ThemeStudioPanelProps {
   setDockVisible: (v: boolean) => void;
   windowAnimation: boolean;
   setWindowAnimation: (v: boolean) => void;
+  windowControlsSide?: WindowControlsSide;
+  setWindowControlsSide?: (side: WindowControlsSide) => void;
   iconBgStyle: IconBgStyle;
   setIconBgStyle: (s: IconBgStyle) => void;
   iconBgColor: string;
@@ -336,6 +338,27 @@ export function ThemeStudioPanel(props: ThemeStudioPanelProps) {
                 <span style={{ fontSize: 12.5, fontWeight: 700 }}>Açılma / Kapanma Efekti</span>
                 <Switch value={windowAnimation} onChange={setWindowAnimation} />
               </div>
+              {props.setWindowControlsSide && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                  <span style={{ fontSize: 12.5, fontWeight: 700 }}>Pencere Düğmeleri Yönü</span>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <Button
+                      size="xs"
+                      variant={(props.windowControlsSide ?? 'left') === 'left' ? 'filled' : 'outlined'}
+                      onClick={() => props.setWindowControlsSide?.('left')}
+                    >
+                      Sol
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant={props.windowControlsSide === 'right' ? 'filled' : 'outlined'}
+                      onClick={() => props.setWindowControlsSide?.('right')}
+                    >
+                      Sağ
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>

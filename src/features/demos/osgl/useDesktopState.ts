@@ -20,7 +20,9 @@ import {
   type QualityMode,
   type WidgetPosition,
   type WidgetSize,
+  type WindowControlsSide,
 } from './types';
+import type { WidgetUserPrefs } from './widgets/widgetCustomization';
 import { FULLBLEED_APP_IDS, useWindowManager } from './useWindowManager';
 import { computeDesktopAppearance, useOSGLPersistence } from './useDesktopPersistence';
 
@@ -143,12 +145,33 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
   const updateWidgetSize = (id: DesktopWidgetId, size: WidgetSize) => {
     setWidgetSizes((prev) => ({ ...prev, [id]: size }));
   };
+  const [widgetUserPrefs, setWidgetUserPrefs] = useState<
+    Partial<Record<DesktopWidgetId, WidgetUserPrefs>>
+  >(() => savedState?.widgetUserPrefs ?? {});
+  const updateWidgetUserPrefs = (id: DesktopWidgetId, patch: Partial<WidgetUserPrefs>) => {
+    setWidgetUserPrefs((prev) => ({
+      ...prev,
+      [id]: { ...(prev[id] ?? {}), ...patch },
+    }));
+  };
+  const resetSingleWidgetPrefs = (id: DesktopWidgetId) => {
+    setWidgetUserPrefs((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setWidgetSizes((prev) => ({ ...prev, [id]: DEFAULT_WIDGET_SIZES[id] }));
+  };
   const resetWidgetPositions = () => {
     setWidgetPositions(getDefaultWidgetPositions(viewportSize.w));
     setWidgetSizes(DEFAULT_WIDGET_SIZES);
+    setWidgetUserPrefs({});
   };
   const [windowAnimation, setWindowAnimation] = useState<boolean>(
     savedState?.windowAnimation ?? true
+  );
+  const [windowControlsSide, setWindowControlsSide] = useState<WindowControlsSide>(
+    savedState?.windowControlsSide ?? 'left'
   );
   const [iconBgStyle, setIconBgStyle] = useState<IconBgStyle>(
     savedState?.iconBgStyle ?? 'vivid'
@@ -240,7 +263,9 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     enabledWidgets,
     widgetPositions,
     widgetSizes,
+    widgetUserPrefs,
     windowAnimation,
+    windowControlsSide,
     iconBgStyle,
     iconBgColor,
     iconGradColor1,
@@ -300,6 +325,8 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     setDockVisible,
     windowAnimation,
     setWindowAnimation,
+    windowControlsSide,
+    setWindowControlsSide,
     iconBgStyle,
     setIconBgStyle,
     iconBgColor,
@@ -359,8 +386,13 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     updateWidgetPosition,
     widgetSizes,
     updateWidgetSize,
+    widgetUserPrefs,
+    updateWidgetUserPrefs,
+    resetSingleWidgetPrefs,
     resetWidgetPositions,
     windowAnimation,
+    windowControlsSide,
+    setWindowControlsSide,
     iconBgStyle,
     iconBgColor,
     iconGradColor1,
