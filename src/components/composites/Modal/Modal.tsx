@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   X,
@@ -26,6 +26,7 @@ import type {
  *   variants and semantic tones.
  */
 
+/** Visual and semantic dialog archetype variants for {@link Modal}. */
 export type ModalVariant =
   | 'default'
   | 'alert'
@@ -34,20 +35,55 @@ export type ModalVariant =
   | 'sheet'
   | 'glass';
 
+/**
+ * Props contract for {@link Modal}.
+ */
 export interface ModalProps extends IdentifiableProps {
+  /** Controls whether the modal dialog is mounted and open. */
   open: boolean;
+  /** Callback fired when the modal is dismissed via backdrop, `Escape`, or close button. */
   onClose: () => void;
+  /** Primary dialog heading linked to the dialog via `aria-labelledby`. */
   title?: React.ReactNode;
+  /** Optional secondary subtitle linked to the dialog via `aria-describedby`. */
   subtitle?: React.ReactNode;
+  /** Optional custom header icon overriding the variant default icon. */
   icon?: React.ReactNode;
+  /** Optional footer slot for primary/secondary action buttons. */
   footer?: React.ReactNode;
+  /** Dialog width scale (defaults to `'md'`). */
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  /** Visual and behavioral modal archetype (defaults to `'default'`). */
   variant?: ModalVariant;
+  /** Semantic color tone applied to the header icon and accents (defaults to `'primary'`). */
   tone?: SemanticTone | 'glass';
+  /** Renders macOS window traffic light controls in the top-left header. */
   showMacTrafficLights?: boolean;
+  /** Main dialog body content. */
   children: React.ReactNode;
 }
 
+/**
+ * Multi-variant enterprise `<Modal />` dialog supporting 6 archetypes (`default`,
+ * `alert`, `confirm`, `danger`, `sheet`, `glass`), WAI-ARIA `dialog` / `alertdialog`
+ * labelling (`aria-labelledby`, `aria-describedby`), body scroll lock, and `Escape` dismissal.
+ *
+ * @param props - {@link ModalProps} configuration options.
+ * @returns Rendered modal dialog overlay or `null` when closed.
+ *
+ * @example
+ * ```tsx
+ * <Modal
+ *   open={isOpen}
+ *   onClose={() => setIsOpen(false)}
+ *   variant="confirm"
+ *   title="Deploy Production Cluster?"
+ *   subtitle="This will roll out v2.8.7 across 5 regions."
+ * >
+ *   <p>Confirm deployment parameters before continuing.</p>
+ * </Modal>
+ * ```
+ */
 export const Modal: React.FC<ModalProps> = ({
   id,
   className = '',
@@ -64,8 +100,11 @@ export const Modal: React.FC<ModalProps> = ({
   showMacTrafficLights = false,
   children,
 }) => {
+  const titleId = useId();
+  const subtitleId = useId();
+
   useKeyboardShortcut('Escape', onClose, { enabled: open });
-  const mouseDownOnBackdropRef = useRef(false);
+  const mouseDownOnBackdropRef = useRef(true);
 
   useEffect(() => {
     if (!open) return;
@@ -103,24 +142,28 @@ export const Modal: React.FC<ModalProps> = ({
     <div
       className={`uxu-modal-backdrop ${
         variant === 'sheet' ? 'uxu-modal-backdrop--sheet' : ''
-      }`}
+      }`.trim()}
       style={{ zIndex: 9999 }}
       onMouseDown={(e) => {
         mouseDownOnBackdropRef.current = e.target === e.currentTarget;
       }}
       onClick={(e) => {
-        if (mouseDownOnBackdropRef.current && e.target === e.currentTarget) {
+        if (e.target === e.currentTarget && mouseDownOnBackdropRef.current !== false) {
           onClose();
         }
-        mouseDownOnBackdropRef.current = false;
+        mouseDownOnBackdropRef.current = true;
       }}
       role="presentation"
     >
       <div
         id={id}
-        role={variant === 'alert' || variant === 'danger' ? 'alertdialog' : 'dialog'}
+        role={
+          variant === 'alert' || variant === 'danger' ? 'alertdialog' : 'dialog'
+        }
         aria-modal="true"
-        className={`uxu-modal uxu-modal--${size} uxu-modal--variant-${variant} uxu-modal--tone-${resolvedTone} ${className}`}
+        aria-labelledby={title ? titleId : undefined}
+        aria-describedby={subtitle ? subtitleId : undefined}
+        className={`uxu-modal uxu-modal--${size} uxu-modal--variant-${variant} uxu-modal--tone-${resolvedTone} ${className}`.trim()}
         style={style}
         onMouseDown={() => {
           mouseDownOnBackdropRef.current = false;
@@ -147,8 +190,16 @@ export const Modal: React.FC<ModalProps> = ({
               </div>
             )}
             <div>
-              {title && <h2 className="uxu-modal__title">{title}</h2>}
-              {subtitle && <p className="uxu-modal__subtitle">{subtitle}</p>}
+              {title && (
+                <h2 id={titleId} className="uxu-modal__title">
+                  {title}
+                </h2>
+              )}
+              {subtitle && (
+                <p id={subtitleId} className="uxu-modal__subtitle">
+                  {subtitle}
+                </p>
+              )}
             </div>
           </div>
 
