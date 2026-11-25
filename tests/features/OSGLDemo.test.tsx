@@ -7,7 +7,7 @@ import { ThemeProvider } from '../../src/providers/ThemeProvider';
 import { ToastProvider } from '../../src/providers/ToastProvider';
 import { OSGLDemo } from '../../src/features/demos/OSGLDemo';
 
-describe('OSGLDemo Showcase (/demos/osgl) Parity & UX Polish', () => {
+describe('OSGLDemo Showcase (/demos/osgl) Parity, 8-Way Window Ops & Magnetic Margin', () => {
   beforeEach(() => {
     localStorage.clear();
     Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1440 });
@@ -20,7 +20,7 @@ describe('OSGLDemo Showcase (/demos/osgl) Parity & UX Polish', () => {
     document.body.style.overflow = '';
   });
 
-  it('opens inline per-widget settings popover from Widget Ayarları menu without Turkish WİDGET typo', () => {
+  it('opens inline per-widget settings popover and renders all 8 window resize handles + snap menu', () => {
     render(
       <ThemeProvider>
         <ToastProvider>
@@ -28,6 +28,16 @@ describe('OSGLDemo Showcase (/demos/osgl) Parity & UX Polish', () => {
         </ToastProvider>
       </ThemeProvider>
     );
+
+    // Default floating window has all 8 directional resize handles
+    const resizeHandles = Array.from(document.querySelectorAll('[data-osgl-resize]')).map((el) =>
+      el.getAttribute('data-osgl-resize')
+    );
+    expect(resizeHandles.sort()).toEqual(['e', 'n', 'ne', 'nw', 's', 'se', 'sw', 'w']);
+
+    // Top bar Window menu exposes active window corner/half snapping
+    fireEvent.click(screen.getByText('Pencere'));
+    expect(screen.getByText('Aktif Pencereyi Köşeye Yasla')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Widget Ayarları' }));
     expect(screen.getByText('Masaüstü Widget Ayarları')).toBeInTheDocument();

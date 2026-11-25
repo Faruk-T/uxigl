@@ -8,11 +8,19 @@ import {
   ToastProvider,
   OSWorkspaceShell,
   WorkspaceShellGallery,
+  WIDGET_MAGNETIC_MARGIN,
+  WINDOW_MAGNETIC_MARGIN,
+  RESIZE_HANDLE_SPECS,
   resolveWidgetOverlaps,
+  computeWidgetMagneticSnap,
+  computeWidgetResizeMagneticSnap,
+  computeWindowMagneticSnap,
+  computeSnapBounds,
   WORKSPACE_SHELL_CATALOG,
   type OSWorkspaceApp,
   type OSDesktopWidgetDefinition,
 } from '../../src';
+import { OSGLWorkspaceSection } from '../../src/features/docs/sections/OSGLWorkspaceSection';
 
 const SAMPLE_APPS: OSWorkspaceApp[] = [
   {
@@ -47,7 +55,7 @@ const SAMPLE_WIDGETS: OSDesktopWidgetDefinition[] = [
   },
 ];
 
-describe('Parametric OSWorkspaceShell, Widget Overlap Solver & WorkspaceShellGallery', () => {
+describe('Parametric OSWorkspaceShell, Magnetic Margins & OSGL Documentation', () => {
   beforeEach(() => {
     localStorage.clear();
   });
@@ -57,24 +65,87 @@ describe('Parametric OSWorkspaceShell, Widget Overlap Solver & WorkspaceShellGal
     localStorage.clear();
   });
 
-  it('resolves overlapping desktop widgets without mutating locked widget position', () => {
+  it('prevents flush/touching widgets and enforces 16px WIDGET_MAGNETIC_MARGIN + alignment guides', () => {
+    expect(WIDGET_MAGNETIC_MARGIN).toBe(16);
+
+    // Case 1: Overlapping or flush (2px gap: 460 -> 462) widgets must separate by at least 16px
     const resolved = resolveWidgetOverlaps(
       [
-        { id: 'w1', pos: { x: 960, y: 20 }, size: { width: 280, height: 180 }, locked: true },
-        { id: 'w2', pos: { x: 960, y: 40 }, size: { width: 280, height: 160 } },
-        { id: 'w3', pos: { x: 960, y: 60 }, size: { width: 280, height: 160 } },
+        { id: 'focus-timer', pos: { x: 1020, y: 280 }, size: { width: 360, height: 180 }, locked: true },
+        { id: 'daily-checklist', pos: { x: 1080, y: 462 }, size: { width: 300, height: 220 } },
       ],
       900
     );
 
-    expect(resolved.w1).toEqual({ x: 960, y: 20 });
-    expect(resolved.w2.y).toBeGreaterThanOrEqual(216);
-    expect(resolved.w3.y).toBeGreaterThanOrEqual(resolved.w2.y + 160);
+    expect(resolved['focus-timer']).toEqual({ x: 1020, y: 280 });
+    expect(resolved['daily-checklist'].y).toBe(280 + 180 + WIDGET_MAGNETIC_MARGIN); // 476px (never 462px flush!)
+
+    // Case 2: Dragging near neighbor bottom + right edge snaps to 16px margin and right-edge alignment
+    const snap = computeWidgetMagneticSnap({
+      rawX: 1085,
+      rawY: 468,
+      width: 300,
+      height: 200,
+      neighbors: [{ id: 'focus-timer', x: 1020, y: 280, width: 360, height: 180 }],
+      viewportW: 1440,
+      viewportH: 900,
+    });
+    expect(snap.x).toBe(1080); // right-aligned: 1020 + 360 - 300
+    expect(snap.y).toBe(476);  // 16px magnetic margin: 280 + 180 + 16
+    expect(snap.snappedX).toBe(true);
+    expect(snap.snappedY).toBe(true);
+    expect(snap.guides.length).toBeGreaterThanOrEqual(2);
+
+    // Case 3: Resizing downward stops cleanly 16px above the widget below
+    const resizeSnap = computeWidgetResizeMagneticSnap({
+      posX: 1020,
+      posY: 280,
+      rawW: 360,
+      rawH: 185,
+      neighbors: [{ id: 'daily-checklist', x: 1080, y: 476, width: 300, height: 220 }],
+      viewportW: 1440,
+      viewportH: 900,
+    });
+    expect(resizeSnap.height).toBe(180); // 476 - 16 - 280 = 180
+    expect(resizeSnap.snappedH).toBe(true);
   });
 
-  it('renders WorkspaceShellGallery with all 6 shell cards and emits selection changes', () => {
+  it('enforces 12px WINDOW_MAGNETIC_MARGIN on floating window drag and Dock-visible snap zones', () => {
+    expect(WINDOW_MAGNETIC_MARGIN).toBe(12);
+    expect(RESIZE_HANDLE_SPECS.map((s) => s.dir).sort()).toEqual([
+      'e', 'n', 'ne', 'nw', 's', 'se', 'sw', 'w',
+    ]);
+
+    // Floating window dragged 4px from sibling (x=40..640 -> rawX=644) snaps out to 652 (640 + 12px)
+    const winSnap = computeWindowMagneticSnap({
+      rawX: 644,
+      rawY: 48,
+      winW: 560,
+      winH: 440,
+      siblings: [{ x: 40, y: 44, width: 600, height: 440 }],
+      vw: 1440,
+      vh: 900,
+      dockVisible: true,
+    });
+    expect(winSnap.x).toBe(640 + WINDOW_MAGNETIC_MARGIN);
+    expect(winSnap.y).toBe(44);
+    expect(winSnap.guides.some((g) => g.kind === 'margin')).toBe(true);
+
+    // Dock-visible split snap bounds maintain 12px outer & inter-window magnetic margins
+    const leftDockSnap = computeSnapBounds('left-half', 1440, 900, true);
+    const rightDockSnap = computeSnapBounds('right-half', 1440, 900, true);
+    expect(leftDockSnap.x).toBe(12);
+    expect(rightDockSnap.x - (leftDockSnap.x + leftDockSnap.width)).toBe(12);
+
+    // Dock-hidden raw geometry preserves exact half-viewport compatibility
+    expect(computeSnapBounds('left-half', 1440, 900, false)).toEqual({
+      x: 0, y: 0, width: 720, height: 856,
+    });
+  });
+
+  it('renders WorkspaceShellGallery with all 6 shell cards and bilingual OSGLWorkspaceSection docs', () => {
     const onChange = vi.fn();
-    render(
+    const { unmount } = render(
       <ThemeProvider>
         <WorkspaceShellGallery value="osgl" onChange={onChange} defaultRoleShell="osgl" />
       </ThemeProvider>
@@ -87,6 +158,18 @@ describe('Parametric OSWorkspaceShell, Widget Overlap Solver & WorkspaceShellGal
 
     fireEvent.click(screen.getByTestId('uxigl-shell-card-flowgl'));
     expect(onChange).toHaveBeenCalledWith('flowgl');
+    unmount();
+
+    render(
+      <ThemeProvider>
+        <ToastProvider>
+          <OSGLWorkspaceSection isTR={true} />
+        </ToastProvider>
+      </ThemeProvider>
+    );
+    expect(
+      screen.getByText(/Manyetik Boşluk \(16px \/ 12px\) & Gelişmiş Pencere İşlemleri API/i)
+    ).toBeInTheDocument();
   });
 
   it('mounts OSWorkspaceShell from barrel export, opens app windows, and triggers inline Widgets menu customization popover', () => {
