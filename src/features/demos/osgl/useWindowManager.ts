@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { osWasmEngine } from '../OSGLEngine';
+import {
+  applySnapWindow,
+  applyToggleFullscreen,
+  applyToggleMaximize,
+} from '../../osgl/windowStateReducers';
+import type { SnapZone } from '../../osgl/windowGeometry';
 import type {
   FloatingWindowState,
   PersistedOSGLState,
@@ -26,7 +32,7 @@ export function clampWindowToViewport(
   vw: number,
   vh: number
 ): FloatingWindowState {
-  if (win.maximized) return win;
+  if (win.maximized || win.fullscreen) return win;
   const maxAvailW = Math.max(280, vw - DESKTOP_PADDING_X * 2);
   const maxAvailH = Math.max(220, vh - DESKTOP_TOP_BAR_H - DESKTOP_DOCK_RESERVE);
   const minW = Math.min(340, maxAvailW);
@@ -51,6 +57,7 @@ export function useWindowManager({
   setMobileOpenAppId,
   windowAnimation,
   qualityMode,
+  dockVisible = true,
   notify,
 }: {
   savedState: PersistedOSGLState | null;
@@ -58,6 +65,7 @@ export function useWindowManager({
   setMobileOpenAppId: (id: string | null) => void;
   windowAnimation: boolean;
   qualityMode: QualityMode;
+  dockVisible?: boolean;
   notify: (input: { title: string; description: string; tone: 'info' | 'success' | 'warning' | 'danger' }) => void;
 }) {
   const [windows, setWindows] = useState<FloatingWindowState[]>(() => {
@@ -78,7 +86,6 @@ export function useWindowManager({
     return initial.map((w) => clampWindowToViewport(w, window.innerWidth, window.innerHeight));
   });
 
-  // Automatically clamp/resize all floating windows when the browser viewport shrinks or resizes
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const handleViewportResize = () => {
@@ -98,6 +105,7 @@ export function useWindowManager({
     window.addEventListener('resize', handleViewportResize);
     return () => window.removeEventListener('resize', handleViewportResize);
   }, []);
+
   const [windowBoundsByApp, setWindowBoundsByApp] = useState<Record<string, WindowBounds>>(
     () => savedState?.windowBoundsByApp ?? {}
   );
@@ -111,7 +119,7 @@ export function useWindowManager({
       let changed = false;
       const next = { ...prev };
       windows.forEach((w) => {
-        if (w.maximized) return;
+        if (w.maximized || w.fullscreen) return;
         const cur = next[w.appId];
         if (!cur || cur.x !== w.x || cur.y !== w.y || cur.width !== w.width || cur.height !== w.height) {
           next[w.appId] = { x: w.x, y: w.y, width: w.width, height: w.height };
@@ -160,17 +168,32 @@ export function useWindowManager({
       appId.startsWith('page-');
     const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
     const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const defaultW =
+      appId === 'forms'
+        ? 780
+        : appId === 'os-theme-studio'
+          ? 760
+          : isLargeApp
+            ? 740
+            : 620;
+    const defaultH =
+      appId === 'forms' || appId === 'os-theme-studio'
+        ? 560
+        : isLargeApp
+          ? 520
+          : 460;
     const newWin = clampWindowToViewport(
       {
         id: `win-${appId}-${Date.now()}`,
         appId,
         x: savedBounds?.x ?? 240 + offset,
         y: savedBounds?.y ?? 20 + offset,
-        width: savedBounds?.width ?? (isLargeApp ? 740 : appId === 'os-theme-studio' ? 760 : 620),
-        height: savedBounds?.height ?? (isLargeApp ? 520 : appId === 'os-theme-studio' ? 560 : 460),
+        width: savedBounds?.width ?? defaultW,
+        height: savedBounds?.height ?? defaultH,
         zIndex: nextZ,
         minimized: false,
         maximized: appId === 'docs',
+        fullscreen: false,
       },
       vw,
       vh
@@ -196,38 +219,52 @@ export function useWindowManager({
     }
   };
 
-  // Close topmost active floating window when Escape is pressed (unless a modal dialog is open)
-  const latestStateRef = useRef({ windows, closingWindowIds, closeWindow });
-  latestStateRef.current = { windows, closingWindowIds, closeWindow };
+  const toggleMinimize = (winId: string) =>
+    setWindows((prev) =>
+      prev.map((w) => (w.id === winId ? { ...w, minimized: !w.minimized, fullscreen: false } : w))
+    );
+
+  const toggleMaximize = (winId: string) => {
+    const nextZ = topZ + 1;
+    setTopZ(nextZ);
+    setWindows((prev) => applyToggleMaximize(prev, winId, nextZ));
+  };
+
+  const toggleFullscreen = (winId: string) => {
+    const nextZ = topZ + 1;
+    setTopZ(nextZ);
+    setWindows((prev) => applyToggleFullscreen(prev, winId, nextZ));
+  };
+
+  const snapWindow = (winId: string, zone: Exclude<SnapZone, null>) => {
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const nextZ = topZ + 1;
+    setTopZ(nextZ);
+    setWindows((prev) => applySnapWindow(prev, winId, zone, nextZ, vw, vh, dockVisible));
+  };
+
+  const latestStateRef = useRef({ windows, closingWindowIds, closeWindow, toggleFullscreen });
+  latestStateRef.current = { windows, closingWindowIds, closeWindow, toggleFullscreen };
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || e.defaultPrevented) return;
       if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
-      const { windows: wins, closingWindowIds: closing, closeWindow: closeFn } =
+      const { windows: wins, closingWindowIds: closing, closeWindow: closeFn, toggleFullscreen: exitFullFn } =
         latestStateRef.current;
       const activeTop = wins
         .filter((w) => !w.minimized && !closing.includes(w.id))
         .sort((a, b) => b.zIndex - a.zIndex)[0];
       if (activeTop) {
         e.preventDefault();
-        closeFn(activeTop.id);
+        if (activeTop.fullscreen) exitFullFn(activeTop.id);
+        else closeFn(activeTop.id);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
-
-  const toggleMinimize = (winId: string) =>
-    setWindows((prev) => prev.map((w) => (w.id === winId ? { ...w, minimized: !w.minimized } : w)));
-
-  const toggleMaximize = (winId: string) => {
-    const nextZ = topZ + 1;
-    setTopZ(nextZ);
-    setWindows((prev) =>
-      prev.map((w) => (w.id === winId ? { ...w, maximized: !w.maximized, zIndex: nextZ } : w))
-    );
-  };
 
   const arrangeWindows = (mode: WindowArrangeMode) => {
     const visible = windows.filter((w) => !w.minimized);
@@ -244,7 +281,7 @@ export function useWindowManager({
       prev.map((w) => {
         if (w.minimized) return w;
         const rect = rects[visible.findIndex((v) => v.id === w.id)];
-        return rect ? { ...w, maximized: false, ...rect } : w;
+        return rect ? { ...w, maximized: false, fullscreen: false, restoreBounds: undefined, ...rect } : w;
       })
     );
     notify({
@@ -253,10 +290,10 @@ export function useWindowManager({
         mode === 'grid'
           ? 'Izgara (Grid) dizilimi uygulandı.'
           : mode === 'quadrants'
-          ? '4 Köşe Kadran dizilimi uygulandı.'
-          : mode === 'side-by-side'
-          ? 'Yan yana dizilim uygulandı.'
-          : 'Kademeli (Cascade) dizilim uygulandı.',
+            ? '4 Köşe Kadran dizilimi uygulandı.'
+            : mode === 'side-by-side'
+              ? 'Yan yana dizilim uygulandı.'
+              : 'Kademeli (Cascade) dizilim uygulandı.',
       tone: 'info',
     });
   };
@@ -273,6 +310,8 @@ export function useWindowManager({
     closeWindow,
     toggleMinimize,
     toggleMaximize,
+    toggleFullscreen,
+    snapWindow,
     arrangeWindows,
   };
 }

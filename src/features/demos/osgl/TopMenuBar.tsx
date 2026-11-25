@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { UXILogo } from '../../../components/brand/UXILogo';
 import uxiNoBgPng from '../../../assets/logo/uxi_no_bg.png';
 import type { ThemeStudioPanelProps } from './ThemeStudioPanel';
+import type { SnapZone } from '../../osgl/windowGeometry';
 import type { DesktopWidgetId, WindowArrangeMode } from './types';
 import { TopMenuDropdowns, type TopMenuKey } from './TopMenuDropdowns';
 import { TopMenuTray } from './TopMenuTray';
@@ -17,6 +18,8 @@ export function TopMenuBar({
   arrangeMenuOpen,
   setArrangeMenuOpen,
   arrangeWindows,
+  onSnapActiveWindow,
+  onFullscreenActive,
   closeAllWindows,
   dockVisible,
   onToggleDock,
@@ -44,6 +47,8 @@ export function TopMenuBar({
   arrangeMenuOpen: boolean;
   setArrangeMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   arrangeWindows: (mode: WindowArrangeMode) => void;
+  onSnapActiveWindow?: (zone: Exclude<SnapZone, null>) => void;
+  onFullscreenActive?: () => void;
   closeAllWindows: () => void;
   dockVisible: boolean;
   onToggleDock: () => void;
@@ -240,6 +245,8 @@ export function TopMenuBar({
                 : undefined
             }
             onToggleMode={() => sharedStudioProps.setMode(isDark ? 'light' : 'dark')}
+            onSnapActiveWindow={onSnapActiveWindow}
+            onFullscreenActive={onFullscreenActive}
             arrangeWindows={arrangeWindows}
             closeAllWindows={closeAllWindows}
             onResetIcons={onResetIcons}

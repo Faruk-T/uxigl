@@ -53,6 +53,10 @@ export function OSGLDemo({
     () => os.folders.find((f) => f.id === os.openFolderId) ?? null,
     [os.folders, os.openFolderId]
   );
+  const topActiveWindow = useMemo(() => {
+    const visible = os.windows.filter((w) => !w.minimized);
+    return visible.length === 0 ? null : visible.reduce((best, cur) => (cur.zIndex >= best.zIndex ? cur : best));
+  }, [os.windows]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -195,6 +199,8 @@ export function OSGLDemo({
         arrangeMenuOpen={os.arrangeMenuOpen}
         setArrangeMenuOpen={os.setArrangeMenuOpen}
         arrangeWindows={os.arrangeWindows}
+        onSnapActiveWindow={topActiveWindow ? (zone) => os.snapWindow(topActiveWindow.id, zone) : undefined}
+        onFullscreenActive={topActiveWindow ? () => os.toggleFullscreen(topActiveWindow.id) : undefined}
         closeAllWindows={() => os.setWindows([])}
         dockVisible={os.dockVisible}
         onToggleDock={() => os.setDockVisible((v) => !v)}
@@ -317,10 +323,13 @@ export function OSGLDemo({
             glassBlur={os.glassBlur}
             customRadiusPx={os.preferences.customRadiusPx}
             paletteTokens={os.paletteTokens}
+            dockVisible={os.dockVisible}
             onFocus={os.focusWindow}
             onClose={os.closeWindow}
             onMinimize={os.toggleMinimize}
             onMaximize={os.toggleMaximize}
+            onFullscreen={os.toggleFullscreen}
+            onSnapWindow={os.snapWindow}
             renderWindowContent={renderWindowContent}
             sharedStudioProps={os.sharedStudioProps}
           />

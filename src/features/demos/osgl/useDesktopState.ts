@@ -310,6 +310,7 @@ export function useDesktopState(initialWallpaper: OSWallpaperId) {
     setMobileOpenAppId,
     windowAnimation,
     qualityMode,
+    dockVisible,
     notify,
   });
 

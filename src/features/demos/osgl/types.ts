@@ -102,6 +102,8 @@ export interface FloatingWindowState {
   zIndex: number;
   minimized: boolean;
   maximized: boolean;
+  fullscreen?: boolean;
+  restoreBounds?: WindowBounds;
 }
 
 export const OSGL_STATE_KEY = 'uxu.macosgl.state.v1';

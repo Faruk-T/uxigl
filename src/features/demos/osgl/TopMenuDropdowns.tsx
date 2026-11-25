@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react';
 import { ContextMenuItem, ContextSubMenu } from './WindowChrome';
+import type { SnapZone } from '../../osgl/windowGeometry';
 import type { DesktopWidgetId, WindowArrangeMode, WindowControlsSide } from './types';
 
 export type TopMenuKey = 'apps' | 'components' | 'window' | 'view' | 'tools' | 'lang' | 'widgets' | null;
@@ -45,6 +46,8 @@ export function TopMenuDropdowns({
   windowControlsSide = 'left',
   onToggleWindowControlsSide,
   onToggleMode,
+  onSnapActiveWindow,
+  onFullscreenActive,
   arrangeWindows,
   closeAllWindows,
   onResetIcons,
@@ -72,6 +75,8 @@ export function TopMenuDropdowns({
   windowControlsSide?: WindowControlsSide;
   onToggleWindowControlsSide?: () => void;
   onToggleMode: () => void;
+  onSnapActiveWindow?: (zone: Exclude<SnapZone, null>) => void;
+  onFullscreenActive?: () => void;
   arrangeWindows: (mode: WindowArrangeMode) => void;
   closeAllWindows: () => void;
   onResetIcons: () => void;
@@ -231,6 +236,23 @@ export function TopMenuDropdowns({
         </button>
         {activeMenu === 'window' && (
           <div data-menu-dropdown="window" onClick={(e) => e.stopPropagation()} style={dropdownStyle}>
+            {onFullscreenActive && (
+              <ContextMenuItem
+                icon={<Monitor size={14} />}
+                label={isTR ? 'Aktif Pencereyi Tam Ekran Yap' : 'Fullscreen Active Window'}
+                onClick={() => { onFullscreenActive(); closeAllMenus(); }}
+              />
+            )}
+            {onSnapActiveWindow && (
+              <ContextSubMenu icon={<Columns2 size={14} />} label={isTR ? 'Aktif Pencereyi Köşeye Yasla' : 'Snap Active Window'} isDark={isDark}>
+                <ContextMenuItem icon={<Columns2 size={14} />} label={isTR ? 'Sol Yarıya Yasla' : 'Snap Left Half'} onClick={() => { onSnapActiveWindow('left-half'); closeAllMenus(); }} />
+                <ContextMenuItem icon={<Columns2 size={14} />} label={isTR ? 'Sağ Yarıya Yasla' : 'Snap Right Half'} onClick={() => { onSnapActiveWindow('right-half'); closeAllMenus(); }} />
+                <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? 'Sol Üst Çeyrek (1/4)' : 'Top-Left Quadrant'} onClick={() => { onSnapActiveWindow('top-left'); closeAllMenus(); }} />
+                <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? 'Sağ Üst Çeyrek (1/4)' : 'Top-Right Quadrant'} onClick={() => { onSnapActiveWindow('top-right'); closeAllMenus(); }} />
+                <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? 'Sol Alt Çeyrek (1/4)' : 'Bottom-Left Quadrant'} onClick={() => { onSnapActiveWindow('bottom-left'); closeAllMenus(); }} />
+                <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? 'Sağ Alt Çeyrek (1/4)' : 'Bottom-Right Quadrant'} onClick={() => { onSnapActiveWindow('bottom-right'); closeAllMenus(); }} />
+              </ContextSubMenu>
+            )}
             <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? 'Izgara Dizilimi (Grid)' : 'Tile Grid'} onClick={() => { arrangeWindows('grid'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Grid2x2 size={14} />} label={isTR ? '4 Köşe Kadran (2×2)' : '4-Corner Quadrants'} onClick={() => { arrangeWindows('quadrants'); closeAllMenus(); }} />
             <ContextMenuItem icon={<Layers size={14} />} label={isTR ? 'Kademeli Dizilim (Cascade)' : 'Cascade'} onClick={() => { arrangeWindows('cascade'); closeAllMenus(); }} />
