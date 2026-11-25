@@ -116,8 +116,10 @@ describe('Modal', () => {
     await user.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalledTimes(2);
 
-    // Clicking backdrop invokes onClose
-    const backdrop = container.querySelector('.uxu-modal-backdrop');
+    // Clicking backdrop invokes onClose (Modal portals into document.body)
+    const backdrop =
+      container.querySelector('.uxu-modal-backdrop') ??
+      document.body.querySelector('.uxu-modal-backdrop');
     expect(backdrop).not.toBeNull();
     await user.click(backdrop!);
     expect(onClose).toHaveBeenCalledTimes(3);
